@@ -1,0 +1,7 @@
+loakin/vendor/
+loakin/.env
+loakin/storage/*.key
+loakin/public/storage
+
+loakin-web/node_modules/
+loakin-web/dist/
