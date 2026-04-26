@@ -20,11 +20,6 @@ class User extends Authenticatable
         'photo',
         'role',
         'status',
-        'city',
-        'latitude',
-        'longitude',
-        'search_radius',
-        'preferred_categories',
         'password',
         'birth_date',
         'gender',
@@ -38,9 +33,6 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at'    => 'datetime',
         'password'             => 'hashed',
-        'preferred_categories' => 'array',
-        'latitude'             => 'decimal:7',
-        'longitude'            => 'decimal:7',
     ];
 
     // Relasi ke user_locations

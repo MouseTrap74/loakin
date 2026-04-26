@@ -14,7 +14,7 @@ class AdminUserController extends Controller
         $query = User::query();
 
         // Filter berdasarkan status
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 

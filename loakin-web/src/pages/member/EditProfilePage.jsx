@@ -222,11 +222,16 @@ export default function EditProfilePage() {
         .pp-logout-btn { width: 100%; padding: 0.65rem; border: none; border-radius: 10px; background: #3BBFC9; color: #fff; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 800; cursor: pointer; transition: background 0.15s, transform 0.15s; box-shadow: 0 3px 10px rgba(59,191,201,0.28); }
         .pp-logout-btn:hover { background: #2aadb8; transform: translateY(-1px); }
 
-        .pp-info-col { flex: 1; padding: 2rem 2.2rem; overflow-y: auto; }
-        .pp-section-title { font-size: 1.05rem; font-weight: 900; color: #3BBFC9; margin-bottom: 0.9rem; margin-top: 0.2rem; letter-spacing: -0.2px; }
+        .pp-info-col {
+          flex: 1;
+          padding: 2rem 2.2rem;
+          overflow-y: auto;
+          align-items: flex-start;
+        }
+        .pp-section-title { font-size: 1.05rem; font-weight: 900; color: #3BBFC9; margin-bottom: 0.9rem; margin-top: 0.2rem; letter-spacing: -0.2px; text-align: left; }
         .pp-field-row { display: flex; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f5f7fa; gap: 0.5rem; }
-        .pp-field-label { width: 145px; flex-shrink: 0; font-size: 0.87rem; color: #8a9ab0; font-weight: 600; }
-        .pp-field-value { flex: 1; font-size: 0.9rem; color: #333; font-weight: 600; }
+        .pp-field-label { width: 145px; flex-shrink: 0; font-size: 0.87rem; color: #8a9ab0; font-weight: 600; text-align: left;}
+        .pp-field-value { flex: 1; font-size: 0.9rem; color: #333; font-weight: 600; text-align: left;}
         .pp-field-input { flex: 1; padding: 0.38rem 0.7rem; border: 1.5px solid #3BBFC9; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8feff; }
         .pp-ubah-btn { background: none; border: none; color: #3BBFC9; font-size: 0.85rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; padding: 0.2rem 0.4rem; border-radius: 6px; transition: background 0.15s; flex-shrink: 0; }
         .pp-ubah-btn:hover { background: #e8f9fb; }
@@ -235,16 +240,16 @@ export default function EditProfilePage() {
         .pp-save-btn:hover { background: #2aadb8; }
 
         /* address section */
-        .pp-addr-header { display: flex; align-items: center; gap: 0.6rem; margin-top: 1.4rem; margin-bottom: 0.9rem; flex-wrap: wrap; }
-        .pp-addr-title { font-size: 1.05rem; font-weight: 900; color: #3BBFC9; }
-        .pp-addr-hint { font-size: 0.74rem; color: #f59e42; font-weight: 700; }
+        .pp-addr-header { display: flex; align-items: center; gap: 0.6rem; margin-top: 1.4rem; margin-bottom: 0.9rem; flex-wrap: wrap; text-align: left}
+        .pp-addr-title { font-size: 1.05rem; font-weight: 900; color: #3BBFC9; text-align: left}
+        .pp-addr-hint { font-size: 0.74rem; color: #f59e42; font-weight: 700; text-align: left}
         .pp-addr-tabs { display: flex; gap: 0.5rem; margin-left: auto; flex-wrap: wrap; }
         .pp-addr-tab { padding: 0.3rem 0.9rem; border: 1.5px solid #dce3ea; border-radius: 50px; background: #fff; font-size: 0.82rem; font-family: 'Nunito', sans-serif; font-weight: 700; color: #6b7a8d; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
         .pp-addr-tab.active, .pp-addr-tab:hover { border-color: #3BBFC9; color: #3BBFC9; background: #f0fbfc; }
         .pp-addr-add { padding: 0.3rem 0.9rem; border: none; border-radius: 50px; background: #3BBFC9; color: #fff; font-size: 0.82rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; transition: background 0.15s; }
         .pp-addr-add:hover { background: #2aadb8; }
         .pp-addr-add:disabled { background: #ccc; cursor: default; }
-        .pp-addr-card { border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.2rem; margin-top: 0.5rem; }
+        .pp-addr-card { border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.2rem; margin-top: 0.5rem; text-align: left}
         .pp-addr-type { font-size: 0.8rem; color: #8a9ab0; font-weight: 700; margin-bottom: 0.3rem; }
         .pp-addr-name { font-size: 0.92rem; font-weight: 800; color: #222; margin-bottom: 0.15rem; }
         .pp-addr-street { font-size: 0.84rem; color: #555; margin-bottom: 0.1rem; }
@@ -345,8 +350,6 @@ export default function EditProfilePage() {
           {/* Sidebar nav */}
           <nav className="pp-side-nav">
             <a href="#" className="active">Profil</a>
-            <Link to="/profile/location">Lokasi</Link>
-            <Link to="/profile/preferences">Preferensi</Link>
           </nav>
 
           {/* Main card */}
@@ -385,6 +388,25 @@ export default function EditProfilePage() {
                   {loading ? 'Menyimpan...' : '💾 Simpan Foto'}
                 </button>
               )}
+
+              {/* Bio */}
+              {editing.bio
+                ? <textarea
+                    className="pp-field-input"
+                    rows={3}
+                    value={form.bio}
+                    onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                    autoFocus
+                    style={{ resize: 'vertical', width: '100%' }}
+                  />
+                : <p style={{ fontSize: '0.82rem', color: '#888', textAlign: 'center', lineHeight: '1.5' }}>
+                    {form.bio || 'Belum ada bio'}
+                  </p>
+              }
+              {editing.bio
+                ? <button className="pp-save-btn" onClick={() => handleSaveField('bio')} disabled={loading}>Simpan</button>
+                : <button className="pp-ubah-btn" onClick={() => toggleEdit('bio')}>Ubah Bio</button>
+              }
 
               <Link to="/profile/change-password" className="pp-pw-btn">Ubah Password</Link>
               <button className="pp-logout-btn" onClick={handleLogout}>Log Out</button>

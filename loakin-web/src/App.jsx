@@ -10,8 +10,6 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 // Member Pages
 import EditProfilePage from './pages/member/EditProfilePage';
 import ChangePasswordPage from './pages/member/ChangePasswordPage';
-import LocationSettingPage from './pages/member/LocationSettingPage';
-import CategoryPreferencePage from './pages/member/CategoryPreferencePage';
 import PublicProfilePage from './pages/member/PublicProfilePage';
 
 // Admin Pages
@@ -46,8 +44,6 @@ function App() {
         {/* Member Routes */}
         <Route path="/profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         <Route path="/profile/change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
-        <Route path="/profile/location" element={<ProtectedRoute><LocationSettingPage /></ProtectedRoute>} />
-        <Route path="/profile/preferences" element={<ProtectedRoute><CategoryPreferencePage /></ProtectedRoute>} />
         <Route path="/users/:id" element={<PublicProfilePage />} />
 
         {/* Admin Routes */}

@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\PreferenceController;
 use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\AdminUserController;
@@ -34,14 +32,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::post('/profile', [ProfileController::class, 'update']);
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword']);
-
-    // Lokasi
-    Route::get('/profile/location', [LocationController::class, 'show']);
-    Route::post('/profile/location', [LocationController::class, 'update']);
-
-    // Preferensi Kategori
-    Route::get('/profile/preferences', [PreferenceController::class, 'show']);
-    Route::post('/profile/preferences', [PreferenceController::class, 'update']);
 
     // Alamat
     Route::get('/profile/addresses', [AddressController::class, 'index']);
