@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
+import logoText from '../../assets/LoakinLogoText.png';
+
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -9,7 +11,7 @@ export default function ChangePasswordPage() {
     password: '',
     password_confirmation: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError]     = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -29,72 +31,236 @@ export default function ChangePasswordPage() {
     }
   };
 
+  const isReady = form.current_password && form.password && form.password_confirmation;
+
   return (
-    <div style={styles.page}>
-      <nav style={styles.navbar}>
-        <span style={styles.logo}>Loakin</span>
-        <Link to="/profile" style={styles.navLink}>← Kembali ke Profil</Link>
-      </nav>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h2 style={styles.title}>Ganti Kata Sandi</h2>
+        .cp-page {
+          min-height: 100vh;
+          background: #f0f2f5;
+          display: flex;
+          flex-direction: column;
+          font-family: 'Nunito', sans-serif;
+        }
 
-          <form onSubmit={handleSubmit}>
-            <label style={styles.label}>Kata Sandi Lama</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Masukkan kata sandi lama"
-              value={form.current_password}
-              onChange={(e) => setForm({ ...form, current_password: e.target.value })}
-            />
+        /* ── navbar ── */
+        .cp-nav {
+          background: #fff;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 2.5rem;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .cp-nav-logo img {
+          height: 34px;
+          object-fit: contain;
+          mix-blend-mode: multiply;
+        }
+        .cp-back {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          color: #3BBFC9;
+          text-decoration: none;
+          font-size: 0.88rem;
+          font-weight: 700;
+          padding: 0.35rem 0.7rem;
+          border-radius: 8px;
+          transition: background 0.15s;
+        }
+        .cp-back:hover { background: #e8f9fb; }
 
-            <label style={styles.label}>Kata Sandi Baru</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Masukkan kata sandi baru"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-            />
+        /* ── container ── */
+        .cp-container {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          padding: 2.5rem 1.5rem 2rem;
+        }
 
-            <label style={styles.label}>Konfirmasi Kata Sandi Baru</label>
-            <input
-              style={styles.input}
-              type="password"
-              placeholder="Konfirmasi kata sandi baru"
-              value={form.password_confirmation}
-              onChange={(e) => setForm({ ...form, password_confirmation: e.target.value })}
-            />
+        /* ── card ── */
+        .cp-card {
+          background: #fff;
+          border-radius: 20px;
+          padding: 2rem 2.2rem 2.2rem;
+          width: 100%;
+          max-width: 440px;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+          height: fit-content;
+          animation: cp-fadein 0.45s ease both;
+        }
+        @keyframes cp-fadein {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0);    }
+        }
 
-            {error && <p style={styles.error}>{error}</p>}
-            {success && <p style={styles.success}>{success}</p>}
+        .cp-title {
+          font-size: 1.3rem;
+          font-weight: 900;
+          color: #1a1a2e;
+          margin-bottom: 1.6rem;
+          letter-spacing: -0.3px;
+        }
 
-            <button style={styles.button} type="submit" disabled={loading}>
-              {loading ? 'Menyimpan...' : 'Simpan'}
-            </button>
-          </form>
+        /* ── fields ── */
+        .cp-label {
+          display: block;
+          font-size: 0.82rem;
+          font-weight: 800;
+          color: #6b7a8d;
+          margin-bottom: 0.4rem;
+        }
+        .cp-input {
+          width: 100%;
+          padding: 0.78rem 1rem;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 10px;
+          font-size: 0.92rem;
+          font-family: 'Nunito', sans-serif;
+          color: #333;
+          outline: none;
+          background: #fafbfc;
+          margin-bottom: 1.1rem;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .cp-input:focus {
+          border-color: #3BBFC9;
+          box-shadow: 0 0 0 3px rgba(59,191,201,0.15);
+          background: #fff;
+        }
+        .cp-input::placeholder { color: #b0bec5; }
+
+        /* ── feedback ── */
+        .cp-error {
+          color: #e53e3e;
+          font-size: 0.82rem;
+          margin-bottom: 0.75rem;
+        }
+        .cp-success {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          background: #edfaf5;
+          border: 1.5px solid #6fcfb0;
+          border-radius: 10px;
+          padding: 0.7rem 0.9rem;
+          color: #1a7a55;
+          font-size: 0.85rem;
+          font-weight: 600;
+          margin-bottom: 0.75rem;
+          line-height: 1.5;
+        }
+
+        /* ── button ── */
+        .cp-btn {
+          width: 100%;
+          padding: 0.78rem;
+          border: none;
+          border-radius: 10px;
+          font-size: 0.97rem;
+          font-family: 'Nunito', sans-serif;
+          font-weight: 700;
+          cursor: pointer;
+          transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+          background: #e4f3f5;
+          color: #8dcdd3;
+        }
+        .cp-btn.ready {
+          background: #3BBFC9;
+          color: #fff;
+          box-shadow: 0 4px 16px rgba(59,191,201,0.32);
+        }
+        .cp-btn.ready:hover  { background: #2aadb8; transform: translateY(-1px); }
+        .cp-btn.ready:active { transform: translateY(0); }
+        .cp-btn:disabled     { opacity: 0.7; cursor: not-allowed; }
+
+        /* ── footer ── */
+        .cp-footer {
+          text-align: center;
+          color: #b0bec5;
+          font-size: 0.77rem;
+          padding: 1.2rem 0;
+          border-top: 1px solid #e8edf0;
+          background: #fff;
+        }
+      `}</style>
+
+      <div className="cp-page">
+        {/* Navbar */}
+        <nav className="cp-nav">
+          <div className="cp-nav-logo">
+            <img src={logoText} alt="Loakin" />
+          </div>
+          <Link to="/profile" className="cp-back">← Kembali ke Profil</Link>
+        </nav>
+
+        {/* Content */}
+        <div className="cp-container">
+          <div className="cp-card">
+            <h2 className="cp-title">Ganti Kata Sandi</h2>
+
+            <form onSubmit={handleSubmit}>
+              <label className="cp-label">Kata Sandi Lama</label>
+              <input
+                className="cp-input"
+                type="password"
+                placeholder="Masukkan kata sandi lama"
+                value={form.current_password}
+                onChange={(e) => setForm({ ...form, current_password: e.target.value })}
+                autoComplete="current-password"
+              />
+
+              <label className="cp-label">Kata Sandi Baru</label>
+              <input
+                className="cp-input"
+                type="password"
+                placeholder="Masukkan kata sandi baru"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                autoComplete="new-password"
+              />
+
+              <label className="cp-label">Konfirmasi Kata Sandi Baru</label>
+              <input
+                className="cp-input"
+                type="password"
+                placeholder="Konfirmasi kata sandi baru"
+                value={form.password_confirmation}
+                onChange={(e) => setForm({ ...form, password_confirmation: e.target.value })}
+                autoComplete="new-password"
+              />
+
+              {error   && <p className="cp-error">{error}</p>}
+              {success && (
+                <div className="cp-success">
+                  <span>✓</span>
+                  <span>{success}</span>
+                </div>
+              )}
+
+              <button
+                className={`cp-btn${isReady ? ' ready' : ''}`}
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? 'Menyimpan...' : 'Simpan'}
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
 
-      <footer style={styles.footer}>© 2026, PT. Loakin Indonesia. All Rights Reserved.</footer>
-    </div>
+        <footer className="cp-footer">
+          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+        </footer>
+      </div>
+    </>
   );
 }
-
-const styles = {
-  page: { minHeight: '100vh', backgroundColor: '#f5f5f5', display: 'flex', flexDirection: 'column' },
-  navbar: { backgroundColor: 'white', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' },
-  logo: { color: '#2BB5A0', fontWeight: 'bold', fontSize: '1.5rem' },
-  navLink: { color: '#2BB5A0', textDecoration: 'none', fontSize: '0.9rem' },
-  container: { display: 'flex', justifyContent: 'center', padding: '2rem' },
-  card: { backgroundColor: 'white', padding: '2rem', borderRadius: '12px', width: '100%', maxWidth: '450px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' },
-  title: { fontSize: '1.3rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#333' },
-  label: { display: 'block', fontSize: '0.9rem', color: '#555', marginBottom: '0.4rem' },
-  input: { width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '1rem', boxSizing: 'border-box', fontSize: '0.95rem' },
-  error: { color: 'red', fontSize: '0.85rem', marginBottom: '0.5rem' },
-  success: { color: 'green', fontSize: '0.85rem', marginBottom: '0.5rem' },
-  button: { width: '100%', padding: '0.75rem', backgroundColor: '#2BB5A0', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer' },
-  footer: { textAlign: 'center', color: '#aaa', fontSize: '0.8rem', padding: '1.5rem', marginTop: 'auto' },
-};

@@ -378,8 +378,8 @@ export default function EditProfilePage() {
               </div>
 
               <div className="pp-photo-hint">
-                Besar file : Maksimum 10 mb.<br/>
-                Ekstensi file yang diperbolehkan: .JPG .JPEG .PNG
+                Ukuran maks: 10 MB<br/>
+                Format: JPG, JPEG, PNG
               </div>
 
               {/* Tombol simpan foto — muncul hanya kalau ada foto baru dipilih */}
