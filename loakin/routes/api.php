@@ -65,3 +65,36 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::post('/banned-keywords', [BannedKeywordController::class, 'store']);
     Route::delete('/banned-keywords/{id}', [BannedKeywordController::class, 'destroy']);
 });
+
+// ─── Public Routes (tanpa login) ──────────────────────────
+Route::get('/categories', [App\Http\Controllers\PublicListingController::class, 'categories']);
+Route::get('/listings', [App\Http\Controllers\PublicListingController::class, 'index']);
+Route::get('/listings/{id}', [App\Http\Controllers\PublicListingController::class, 'show']);
+
+// ─── Member Routes (butuh login) ──────────────────────────
+Route::middleware('auth:sanctum')->group(function () {
+    // Kelola listing sendiri
+    Route::get('/my-listings', [App\Http\Controllers\ListingController::class, 'myListings']);
+    Route::post('/listings', [App\Http\Controllers\ListingController::class, 'store']);
+    Route::put('/listings/{id}', [App\Http\Controllers\ListingController::class, 'update']);
+    Route::delete('/listings/{id}', [App\Http\Controllers\ListingController::class, 'destroy']);
+    Route::patch('/listings/{id}/sold', [App\Http\Controllers\ListingController::class, 'markAsSold']);
+
+    // Foto listing
+    Route::post('/listings/{id}/photos', [App\Http\Controllers\ListingController::class, 'uploadPhotos']);
+    Route::delete('/listings/{id}/photos/{photoId}', [App\Http\Controllers\ListingController::class, 'deletePhoto']);
+});
+
+// ─── Admin Routes (butuh login + role admin) ───────────────
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index']);
+
+    // Listing admin
+    Route::get('/listings', [App\Http\Controllers\Admin\AdminListingController::class, 'index']);
+    Route::get('/listings/{id}', [App\Http\Controllers\Admin\AdminListingController::class, 'show']);
+    Route::patch('/listings/{id}/approve', [App\Http\Controllers\Admin\AdminListingController::class, 'approve']);
+    Route::patch('/listings/{id}/reject', [App\Http\Controllers\Admin\AdminListingController::class, 'reject']);
+    Route::patch('/listings/{id}/feature', [App\Http\Controllers\Admin\AdminListingController::class, 'toggleFeature']);
+    Route::delete('/listings/{id}', [App\Http\Controllers\Admin\AdminListingController::class, 'destroy']);
+});

@@ -22,7 +22,7 @@ export default function LoginPage() {
     try {
       const res = await api.post('/login', form);
       login(res.data.user, res.data.token);
-      navigate(res.data.user.role === 'admin' ? '/admin/users' : '/profile');
+      navigate(res.data.user.role === 'admin' ? '/admin/dashboard' : '/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login gagal');
     } finally {

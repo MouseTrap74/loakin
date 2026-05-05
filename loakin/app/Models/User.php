@@ -53,6 +53,17 @@ class User extends Authenticatable
         return $this->hasMany(BannedKeyword::class, 'created_by');
     }
 
+    public function listings()
+    {
+        return $this->hasMany(Listing::class);
+    }
+
+    // Listing yang masih aktif milik user ini
+    public function activeListings()
+    {
+        return $this->hasMany(Listing::class)->where('status', 'active');
+    }
+
     // Helper: cek apakah user adalah admin
     public function isAdmin()
     {

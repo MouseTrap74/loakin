@@ -18,6 +18,15 @@ import AdminUserDetailPage from './pages/admin/AdminUserDetailPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminBannedKeywordPage from './pages/admin/AdminBannedKeywordPage';
 
+// Tambahkan import ini bersama import halaman lainnya
+import ListingBrowsePage from './pages/listing/ListingBrowsePage';
+import ListingDetailPage from './pages/listing/ListingDetailPage';
+import CreateListingPage from './pages/listing/CreateListingPage';
+import EditListingPage from './pages/listing/EditListingPage';
+import MyListingsPage from './pages/listing/MyListingsPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminListingPage from './pages/admin/AdminListingPage';
+
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
   const { isLoggedIn } = useAuth();
@@ -52,8 +61,29 @@ function App() {
         <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
         <Route path="/admin/banned-keywords" element={<AdminRoute><AdminBannedKeywordPage /></AdminRoute>} />
 
-        {/* Default */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        {/* Guest Routes */}
+        <Route path="/" element={<ListingBrowsePage />} />
+        <Route path="/listings/:id" element={<ListingDetailPage />} />
+
+        {/* Member Routes */}
+        <Route path="/listings/create" element={
+          <ProtectedRoute><CreateListingPage /></ProtectedRoute>
+        } />
+        <Route path="/listings/:id/edit" element={
+          <ProtectedRoute><EditListingPage /></ProtectedRoute>
+        } />
+        <Route path="/my-listings" element={
+          <ProtectedRoute><MyListingsPage /></ProtectedRoute>
+        } />
+
+        {/* Admin Routes */}
+        <Route path="/admin/dashboard" element={
+          <AdminRoute><AdminDashboardPage /></AdminRoute>
+        } />
+        <Route path="/admin/listings" element={
+          <AdminRoute><AdminListingPage /></AdminRoute>
+        } />
+
       </Routes>
     </BrowserRouter>
   );
