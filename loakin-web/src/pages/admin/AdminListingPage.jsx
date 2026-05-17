@@ -37,10 +37,10 @@ export default function AdminListingPage() {
     }
   };
 
-  const fetchListings = async () => {
+  const fetchListings = async ({ page = currentPage, nextFilters = filters } = {}) => {
     setLoading(true);
     try {
-      const params = { ...filters, page: currentPage };
+      const params = { ...nextFilters, page };
       const res = await api.get('/admin/listings', { params });
       setListings(res.data.data);
       setLastPage(res.data.last_page);
@@ -54,8 +54,9 @@ export default function AdminListingPage() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setCurrentPage(1);
-    fetchListings();
+    const page = 1;
+    setCurrentPage(page);
+    fetchListings({ page, nextFilters: filters });
   };
 
   const handleFilterChange = (key, value) => {
@@ -200,9 +201,10 @@ export default function AdminListingPage() {
               type="button"
               style={styles.btnReset}
               onClick={() => {
-                setFilters({ search: '', status: '', category_id: '', is_featured: '' });
+                const resetFilters = { search: '', status: '', category_id: '', is_featured: '' };
+                setFilters(resetFilters);
                 setCurrentPage(1);
-                setTimeout(fetchListings, 100);
+                fetchListings({ page: 1, nextFilters: resetFilters });
               }}
             >Reset</button>
           </form>

@@ -10,10 +10,10 @@ class PublicProfileController extends Controller
     public function show($id)
     {
         $user = User::select([
-                'id', 'name', 'photo', 'bio', 'city', 'role', 'created_at'
+                'id', 'name', 'photo', 'bio', 'role', 'created_at'
             ])
             ->where('id', $id)
-            ->where('status', 'active')
+            ->where('status', ['active', null])
             ->firstOrFail();
 
         return response()->json($user);

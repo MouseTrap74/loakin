@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -23,23 +23,28 @@ function ClickHandler({ onLocationSelect }) {
 // Pindahkan view peta ke koordinat baru
 function FlyTo({ latitude, longitude }) {
   const map = useMap();
-  if (latitude && longitude) {
-    map.flyTo([latitude, longitude], 15);
-  }
+  useEffect(() => {
+    if (latitude != null && longitude != null) {
+      const current  = map.getCenter();
+      const distance = map.distance(current, [latitude, longitude]);
+      if (distance > 500) {
+        map.flyTo([latitude, longitude], 15);
+      }
+    }
+  }, [map, latitude, longitude]);
   return null;
 }
 
 export default function MapPicker({ latitude, longitude, onLocationSelect }) {
   const defaultPos = [-6.2088, 106.8456];
-  const position   = latitude && longitude ? [latitude, longitude] : defaultPos;
+  const hasCoords  = latitude != null && longitude != null;
+  const position   = hasCoords ? [latitude, longitude] : defaultPos;
 
-  const [searchQuery, setSearchQuery]   = useState('');
-  const [searching, setSearching]       = useState(false);
-  const [searchError, setSearchError]   = useState('');
-  const [flyTarget, setFlyTarget]       = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searching, setSearching]     = useState(false);
+  const [searchError, setSearchError] = useState('');
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     setSearching(true);
     setSearchError('');
@@ -60,10 +65,7 @@ export default function MapPicker({ latitude, longitude, onLocationSelect }) {
 
       const lat = parseFloat(data[0].lat);
       const lng = parseFloat(data[0].lon);
-
-      // Pindahkan peta & set koordinat
-      setFlyTarget({ lat, lng });
-      onLocationSelect(lat, lng);
+      onLocationSelect(lat, lng); // update parent → props latitude/longitude berubah → FlyTo terpicu
     } catch (err) {
       setSearchError('Gagal mencari lokasi. Cek koneksi internet.');
     } finally {
@@ -73,12 +75,13 @@ export default function MapPicker({ latitude, longitude, onLocationSelect }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {/* Search bar */}
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8 }}>
+      {/* Search bar — pakai div bukan form agar tidak nested di form parent */}
+      <div style={{ display: 'flex', gap: 8 }}>
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); } }}
           placeholder="Cari lokasi... (contoh: Bandung, Surabaya)"
           style={{
             flex: 1,
@@ -88,10 +91,13 @@ export default function MapPicker({ latitude, longitude, onLocationSelect }) {
             fontSize: 13,
             fontFamily: 'Nunito, sans-serif',
             outline: 'none',
+            background: '#fafbfc', 
+            color: '#333',        
           }}
         />
         <button
-          type="submit"
+          type="button"
+          onClick={handleSearch}
           disabled={searching}
           style={{
             background: '#3BBFC9',
@@ -107,10 +113,12 @@ export default function MapPicker({ latitude, longitude, onLocationSelect }) {
         >
           {searching ? '...' : '🔍 Cari'}
         </button>
-      </form>
+      </div>
 
       {searchError && (
-        <p style={{ fontSize: 12, color: '#e53e3e', fontWeight: 600 }}>{searchError}</p>
+        <p style={{ fontSize: 12, color: '#e53e3e', fontWeight: 600, margin: 0 }}>
+          {searchError}
+        </p>
       )}
 
       {/* Peta */}
@@ -125,8 +133,9 @@ export default function MapPicker({ latitude, longitude, onLocationSelect }) {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <ClickHandler onLocationSelect={onLocationSelect} />
-          {flyTarget && <FlyTo latitude={flyTarget.lat} longitude={flyTarget.lng} />}
-          {latitude && longitude && (
+          {/* FlyTo selalu ada di dalam peta, merespons perubahan props */}
+          <FlyTo latitude={latitude} longitude={longitude} />
+          {hasCoords && (
             <Marker position={[latitude, longitude]} />
           )}
         </MapContainer>

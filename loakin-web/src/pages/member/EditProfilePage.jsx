@@ -2,13 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
-
 import logoText from '../../assets/LoakinLogoText.png';
 
 export default function EditProfilePage() {
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, isLoggedIn, isAdmin } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+
+  const [searchInput, setSearchInput] = useState('');
 
   const [form, setForm] = useState({
     name: '', phone: '', email: '', bio: '', birth_date: '', gender: '',
@@ -24,7 +25,7 @@ export default function EditProfilePage() {
   const [addresses, setAddresses]       = useState([]);
   const [addrTab, setAddrTab]           = useState(0);
   const [showAddrForm, setShowAddrForm] = useState(false);
-  const [editingAddr, setEditingAddr]   = useState(null); // null = tambah baru, object = edit
+  const [editingAddr, setEditingAddr]   = useState(null);
   const [addrForm, setAddrForm]         = useState({ label: 'Rumah', recipient_name: '', address: '', note: '', is_primary: false });
   const [addrLoading, setAddrLoading]   = useState(false);
   const [addrError, setAddrError]       = useState('');
@@ -45,7 +46,6 @@ export default function EditProfilePage() {
     fetchAddresses();
   }, [user]);
 
-  // ── fetch addresses ──
   const fetchAddresses = async () => {
     try {
       const res = await api.get('/profile/addresses');
@@ -53,7 +53,11 @@ export default function EditProfilePage() {
     } catch (_) {}
   };
 
-  // ── photo ──
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
+  };
+
   const handlePhoto = (e) => {
     const file = e.target.files[0];
     if (file) { setPhoto(file); setPreview(URL.createObjectURL(file)); }
@@ -65,7 +69,6 @@ export default function EditProfilePage() {
     try {
       const formData = new FormData();
       formData.append('photo', photo);
-      // kirim juga field lain supaya validasi tidak gagal
       formData.append('name',  form.name  || '');
       formData.append('phone', form.phone || '');
       formData.append('bio',   form.bio   || '');
@@ -83,7 +86,6 @@ export default function EditProfilePage() {
     }
   };
 
-  // ── save single field ──
   const handleSaveField = async (field) => {
     setLoading(true); setError(''); setSuccess('');
     try {
@@ -115,7 +117,6 @@ export default function EditProfilePage() {
   const toggleEdit = (field) =>
     setEditing((prev) => ({ ...prev, [field]: !prev[field] }));
 
-  // ── address handlers ──
   const openAddAddr = () => {
     setEditingAddr(null);
     setAddrForm({ label: 'Rumah', recipient_name: '', address: '', note: '', is_primary: false });
@@ -169,6 +170,8 @@ export default function EditProfilePage() {
     }
   };
 
+  const navPhotoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+
   return (
     <>
       <style>{`
@@ -178,26 +181,37 @@ export default function EditProfilePage() {
 
         .pp-wrap { min-height: 100vh; display: flex; flex-direction: column; font-family: 'Nunito', sans-serif; background: #f0f2f5; }
 
+        /* ── utility bar ── */
         .pp-util { background: #fff; border-bottom: 1px solid #eaeef2; display: flex; justify-content: flex-end; align-items: center; padding: 0.35rem 2.5rem; gap: 1.6rem; }
         .pp-util a { color: #8a9ab0; font-size: 0.78rem; text-decoration: none; font-weight: 600; }
         .pp-util a:hover { color: #3BBFC9; }
 
+        /* ── navbar ── */
         .pp-nav { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; padding: 0.7rem 2.5rem; gap: 1.5rem; position: sticky; top: 0; z-index: 100; }
-        .pp-nav-logo img { height: 34px; object-fit: contain; mix-blend-mode: multiply; }
+        .pp-nav-logo img { height: 34px; object-fit: contain; mix-blend-mode: multiply; cursor: pointer; }
         .pp-search { flex: 1; position: relative; }
         .pp-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.6rem; border: 1.5px solid #e2e8f0; border-radius: 50px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8fafc; transition: border-color 0.2s; }
         .pp-search input:focus { border-color: #3BBFC9; background: #fff; }
         .pp-search input::placeholder { color: #b0bec5; }
         .pp-search-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #b0bec5; pointer-events: none; }
+        .pp-search-btn { position: absolute; right: 0; top: 0; bottom: 0; background: #3BBFC9; border: none; border-radius: 0 50px 50px 0; padding: 0 1.2rem; color: #fff; font-weight: 700; font-size: 0.85rem; font-family: 'Nunito', sans-serif; cursor: pointer; }
+        .pp-search-btn:hover { background: #2aadb8; }
         .pp-nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .pp-icon-btn { background: none; border: none; cursor: pointer; color: #6b7a8d; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: background 0.15s, color 0.15s; }
+        .pp-icon-btn { background: none; border: none; cursor: pointer; color: #6b7a8d; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: background 0.15s, color 0.15s; text-decoration: none; }
         .pp-icon-btn:hover { background: #f0f4f8; color: #3BBFC9; }
-        .pp-user-chip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 50px; transition: background 0.15s; }
+        .pp-user-chip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 50px; transition: background 0.15s; text-decoration: none; }
         .pp-user-chip:hover { background: #f0f4f8; }
-        .pp-avatar-sm { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #e8f7f8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .pp-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: #e8f7f8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
         .pp-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
         .pp-username { font-size: 0.88rem; font-weight: 700; color: #333; }
+        .pp-btn-login { background: #fff; border: 1.5px solid #3BBFC9; color: #3BBFC9; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+        .pp-btn-login:hover { background: #f0fbfc; }
+        .pp-btn-register { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
+        .pp-btn-register:hover { background: #2aadb8; }
+        .pp-btn-sell { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
+        .pp-btn-sell:hover { background: #2aadb8; }
 
+        /* ── body layout ── */
         .pp-body { flex: 1; display: flex; gap: 1.25rem; padding: 2rem 2.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
 
         .pp-side-nav { width: 170px; flex-shrink: 0; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); padding: 1.2rem 0; }
@@ -222,16 +236,11 @@ export default function EditProfilePage() {
         .pp-logout-btn { width: 100%; padding: 0.65rem; border: none; border-radius: 10px; background: #3BBFC9; color: #fff; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 800; cursor: pointer; transition: background 0.15s, transform 0.15s; box-shadow: 0 3px 10px rgba(59,191,201,0.28); }
         .pp-logout-btn:hover { background: #2aadb8; transform: translateY(-1px); }
 
-        .pp-info-col {
-          flex: 1;
-          padding: 2rem 2.2rem;
-          overflow-y: auto;
-          align-items: flex-start;
-        }
+        .pp-info-col { flex: 1; padding: 2rem 2.2rem; overflow-y: auto; align-items: flex-start; }
         .pp-section-title { font-size: 1.05rem; font-weight: 900; color: #3BBFC9; margin-bottom: 0.9rem; margin-top: 0.2rem; letter-spacing: -0.2px; text-align: left; }
         .pp-field-row { display: flex; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f5f7fa; gap: 0.5rem; }
-        .pp-field-label { width: 145px; flex-shrink: 0; font-size: 0.87rem; color: #8a9ab0; font-weight: 600; text-align: left;}
-        .pp-field-value { flex: 1; font-size: 0.9rem; color: #333; font-weight: 600; text-align: left;}
+        .pp-field-label { width: 145px; flex-shrink: 0; font-size: 0.87rem; color: #8a9ab0; font-weight: 600; text-align: left; }
+        .pp-field-value { flex: 1; font-size: 0.9rem; color: #333; font-weight: 600; text-align: left; }
         .pp-field-input { flex: 1; padding: 0.38rem 0.7rem; border: 1.5px solid #3BBFC9; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8feff; }
         .pp-ubah-btn { background: none; border: none; color: #3BBFC9; font-size: 0.85rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; padding: 0.2rem 0.4rem; border-radius: 6px; transition: background 0.15s; flex-shrink: 0; }
         .pp-ubah-btn:hover { background: #e8f9fb; }
@@ -240,16 +249,16 @@ export default function EditProfilePage() {
         .pp-save-btn:hover { background: #2aadb8; }
 
         /* address section */
-        .pp-addr-header { display: flex; align-items: center; gap: 0.6rem; margin-top: 1.4rem; margin-bottom: 0.9rem; flex-wrap: wrap; text-align: left}
-        .pp-addr-title { font-size: 1.05rem; font-weight: 900; color: #3BBFC9; text-align: left}
-        .pp-addr-hint { font-size: 0.74rem; color: #f59e42; font-weight: 700; text-align: left}
+        .pp-addr-header { display: flex; align-items: center; gap: 0.6rem; margin-top: 1.4rem; margin-bottom: 0.9rem; flex-wrap: wrap; text-align: left; }
+        .pp-addr-title { font-size: 1.05rem; font-weight: 900; color: #3BBFC9; text-align: left; }
+        .pp-addr-hint { font-size: 0.74rem; color: #f59e42; font-weight: 700; text-align: left; }
         .pp-addr-tabs { display: flex; gap: 0.5rem; margin-left: auto; flex-wrap: wrap; }
         .pp-addr-tab { padding: 0.3rem 0.9rem; border: 1.5px solid #dce3ea; border-radius: 50px; background: #fff; font-size: 0.82rem; font-family: 'Nunito', sans-serif; font-weight: 700; color: #6b7a8d; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
         .pp-addr-tab.active, .pp-addr-tab:hover { border-color: #3BBFC9; color: #3BBFC9; background: #f0fbfc; }
         .pp-addr-add { padding: 0.3rem 0.9rem; border: none; border-radius: 50px; background: #3BBFC9; color: #fff; font-size: 0.82rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; transition: background 0.15s; }
         .pp-addr-add:hover { background: #2aadb8; }
         .pp-addr-add:disabled { background: #ccc; cursor: default; }
-        .pp-addr-card { border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.2rem; margin-top: 0.5rem; text-align: left}
+        .pp-addr-card { border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.2rem; margin-top: 0.5rem; text-align: left; }
         .pp-addr-type { font-size: 0.8rem; color: #8a9ab0; font-weight: 700; margin-bottom: 0.3rem; }
         .pp-addr-name { font-size: 0.92rem; font-weight: 800; color: #222; margin-bottom: 0.15rem; }
         .pp-addr-street { font-size: 0.84rem; color: #555; margin-bottom: 0.1rem; }
@@ -283,7 +292,7 @@ export default function EditProfilePage() {
         .pp-error   { color: #e53e3e; font-size: 0.82rem; margin-top: 0.5rem; }
         .pp-success { color: #2a9d6e; font-size: 0.82rem; margin-top: 0.5rem; font-weight: 700; }
 
-        .pp-footer { text-align: center; color: #b0bec5; font-size: 0.77rem; padding: 1.2rem 0; border-top: 1px solid #e8edf0; background: #fff; }
+        .pp-footer { text-align: center; color: #b0bec5; font-size: 0.77rem; padding: 1.2rem 0; border-top: 1px solid #e8edf0; background: #fff; margin-top: auto; }
 
         @media (max-width: 900px) {
           .pp-body { flex-direction: column; padding: 1rem; }
@@ -299,48 +308,83 @@ export default function EditProfilePage() {
 
         {/* Utility bar */}
         <div className="pp-util">
-          <a href="#">Notifikasi</a>
+          {isLoggedIn() && isAdmin() && (
+            <Link to="/admin/dashboard" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>
+              Admin Dashboard
+            </Link>
+          )}
+          <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>
+            Notifikasi
+          </a>
           <a href="#">Pusat Bantuan</a>
           <a href="#">FAQ</a>
+          {isLoggedIn() && (
+            <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>
+              Keluar
+            </a>
+          )}
         </div>
 
-        {/* Main navbar */}
+        {/* Navbar */}
         <nav className="pp-nav">
-          <div className="pp-nav-logo">
+          <div className="pp-nav-logo" onClick={() => navigate('/')}>
             <img src={logoText} alt="Loakin" />
           </div>
-          <div className="pp-search">
+          <form className="pp-search" onSubmit={handleSearch}>
             <span className="pp-search-icon">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
               </svg>
             </span>
-            <input type="text" placeholder="Temukan Handphone, Mouse, dan lainnya ..." />
-          </div>
+            <input
+              type="text"
+              placeholder="Temukan Handphone, Mouse, dan lainnya ..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <button type="submit" className="pp-search-btn">Cari</button>
+          </form>
           <div className="pp-nav-actions">
-            <button className="pp-icon-btn" aria-label="Notifikasi">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-            </button>
-            <button className="pp-icon-btn" aria-label="Keranjang">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-              </svg>
-            </button>
-            <div className="pp-user-chip">
-              <div className="pp-avatar-sm">
-                {preview
-                  ? <img src={preview} alt="avatar" />
-                  : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                }
-              </div>
-              <span className="pp-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-            </div>
+            {isLoggedIn() ? (
+              <>
+                <button className="pp-icon-btn" aria-label="Notifikasi">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                </button>
+                <button className="pp-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                </button>
+                <Link to="/listings/create" className="pp-btn-sell">+ Jual</Link>
+                <Link to="/my-listings" className="pp-user-chip" style={{ textDecoration: 'none' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                  </svg>
+                  <span className="pp-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
+                </Link>
+                <Link to="/profile" className="pp-user-chip">
+                  <div className="pp-avatar-sm">
+                    {navPhotoUrl
+                      ? <img src={navPhotoUrl} alt="avatar" />
+                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    }
+                  </div>
+                  <span className="pp-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="pp-btn-login">Masuk</Link>
+                <Link to="/register" className="pp-btn-register">Daftar</Link>
+              </>
+            )}
           </div>
         </nav>
 
@@ -382,14 +426,12 @@ export default function EditProfilePage() {
                 Format: JPG, JPEG, PNG
               </div>
 
-              {/* Tombol simpan foto — muncul hanya kalau ada foto baru dipilih */}
               {photo && (
                 <button className="pp-save-photo-btn" onClick={handleSavePhoto} disabled={loading}>
                   {loading ? 'Menyimpan...' : '💾 Simpan Foto'}
                 </button>
               )}
 
-              {/* Bio */}
               {editing.bio
                 ? <textarea
                     className="pp-field-input"
@@ -418,10 +460,8 @@ export default function EditProfilePage() {
             {/* Info column */}
             <div className="pp-info-col">
 
-              {/* Biodata */}
               <h3 className="pp-section-title">Ubah Biodata Diri</h3>
 
-              {/* Nama */}
               <div className="pp-field-row">
                 <span className="pp-field-label">Nama</span>
                 {editing.name
@@ -434,7 +474,6 @@ export default function EditProfilePage() {
                 }
               </div>
 
-              {/* Tanggal Lahir */}
               <div className="pp-field-row">
                 <span className="pp-field-label">Tanggal Lahir</span>
                 {editing.birth_date
@@ -457,7 +496,6 @@ export default function EditProfilePage() {
                 }
               </div>
 
-              {/* Jenis Kelamin */}
               <div className="pp-field-row">
                 <span className="pp-field-label">Jenis Kelamin</span>
                 {editing.gender
@@ -474,17 +512,14 @@ export default function EditProfilePage() {
                 }
               </div>
 
-              {/* Kontak */}
               <h3 className="pp-section-title" style={{ marginTop: '1.4rem' }}>Ubah Kontak</h3>
 
-              {/* Email — disabled dulu */}
               <div className="pp-field-row">
                 <span className="pp-field-label">Email</span>
                 <span className="pp-field-value">{form.email || '—'}</span>
                 <button className="pp-ubah-btn" disabled title="Fitur segera hadir">Ubah</button>
               </div>
 
-              {/* Nomor HP */}
               <div className="pp-field-row">
                 <span className="pp-field-label">Nomor Handphone</span>
                 {editing.phone
@@ -497,7 +532,6 @@ export default function EditProfilePage() {
                 }
               </div>
 
-              {/* Daftar Alamat */}
               <div className="pp-addr-header">
                 <span className="pp-addr-title">Daftar Alamat</span>
                 <span className="pp-addr-hint">*Maksimum 5 alamat</span>
@@ -558,15 +592,10 @@ export default function EditProfilePage() {
       {showAddrForm && (
         <div className="pp-modal-overlay" onClick={(e) => { if (e.target.classList.contains('pp-modal-overlay')) setShowAddrForm(false); }}>
           <div className="pp-modal">
-
-            {/* Header */}
             <div className="pp-modal-header">
               <h3 className="pp-modal-title">{editingAddr ? 'Ubah Alamat' : 'Tambah Alamat Baru'}</h3>
             </div>
-
-            {/* Body */}
             <div className="pp-modal-body">
-
               <div className="pp-modal-field">
                 <span className="pp-modal-label">Label Alamat</span>
                 <select className="pp-modal-input" value={addrForm.label} onChange={(e) => setAddrForm({ ...addrForm, label: e.target.value })}>
@@ -576,59 +605,29 @@ export default function EditProfilePage() {
                   <option value="Lainnya">Lainnya</option>
                 </select>
               </div>
-
               <div className="pp-modal-field">
                 <span className="pp-modal-label">Nama Penerima</span>
-                <input
-                  className="pp-modal-input"
-                  type="text"
-                  placeholder="Nama lengkap penerima"
-                  value={addrForm.recipient_name}
-                  onChange={(e) => setAddrForm({ ...addrForm, recipient_name: e.target.value })}
-                />
+                <input className="pp-modal-input" type="text" placeholder="Nama lengkap penerima" value={addrForm.recipient_name} onChange={(e) => setAddrForm({ ...addrForm, recipient_name: e.target.value })} />
               </div>
-
               <div className="pp-modal-field">
                 <span className="pp-modal-label">Alamat Lengkap</span>
-                <textarea
-                  className="pp-modal-input"
-                  rows={3}
-                  placeholder="Jl. Contoh No. 123..."
-                  value={addrForm.address}
-                  onChange={(e) => setAddrForm({ ...addrForm, address: e.target.value })}
-                  style={{ resize: 'vertical' }}
-                />
+                <textarea className="pp-modal-input" rows={3} placeholder="Jl. Contoh No. 123..." value={addrForm.address} onChange={(e) => setAddrForm({ ...addrForm, address: e.target.value })} style={{ resize: 'vertical' }} />
               </div>
-
               <div className="pp-modal-field">
                 <span className="pp-modal-label">Catatan</span>
-                <input
-                  className="pp-modal-input"
-                  type="text"
-                  placeholder="Opsional"
-                  value={addrForm.note}
-                  onChange={(e) => setAddrForm({ ...addrForm, note: e.target.value })}
-                />
+                <input className="pp-modal-input" type="text" placeholder="Opsional" value={addrForm.note} onChange={(e) => setAddrForm({ ...addrForm, note: e.target.value })} />
               </div>
-
               <label className="pp-modal-checkbox">
-                <input
-                  type="checkbox"
-                  checked={addrForm.is_primary}
-                  onChange={(e) => setAddrForm({ ...addrForm, is_primary: e.target.checked })}
-                />
+                <input type="checkbox" checked={addrForm.is_primary} onChange={(e) => setAddrForm({ ...addrForm, is_primary: e.target.checked })} />
                 Jadikan sebagai alamat utama
               </label>
-
               {addrError && <p className="pp-modal-error">{addrError}</p>}
-
               <div className="pp-modal-actions">
                 <button className="pp-modal-cancel" onClick={() => setShowAddrForm(false)}>Batal</button>
                 <button className="pp-modal-save" onClick={handleSaveAddr} disabled={addrLoading}>
                   {addrLoading ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
-
             </div>
           </div>
         </div>

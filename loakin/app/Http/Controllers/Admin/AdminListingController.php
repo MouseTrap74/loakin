@@ -61,6 +61,9 @@ class AdminListingController extends Controller
     public function approve($id)
     {
         $listing = Listing::withTrashed()->findOrFail($id);
+        if ($listing->trashed()) {
+            $listing->restore();
+        }
         $listing->update(['status' => 'active']);
 
         return response()->json(['message' => 'Listing disetujui dan aktif kembali.']);

@@ -25,10 +25,10 @@ class PublicListingController extends Controller
         }
 
         // Filter harga
-        if ($request->min_price) {
+        if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }
-        if ($request->max_price) {
+        if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->max_price);
         }
 
@@ -37,10 +37,51 @@ class PublicListingController extends Controller
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // Listing featured tampil duluan
-        $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
+        // Filter radius geolokasi — hanya aktif kalau lat, lng, dan radius semua terisi
+        if ($request->filled('lat') && $request->filled('lng') && $request->filled('radius')) {
+            $lat    = (float) $request->lat;
+            $lng    = (float) $request->lng;
+            $radius = (float) $request->radius; // dalam km
+            $query->whereNotNull('latitude')
+                  ->whereNotNull('longitude')
+                  ->whereRaw(
+                      'ST_Distance_Sphere(POINT(longitude, latitude), POINT(?, ?)) <= ?',
+                      [$lng, $lat, $radius * 1000] // konversi km → meter
+                  );
+        }
+
+        // Urutan: sort_by=recent → hanya created_at; default → featured dulu baru terbaru
+        if ($request->sort_by === 'recent') {
+            $query->orderBy('created_at', 'desc');
+        } else {
+            $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
+        }
 
         return response()->json($query->paginate(12));
+    }
+
+    // GET /api/listings/map-pins — Semua pin untuk tampilan peta (tanpa pagination)
+    public function mapPins(Request $request)
+    {
+        $query = Listing::with(['primaryPhoto:id,listing_id,photo_path', 'category:id,name,icon'])
+            ->where('status', 'active')
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->select(['id', 'title', 'price', 'latitude', 'longitude', 'condition', 'is_featured', 'category_id']);
+
+        // Filter radius kalau koordinat dan radius tersedia
+        if ($request->filled('lat') && $request->filled('lng') && $request->filled('radius')) {
+            $lat    = (float) $request->lat;
+            $lng    = (float) $request->lng;
+            $radius = (float) $request->radius;
+            $query->whereRaw(
+                'ST_Distance_Sphere(POINT(longitude, latitude), POINT(?, ?)) <= ?',
+                [$lng, $lat, $radius * 1000]
+            );
+        }
+
+        // Batasi 500 marker untuk mencegah browser hang
+        return response()->json($query->limit(500)->get());
     }
 
     // GET /api/listings/{id} — Detail listing

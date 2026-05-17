@@ -17,8 +17,9 @@ class ListingController extends Controller
         $bannedKeywords = BannedKeyword::pluck('keyword')->toArray();
 
         foreach ($bannedKeywords as $keyword) {
-            if (str_contains(strtolower($title), $keyword) ||
-                str_contains(strtolower($description), $keyword)) {
+            $needle = mb_strtolower($keyword);
+            if (str_contains(mb_strtolower($title), $needle) ||
+                str_contains(mb_strtolower($description), $needle)) {
                 return true;
             }
         }
