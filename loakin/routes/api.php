@@ -5,7 +5,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ListingController;
+use App\Http\Controllers\PublicListingController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminListingController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\BannedKeywordController;
 
@@ -19,6 +23,15 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // Profil publik
 Route::get('/users/{id}/public', [PublicProfileController::class, 'show']);
+
+// Listing publik
+Route::get('/categories', [PublicListingController::class, 'categories']);
+Route::get('/listings', [PublicListingController::class, 'index']);
+
+// PENTING: /listings/map-pins harus di atas /listings/{id}
+// agar Laravel tidak menganggap "map-pins" sebagai {id}
+Route::get('/listings/map-pins', [PublicListingController::class, 'mapPins']);
+Route::get('/listings/{id}', [PublicListingController::class, 'show']);
 
 // ================================================================
 // MEMBER ROUTES (harus login)
@@ -38,6 +51,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/addresses', [AddressController::class, 'store']);
     Route::put('/profile/addresses/{id}', [AddressController::class, 'update']);
     Route::delete('/profile/addresses/{id}', [AddressController::class, 'destroy']);
+
+    // Kelola listing sendiri
+    Route::get('/my-listings', [ListingController::class, 'myListings']);
+    Route::post('/listings', [ListingController::class, 'store']);
+    Route::put('/listings/{id}', [ListingController::class, 'update']);
+    Route::delete('/listings/{id}', [ListingController::class, 'destroy']);
+    Route::patch('/listings/{id}/sold', [ListingController::class, 'markAsSold']);
+
+    // Foto listing
+    Route::post('/listings/{id}/photos', [ListingController::class, 'uploadPhotos']);
+    Route::delete('/listings/{id}/photos/{photoId}', [ListingController::class, 'deletePhoto']);
 });
 
 // ================================================================
@@ -45,12 +69,23 @@ Route::middleware('auth:sanctum')->group(function () {
 // ================================================================
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
 
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
     // Manajemen Pengguna
     Route::get('/users', [AdminUserController::class, 'index']);
     Route::get('/users/{id}', [AdminUserController::class, 'show']);
     Route::patch('/users/{id}/suspend', [AdminUserController::class, 'suspend']);
     Route::patch('/users/{id}/activate', [AdminUserController::class, 'activate']);
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+
+    // Manajemen Listing
+    Route::get('/listings', [AdminListingController::class, 'index']);
+    Route::get('/listings/{id}', [AdminListingController::class, 'show']);
+    Route::patch('/listings/{id}/approve', [AdminListingController::class, 'approve']);
+    Route::patch('/listings/{id}/reject', [AdminListingController::class, 'reject']);
+    Route::patch('/listings/{id}/feature', [AdminListingController::class, 'toggleFeature']);
+    Route::delete('/listings/{id}', [AdminListingController::class, 'destroy']);
 
     // Pengaturan Sistem
     Route::get('/settings/general', [SettingController::class, 'showGeneral']);
