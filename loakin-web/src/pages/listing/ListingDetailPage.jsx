@@ -2,12 +2,21 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
+<<<<<<< HEAD
 import { trackListingView } from '../../services/searchHistory';
 import logoText from '../../assets/LoakinLogoText.png';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Footer from '../../components/Footer';
+=======
+import logoText from '../../assets/LoakinLogoText.png';
+import NotificationBell from '../../components/NotificationBell';
+import { useChat } from '../../context/ChatContext';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -19,12 +28,17 @@ L.Icon.Default.mergeOptions({
 export default function ListingDetailPage() {
   const { id } = useParams();
   const { user, isLoggedIn, isAdmin, logout } = useAuth();
+<<<<<<< HEAD
+=======
+  const { openWidget, fetchConversations } = useChat();
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   const navigate = useNavigate();
 
   const [listing, setListing]         = useState(null);
   const [loading, setLoading]         = useState(true);
   const [activePhoto, setActivePhoto] = useState(0);
   const [searchInput, setSearchInput] = useState('');
+<<<<<<< HEAD
   const [isFavorite, setIsFavorite] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
 
@@ -74,15 +88,22 @@ export default function ListingDetailPage() {
       alert(err.response?.data?.message || 'Gagal mengirim laporan');
     }
   };
+=======
+
+  useEffect(() => { fetchListing(); }, [id]);
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
   const fetchListing = async () => {
     try {
       const res = await api.get(`/listings/${id}`);
       setListing(res.data);
+<<<<<<< HEAD
       // Track kategori listing yang dilihat untuk rekomendasi personalisasi
       if (res.data?.category_id) {
         trackListingView(res.data.category_id, res.data.id);
       }
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
     } catch (err) {
       navigate('/');
     } finally {
@@ -101,6 +122,7 @@ export default function ListingDetailPage() {
     if (searchInput.trim()) navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
   };
 
+<<<<<<< HEAD
   useEffect(() => {
     if (isLoggedIn() && listing) {
       checkFavorite();
@@ -132,6 +154,8 @@ export default function ListingDetailPage() {
     }
   };
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   const formatPrice = (price) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
 
@@ -147,6 +171,7 @@ export default function ListingDetailPage() {
   if (!listing) return null;
 
   const isOwner = isLoggedIn() && user?.id === listing.user_id;
+<<<<<<< HEAD
   const waUrl = 'https://wa.me/?text=Halo, saya tertarik dengan listing ' + listing.title + ' di Loakin!';
 
   const hasPhotos = listing.photos?.length > 0;
@@ -155,6 +180,23 @@ export default function ListingDetailPage() {
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : '0.0';
 
+=======
+
+  const startChatWithSeller = async () => {
+    if (!isLoggedIn()) { navigate('/login'); return; }
+    try {
+      const res = await api.post('/conversations', { listing_id: listing.id, recipient_id: listing.user_id });
+      await fetchConversations();
+      openWidget();
+    } catch (err) {
+      console.error('Failed to start conversation:', err);
+      alert('Gagal memulai percakapan.');
+    }
+  };
+
+  const hasPhotos = listing.photos?.length > 0;
+
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   return (
     <>
       <style>{`
@@ -242,9 +284,17 @@ export default function ListingDetailPage() {
           <div className="ld-nav-actions">
             {isLoggedIn() ? (
               <>
+<<<<<<< HEAD
                 <button className="ld-icon-btn" aria-label="Notifikasi">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+=======
+                <NotificationBell />
+                <button className="ld-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                   </svg>
                 </button>
                 <Link to="/listings/create" className="ld-btn-sell">+ Jual</Link>
@@ -255,12 +305,15 @@ export default function ListingDetailPage() {
                   </svg>
                   <span className="ld-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
                 </Link>
+<<<<<<< HEAD
                 <Link to="/favorites" className="ld-user-chip" style={{ textDecoration: 'none' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                   </svg>
                   <span className="ld-username" style={{ fontSize: '0.84rem' }}>Favorit</span>
                 </Link>
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                 <Link to="/profile" className="ld-user-chip">
                   <div className="ld-avatar-sm">
                     {photoUrl
@@ -332,7 +385,11 @@ export default function ListingDetailPage() {
             {/* Peta */}
             <div style={s.mapCol}>
               <div style={s.mapHeader}>
+<<<<<<< HEAD
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2.5">
+=======
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2.5">
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
                 </svg>
                 <span style={s.mapHeaderText}>Lokasi Barang</span>
@@ -346,7 +403,11 @@ export default function ListingDetailPage() {
                     center={[parseFloat(listing.latitude), parseFloat(listing.longitude)]}
                     zoom={isLoggedIn() ? 15 : 12}
                     style={{
+<<<<<<< HEAD
                       height: 360,
+=======
+                      height: 200,
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                       width: '100%',
                       filter: isLoggedIn() ? 'none' : 'blur(5px)',
                       pointerEvents: isLoggedIn() ? 'auto' : 'none',
@@ -405,20 +466,37 @@ export default function ListingDetailPage() {
               ) : isOwner ? (
                 <>
                   <Link to={'/listings/' + listing.id + '/edit'} style={s.btnPesan}>✏️ Edit Listing</Link>
+<<<<<<< HEAD
                   <Link to="/my-listings" style={{ background: '#fff', color: '#3BBFC9', border: '1.5px solid #3BBFC9', padding: '10px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' }}>📋 Kelola Listing</Link>
                 </>
               ) : isLoggedIn() ? (
                 <>
                   <a href={waUrl} target="_blank" rel="noreferrer" style={s.btnPesan}>Pesan</a>
                   <a href={waUrl} target="_blank" rel="noreferrer" style={s.btnChat}>Chat Penjual</a>
+=======
+                  <Link to="/my-listings" style={s.btnKeranjang}>📋 Kelola Listing</Link>
+                </>
+              ) : isLoggedIn() ? (
+                <>
+                  <button style={s.btnPesan} onClick={startChatWithSeller}>Pesan</button>
+                  <button style={s.btnKeranjang} onClick={() => alert('Fitur keranjang akan segera hadir!')}>
+                    Masuk ke Keranjang
+                  </button>
+                  <button style={s.btnChat} onClick={startChatWithSeller}>Chat Penjual</button>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                 </>
               ) : (
                 <>
                   <Link to="/login" style={s.btnPesan}>Masuk untuk Pesan</Link>
+<<<<<<< HEAD
+=======
+                  <Link to="/login" style={s.btnKeranjang}>Masuk ke Keranjang</Link>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                   <Link to="/login" style={s.btnChat}>Chat Penjual</Link>
                 </>
               )}
 
+<<<<<<< HEAD
               {!isOwner && (
                 <button
                   onClick={toggleFavorite}
@@ -444,6 +522,8 @@ export default function ListingDetailPage() {
                 </button>
               )}
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
               <div style={s.panelMeta}>
                 <span>Kondisi: <b>{listing.condition}</b></span>
                 <span>Stok: <b>{listing.stock}</b></span>
@@ -487,16 +567,24 @@ export default function ListingDetailPage() {
               {/* Info Penjual */}
               <div style={s.sellerRow}>
                 <div style={s.sellerLeft}>
+<<<<<<< HEAD
                   {/* Avatar */}
                   <div style={s.sellerAvatar}>
                     {listing.user?.photo
                       ? <img src={getPhotoUrl(listing.user.photo)} alt={listing.user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
+=======
+                  <div style={s.sellerAvatar}>
+                    {listing.user?.photo
+                      ? <img src={getPhotoUrl(listing.user.photo)} alt={listing.user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                           <circle cx="12" cy="7" r="4"/>
                         </svg>
                     }
                   </div>
+<<<<<<< HEAD
                   {/* Info Toko */}
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
@@ -667,18 +755,36 @@ export default function ListingDetailPage() {
                     </div>
                   ))
                 )}
+=======
+                  <div>
+                    <p style={s.sellerName}>{listing.user?.name}</p>
+                    <p style={s.sellerJoined}>Bergabung {formatDate(listing.user?.created_at)}</p>
+                  </div>
+                </div>
+                <Link to={'/users/' + listing.user_id} style={s.btnSellerProfile}>Lihat Profil</Link>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
               </div>
             </div>
           </div>
         </div>
+<<<<<<< HEAD
         
         <Footer />
+=======
+
+        <footer className="ld-footer">
+          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+        </footer>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
       </div>
     </>
   );
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 const s = {
   container:       { maxWidth: 1200, margin: '0 auto', padding: '20px 16px' },
   center:          { textAlign: 'center', padding: 80, fontSize: 16, color: '#aaa', fontFamily: 'Nunito, sans-serif' },
@@ -703,9 +809,15 @@ const s = {
   // Peta
   mapCol:          { background: '#fff', borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', gap: 8 },
   mapHeader:       { display: 'flex', alignItems: 'center', gap: 6 },
+<<<<<<< HEAD
   mapHeaderText:   { fontSize: 17, fontWeight: 800, color: '#333' },
   mapAddress:      { fontSize: 12, color: '#8a9ab0', fontWeight: 600 },
   mapWrap:         { position: 'relative', borderRadius: 8, overflow: 'hidden', flex: 1, minHeight: 360, zIndex: 0 },
+=======
+  mapHeaderText:   { fontSize: 13, fontWeight: 700, color: '#333' },
+  mapAddress:      { fontSize: 12, color: '#8a9ab0', fontWeight: 600 },
+  mapWrap:         { position: 'relative', borderRadius: 8, overflow: 'hidden', flex: 1, minHeight: 200, zIndex: 0 },
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   mapOverlay:      { position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 },
   mapOverlayBox:   { background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(2px)', padding: '12px 20px', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, boxShadow: '0 2px 12px rgba(0,0,0,0.12)' },
   mapOverlayText:  { color: '#333', fontSize: 13, fontWeight: 700 },
@@ -721,6 +833,10 @@ const s = {
   panelLabel:      { fontSize: 13, color: '#8a9ab0', fontWeight: 600 },
   panelPrice:      { fontSize: 16, fontWeight: 800, color: '#333' },
   btnPesan:        { background: '#3BBFC9', color: '#fff', border: 'none', padding: '11px', borderRadius: 8, fontWeight: 800, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' },
+<<<<<<< HEAD
+=======
+  btnKeranjang:    { background: '#fff', color: '#3BBFC9', border: '1.5px solid #3BBFC9', padding: '10px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' },
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   btnChat:         { background: '#f0f2f5', color: '#555', border: 'none', padding: '10px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' },
   panelMeta:       { display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#8a9ab0' },
   soldBanner:      { background: '#fff5f5', color: '#e53e3e', padding: 12, borderRadius: 8, textAlign: 'center', fontWeight: 700, fontSize: 14 },
@@ -739,10 +855,19 @@ const s = {
   detailItem:      { display: 'flex', flexDirection: 'column', gap: 2 },
   detailLabel:     { fontSize: 12, color: '#aaa', fontWeight: 600 },
   detailValue:     { fontSize: 14, color: '#333', fontWeight: 700 },
+<<<<<<< HEAD
   sellerRow:       { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', borderRadius: 12, padding: '16px 20px', marginTop: 8, border: '1px solid #e8edf2' },
   sellerLeft:      { display: 'flex', alignItems: 'center', gap: 14 },
   sellerAvatar:    { width: 52, height: 52, borderRadius: 10, background: '#e8f7f8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 },
   sellerName:      { fontSize: 15, fontWeight: 800, color: '#333', margin: 0 },
   sellerJoined:    { fontSize: 12, color: '#aaa', margin: '2px 0 0' },
   btnFollow:       { background: '#fff', border: '1.5px solid #3BBFC9', color: '#3BBFC9', padding: '8px 24px', borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap' },
+=======
+  sellerRow:       { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8f9fb', borderRadius: 10, padding: 14, marginTop: 8 },
+  sellerLeft:      { display: 'flex', alignItems: 'center', gap: 12 },
+  sellerAvatar:    { width: 44, height: 44, borderRadius: '50%', background: '#e8f7f8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  sellerName:      { fontSize: 14, fontWeight: 800, color: '#333', margin: 0 },
+  sellerJoined:    { fontSize: 12, color: '#aaa', margin: '2px 0 0' },
+  btnSellerProfile:{ background: '#fff', border: '1.5px solid #e2e8f0', color: '#555', padding: '7px 14px', borderRadius: 8, textDecoration: 'none', fontSize: 13, fontWeight: 700 },
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 };

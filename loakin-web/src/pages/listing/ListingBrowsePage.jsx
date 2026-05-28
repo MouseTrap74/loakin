@@ -1,11 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+<<<<<<< HEAD
 import api, { storageUrl } from '../../services/api';
 import logoText from '../../assets/LoakinLogoText.png';
 import BrowseMapView from '../../components/BrowseMapView';
 import Footer from '../../components/Footer';
 import { trackSearch, trackCategoryClick, getTopCategories, hasHistory } from '../../services/searchHistory';
+=======
+import api from '../../services/api';
+import logoText from '../../assets/LoakinLogoText.png';
+import BrowseMapView from '../../components/BrowseMapView';
+import NotificationBell from '../../components/NotificationBell';
+import { useChat } from '../../context/ChatContext';
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
 // ── Carousel & category assets ────────────────────────────────
 import carousel1 from '../../assets/carousel1.png';
@@ -33,6 +41,10 @@ const QUICK_CAT_LIMIT = 6;
 
 export default function ListingBrowsePage() {
   const { user, isLoggedIn, isAdmin, logout } = useAuth();
+<<<<<<< HEAD
+=======
+  const { openWidget } = useChat();
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   const navigate = useNavigate();
 
   // ── State yang sudah ada ──────────────────────────────────
@@ -42,7 +54,10 @@ export default function ListingBrowsePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [searchInput, setSearchInput] = useState('');
+<<<<<<< HEAD
   const [favoriteIds, setFavoriteIds] = useState(new Set());
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
   // ── State baru untuk geolokasi & peta ────────────────────
   const [viewMode, setViewMode] = useState('grid');
@@ -59,8 +74,11 @@ export default function ListingBrowsePage() {
     min_price: '',
     max_price: '',
     radius: '',
+<<<<<<< HEAD
     sort_by: '',
     search_in: '',
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   });
 
   // ── State UI ──────────────────────────────────────────────
@@ -68,12 +86,19 @@ export default function ListingBrowsePage() {
   const [specialListings, setSpecialListings] = useState([]);
   const [showCatPopup, setShowCatPopup] = useState(false);
   const carouselTimerRef = useRef(null);
+<<<<<<< HEAD
   const [recoSource, setRecoSource] = useState('featured'); // 'personalized' | 'featured'
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
   // ── Effects ──────────────────────────────────────────────
   useEffect(() => {
     fetchCategories();
+<<<<<<< HEAD
     fetchRecommendations();
+=======
+    fetchSpecialListings();
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   }, []);
 
   useEffect(() => {
@@ -88,6 +113,7 @@ export default function ListingBrowsePage() {
     fetchNearbyListings();
   }, [userLocation, filters.radius]);
 
+<<<<<<< HEAD
   const loggedIn = isLoggedIn();
   useEffect(() => {
     if (loggedIn) fetchFavoriteIds();
@@ -122,6 +148,8 @@ const toggleFavorite = async (e, listingId) => {
   } catch (_) {}
 };
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   // Auto-play carousel
   useEffect(() => {
     carouselTimerRef.current = setInterval(() => {
@@ -153,6 +181,7 @@ const toggleFavorite = async (e, listingId) => {
     }
   };
 
+<<<<<<< HEAD
   // ── Rekomendasi Personalisasi ──────────────────────────────
   const fetchRecommendations = async () => {
     const topCats = getTopCategories(3);
@@ -192,6 +221,12 @@ const toggleFavorite = async (e, listingId) => {
       const res = await api.get('/listings', { params: { is_featured: 1, per_page: 8 } });
       setSpecialListings(res.data.data || []);
       setRecoSource('featured');
+=======
+  const fetchSpecialListings = async () => {
+    try {
+      const res = await api.get('/listings', { params: { is_featured: 1, per_page: 8 } });
+      setSpecialListings(res.data.data || []);
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
     } catch (err) {
       console.error(err);
     }
@@ -281,7 +316,10 @@ const toggleFavorite = async (e, listingId) => {
   // ── Handler filter ────────────────────────────────────────
   const handleSearch = (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     trackSearch(searchInput);
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
     setFilters((prev) => ({ ...prev, search: searchInput }));
     setCurrentPage(1);
   };
@@ -293,7 +331,11 @@ const toggleFavorite = async (e, listingId) => {
 
   const handleReset = () => {
     setSearchInput('');
+<<<<<<< HEAD
     setFilters({ search: '', category_id: '', condition: '', min_price: '', max_price: '', radius: '', sort_by: '', search_in: '' });
+=======
+    setFilters({ search: '', category_id: '', condition: '', min_price: '', max_price: '', radius: '' });
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
     setUserLocation(null);
     setNearbyListings([]);
     setCurrentPage(1);
@@ -302,13 +344,20 @@ const toggleFavorite = async (e, listingId) => {
   const handleLogout = async () => {
     try {
       await api.post('/logout');
+<<<<<<< HEAD
     } catch (_) { }
+=======
+    } catch (_) {}
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
     logout();
     navigate('/login');
   };
 
   const handleSelectCategory = (id) => {
+<<<<<<< HEAD
     if (id) trackCategoryClick(id);
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
     handleFilterChange('category_id', id);
     setShowCatPopup(false);
   };
@@ -329,9 +378,15 @@ const toggleFavorite = async (e, listingId) => {
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
 
   const getPhotoUrl = (photo) =>
+<<<<<<< HEAD
     photo ? storageUrl(photo.photo_path) : null;
 
   const photoUrl = user?.photo ? storageUrl(user.photo) : null;
+=======
+    photo ? `http://127.0.0.1:8000/storage/${photo.photo_path}` : null;
+
+  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
   const categoriesToShow = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
   const quickCategories = categoriesToShow.slice(0, QUICK_CAT_LIMIT);
@@ -385,6 +440,7 @@ const toggleFavorite = async (e, listingId) => {
         /* ── CAROUSEL (card style) ── */
         .lb-carousel-card {
           margin: 1.2rem 0 0;
+<<<<<<< HEAD
           border-radius: 28px;
           overflow: hidden;
           box-shadow: 0 2px 12px rgba(0,0,0,0.1);
@@ -393,6 +449,18 @@ const toggleFavorite = async (e, listingId) => {
         .lb-carousel-track { display: flex; transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
         .lb-carousel-slide { flex-shrink: 0; width: 100%; }
         .lb-carousel-slide img { width: 100%; height: auto; display: block; }
+=======
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+          position: relative;
+          background: #f5f5f5;
+          aspect-ratio: 16 / 5;
+        }
+        .lb-carousel-track { display: flex; height: 100%; transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+        .lb-carousel-slide { flex-shrink: 0; width: 100%; height: 100%; }
+        .lb-carousel-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         .lb-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.88); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.18); transition: background 0.15s; z-index: 2; backdrop-filter: blur(4px); }
         .lb-carousel-btn:hover { background: #fff; }
         .lb-carousel-btn.prev { left: 14px; }
@@ -402,11 +470,17 @@ const toggleFavorite = async (e, listingId) => {
         .lb-carousel-dot.active { background: #3BBFC9; transform: scale(1.3); }
 
         /* ── CATEGORY CARD ── */
+<<<<<<< HEAD
         .lb-cat-card { background: #fff; border-radius: 16px; margin: 1.5rem 0 0; border: 1.5px solid #eaeef2; padding: 1.2rem 1.5rem 1.5rem; }
         .lb-cat-title { font-size: 1.35rem; font-weight: 900; color: #111; margin: 0 0 1rem 0; font-family: 'Nunito', sans-serif; text-align: left; }
         .lb-cat-banner-img { width: 100%; height: auto; display: block; border-radius: 12px; margin-bottom: 1.2rem; }
         .lb-cat-chips { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
         .lb-cat-chips::-webkit-scrollbar { display: none; }
+=======
+        .lb-cat-card { background: #fff; border-radius: 14px; overflow: visible; margin: 1rem 0 0; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+        .lb-cat-banner-img { width: 100%; display: block; border-radius: 14px 14px 0 0; object-fit: cover; max-height: 170px; }
+        .lb-cat-chips { display: flex; align-items: center; gap: 8px; padding: 0.9rem 1.2rem 1.1rem; flex-wrap: nowrap; overflow: hidden; }
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
         /* Category chip */
         .lb-cat-chip { display: inline-flex; align-items: center; gap: 5px; padding: 0.38rem 0.9rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; color: #555; background: #fff; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; white-space: nowrap; flex-shrink: 0; }
@@ -471,6 +545,7 @@ const toggleFavorite = async (e, listingId) => {
         .lb-cat-popup-clear:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
 
         /* ── SPESIAL UNTUKMU ── */
+<<<<<<< HEAD
         .lb-special-card { background: #51a5ba; border-radius: 12px; overflow: hidden; margin: 1.5rem 0 0; padding: 1.4rem 1.6rem 1.6rem; }
         .lb-special-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .lb-special-title { font-size: 1.5rem; font-weight: 800; color: #fff; font-family: 'Nunito', sans-serif; }
@@ -494,6 +569,37 @@ const toggleFavorite = async (e, listingId) => {
         .lb-special-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
         .lb-special-cond { font-size: 11px; background: #e8f7f8; color: #3BBFC9; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
         .lb-special-seller { font-size: 11px; color: #a0aec0; font-weight: 600; }
+=======
+        .lb-special-card { background: #47A8BC; border-radius: 14px; overflow: hidden; margin: 1rem 0 0; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 1.2rem 1.4rem 1.4rem; }
+        .lb-special-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .lb-special-title { font-size: 1rem; font-weight: 900; color: #fff; }
+        .lb-special-link { font-size: 0.82rem; font-weight: 700; color: #fff; text-decoration: none; }
+        .lb-special-link:hover { text-decoration: underline; }
+        .lb-special-scroll {
+          display: flex;
+          gap: 12px;
+          overflow-x: auto;
+          padding: 4px 0 6px;
+          scrollbar-width: thin;
+        }
+        .lb-special-scroll::-webkit-scrollbar { height: 4px; }
+        .lb-special-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.35); border-radius: 2px; }
+        .lb-special-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.65); border-radius: 2px; }
+        .lb-special-item { flex-shrink: 0; width: 155px; background: #fff; border-radius: 10px; overflow: hidden; text-decoration: none; color: inherit; border: 1.5px solid #f0f2f5; transition: transform 0.15s, box-shadow 0.15s; display: block; }
+        .lb-special-item:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+          border-color: #e2e8f0;
+        }
+        .lb-special-img { height: 110px; background: #f5f5f5; overflow: hidden; position: relative; }
+        .lb-special-img img { width: 100%; height: 100%; object-fit: cover; }
+        .lb-special-no-img { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #ddd; }
+        .lb-special-badge { position: absolute; top: 7px; left: 7px; background: #f6c90e; color: #7a6000; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
+        .lb-special-body { padding: 9px 10px 11px; }
+        .lb-special-seller { font-size: 10px; color: #3BBFC9; font-weight: 700; text-transform: uppercase; margin: 0 0 2px; }
+        .lb-special-name { font-size: 11.5px; font-weight: 700; color: #333; margin: 0 0 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.35; }
+        .lb-special-price { font-size: 13px; font-weight: 900; color: #2BB5A0; margin: 0; }
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         .lb-special-empty { display: flex; flex-direction: column; align-items: center; padding: 2rem; color: rgba(255,255,255,0.8); gap: 8px; }
         .lb-special-empty span { font-size: 32px; }
         .lb-special-empty p { font-size: 13px; font-weight: 600; }
@@ -522,7 +628,11 @@ const toggleFavorite = async (e, listingId) => {
         .lb-inline-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0.8rem 1.4rem; border-bottom: 1px solid #f0f2f5; }
         .lb-filter-select { padding: 0.42rem 0.85rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; font-family: 'Nunito', sans-serif; color: #555; background: #fff; cursor: pointer; outline: none; transition: border-color 0.2s; }
         .lb-filter-select:focus { border-color: #3BBFC9; }
+<<<<<<< HEAD
         .lb-filter-input { padding: 0.42rem 0.85rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; font-family: 'Nunito', sans-serif; color: #555; width: 140px; outline: none; background: #fff; }
+=======
+        .lb-filter-input { padding: 0.42rem 0.85rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; font-family: 'Nunito', sans-serif; color: #555; width: 115px; outline: none; background: #fff; }
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         .lb-filter-reset { background: #f0f2f5; color: #555; border: 1.5px solid #e2e8f0; padding: 0.42rem 1rem; border-radius: 50px; font-weight: 700; font-size: 0.82rem; font-family: 'Nunito', sans-serif; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
         .lb-filter-reset:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
         .lb-loc-btn { display: inline-flex; align-items: center; gap: 5px; padding: 0.42rem 0.9rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; background: #fff; color: #555; transition: border-color 0.15s, color 0.15s; white-space: nowrap; }
@@ -544,8 +654,11 @@ const toggleFavorite = async (e, listingId) => {
         .lb-card-img img { width: 100%; height: 100%; object-fit: cover; }
         .lb-no-img { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: #ddd; }
         .lb-featured-badge { position: absolute; top: 8px; left: 8px; background: #f6c90e; color: #7a6000; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+<<<<<<< HEAD
         .lb-fav-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.92); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); transition: background 0.15s, transform 0.15s; z-index: 2; padding: 0; }
         .lb-fav-btn:hover { background: #fff; transform: scale(1.1); }
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         .lb-card-body { padding: 10px 12px 12px; }
         .lb-card-cat { font-size: 10.5px; color: #8a9ab0; margin: 0 0 3px; }
         .lb-card-title { font-size: 13px; font-weight: 700; color: #333; margin: 0 0 5px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -560,6 +673,12 @@ const toggleFavorite = async (e, listingId) => {
         .lb-page-btn:disabled { opacity: 0.45; cursor: default; }
         .lb-page-info { color: #555; font-size: 13px; font-weight: 600; }
         .lb-map-wrap { padding: 1rem 1.4rem 1.4rem; min-height: 480px; }
+<<<<<<< HEAD
+=======
+
+        /* Footer */
+        .lb-footer { text-align: center; color: #b0bec5; font-size: 0.77rem; padding: 1.2rem 0; border-top: 1px solid #e8edf0; background: #fff; margin-top: auto; }
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
       `}</style>
 
       <div className="lb-wrap">
@@ -606,10 +725,22 @@ const toggleFavorite = async (e, listingId) => {
           <div className="lb-nav-actions">
             {isLoggedIn() ? (
               <>
+<<<<<<< HEAD
                 <button className="lb-icon-btn" aria-label="Notifikasi">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                     <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+=======
+                <NotificationBell />
+                <button
+                  className="lb-icon-btn"
+                  aria-label="Keranjang"
+                  onClick={() => alert('Fitur keranjang segera hadir!')}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                   </svg>
                 </button>
                 <Link to="/listings/create" className="lb-btn-sell">+ Jual</Link>
@@ -620,20 +751,29 @@ const toggleFavorite = async (e, listingId) => {
                   </svg>
                   <span className="lb-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
                 </Link>
+<<<<<<< HEAD
                 <Link to="/favorites" className="lb-user-chip" style={{ textDecoration: 'none' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                   </svg>
                   <span className="lb-username" style={{ fontSize: '0.84rem' }}>Favorit</span>
                 </Link>
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                 <Link to="/profile" className="lb-user-chip">
                   <div className="lb-avatar-sm">
                     {photoUrl
                       ? <img src={photoUrl} alt="avatar" />
                       : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
+<<<<<<< HEAD
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                         <circle cx="12" cy="7" r="4" />
                       </svg>
+=======
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                     }
                   </div>
                   <span className="lb-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
@@ -688,7 +828,10 @@ const toggleFavorite = async (e, listingId) => {
 
           {/* ── CATEGORY CARD ── */}
           <div className="lb-cat-card">
+<<<<<<< HEAD
             <h2 className="lb-cat-title">Kategori</h2>
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
             <img src={kategoriBanner} alt="Kategori" className="lb-cat-banner-img" />
 
             <div className="lb-cat-chips">
@@ -724,11 +867,15 @@ const toggleFavorite = async (e, listingId) => {
                   <button
                     key={catValue}
                     className={`lb-cat-chip${isActive ? ' active' : ''}`}
+<<<<<<< HEAD
                     onClick={() => {
                       const newVal = isActive ? '' : catValue;
                       if (newVal) trackCategoryClick(newVal);
                       handleFilterChange('category_id', newVal);
                     }}
+=======
+                    onClick={() => handleFilterChange('category_id', isActive ? '' : catValue)}
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                     type="button"
                   >
                     {cat.icon} {cat.name}
@@ -805,6 +952,7 @@ const toggleFavorite = async (e, listingId) => {
             </div>
           )}
 
+<<<<<<< HEAD
           {/* ── REKOMENDASI UNTUKMU ── */}
           <div className="lb-special-card">
             <div className="lb-special-header">
@@ -822,6 +970,18 @@ const toggleFavorite = async (e, listingId) => {
               <div className="lb-special-empty">
                 <span>🎁</span>
                 <p>Belum ada rekomendasi untukmu saat ini. Coba cari produk yang kamu suka!</p>
+=======
+          {/* ── SPESIAL UNTUKMU ── */}
+          <div className="lb-special-card">
+            <div className="lb-special-header">
+              <span className="lb-special-title">✨ Spesial Untukmu</span>
+              <Link to="/listings" className="lb-special-link">Lihat Semua →</Link>
+            </div>
+            {specialListings.length === 0 ? (
+              <div className="lb-special-empty">
+                <span>🎁</span>
+                <p>Belum ada rekomendasi untukmu saat ini.</p>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
               </div>
             ) : (
               <div className="lb-special-scroll">
@@ -863,6 +1023,7 @@ const toggleFavorite = async (e, listingId) => {
                 <option value="bekas">🔄 Bekas</option>
               </select>
 
+<<<<<<< HEAD
               <select
                 className="lb-filter-select"
                 value={filters.sort_by}
@@ -876,6 +1037,8 @@ const toggleFavorite = async (e, listingId) => {
                 <option value="popular">Terpopuler</option>
               </select>
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
               <input
                 className="lb-filter-input"
                 placeholder="Harga min"
@@ -917,6 +1080,7 @@ const toggleFavorite = async (e, listingId) => {
 
               <button className="lb-filter-reset" onClick={handleReset} type="button">↺ Reset</button>
 
+<<<<<<< HEAD
               {isLoggedIn() && (
                 <label style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.82rem', fontWeight: 700, color: '#555', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   <input
@@ -929,6 +1093,8 @@ const toggleFavorite = async (e, listingId) => {
                 </label>
               )}
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
               <div className="lb-filter-right">
                 <div className="lb-view-toggle">
                   <button
@@ -987,6 +1153,7 @@ const toggleFavorite = async (e, listingId) => {
                           {listing.is_featured && (
                             <span className="lb-featured-badge">⭐ Unggulan</span>
                           )}
+<<<<<<< HEAD
                           {isLoggedIn() && (
                             <button
                               className="lb-fav-btn"
@@ -996,6 +1163,8 @@ const toggleFavorite = async (e, listingId) => {
                               {favoriteIds.has(listing.id) ? '❤️' : '🤍'}
                             </button>
                           )}
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                         </div>
                         <div className="lb-card-body">
                           <p className="lb-card-cat">{listing.category?.icon} {listing.category?.name}</p>
@@ -1036,7 +1205,14 @@ const toggleFavorite = async (e, listingId) => {
             )}
           </div>
         </div>{/* end lb-section-wrap */}
+<<<<<<< HEAD
         <Footer />
+=======
+
+        <footer className="lb-footer">
+          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+        </footer>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
       </div>
     </>
   );

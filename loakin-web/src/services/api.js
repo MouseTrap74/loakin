@@ -1,10 +1,15 @@
 import axios from 'axios';
 
+<<<<<<< HEAD
 const API_BASE_URL =
     (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
 
 const api = axios.create({
     baseURL: `${API_BASE_URL}/api`,
+=======
+const api = axios.create({
+    baseURL: 'http://127.0.0.1:8000/api',
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -33,6 +38,7 @@ api.interceptors.response.use(
     }
 );
 
+<<<<<<< HEAD
 /**
  * Build a full URL to a file in Laravel's /storage directory.
  * @param {string} path — relative path inside storage (e.g. "photos/abc.jpg")
@@ -40,4 +46,6 @@ api.interceptors.response.use(
  */
 export const storageUrl = (path) => `${API_BASE_URL}/storage/${path}`;
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 export default api;

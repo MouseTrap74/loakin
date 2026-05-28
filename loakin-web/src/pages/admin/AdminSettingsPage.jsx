@@ -285,6 +285,7 @@ export default function AdminSettingsPage() {
       <div className="as-page">
         {/* Navbar */}
         <nav className="as-nav">
+<<<<<<< HEAD
           <Link to="/" className="as-nav-logo" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <img src={logoText} alt="Loakin" />
           </Link>
@@ -293,6 +294,13 @@ export default function AdminSettingsPage() {
             <Link to="/admin/listings"        className="as-nav-link">Listing</Link>
             <Link to="/admin/users"           className="as-nav-link">Pengguna</Link>
             <Link to="/admin/reports"         className="as-nav-link">Laporan</Link>
+=======
+          <div className="as-nav-logo">
+            <img src={logoText} alt="Loakin" />
+          </div>
+          <div className="as-nav-right">
+            <Link to="/admin/users"           className="as-nav-link">Pengguna</Link>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
             <Link to="/admin/settings"        className="as-nav-link active">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="as-nav-link">Kata Kunci</Link>
             <button className="as-logout-btn" onClick={handleLogout}>Logout</button>

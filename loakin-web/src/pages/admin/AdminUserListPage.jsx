@@ -315,6 +315,7 @@ export default function AdminUserListPage() {
       <div className="al-page">
         {/* Navbar */}
         <nav className="al-nav">
+<<<<<<< HEAD
           <Link to="/" className="al-nav-logo" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <img src={logoText} alt="Loakin" />
           </Link>
@@ -323,6 +324,13 @@ export default function AdminUserListPage() {
             <Link to="/admin/listings"        className="al-nav-link">Listing</Link>
             <Link to="/admin/users"           className="al-nav-link active">Pengguna</Link>
             <Link to="/admin/reports"         className="al-nav-link">Laporan</Link>
+=======
+          <div className="al-nav-logo">
+            <img src={logoText} alt="Loakin" />
+          </div>
+          <div className="al-nav-right">
+            <Link to="/admin/users"           className="al-nav-link active">Pengguna</Link>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
             <Link to="/admin/settings"        className="al-nav-link">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="al-nav-link">Kata Kunci</Link>
             <button className="al-logout-btn" onClick={handleLogout}>Logout</button>
@@ -407,9 +415,15 @@ export default function AdminUserListPage() {
           {/* Pagination */}
           {meta && (
             <div className="al-pagination">
+<<<<<<< HEAD
               <button className="al-page-btn" disabled={page === 1} onClick={() => setPage(page - 1)}>Prev</button>
               <span className="al-page-info">Halaman {meta.current_page} dari {meta.last_page}</span>
               <button className="al-page-btn" disabled={page === meta.last_page} onClick={() => setPage(page + 1)}>Next</button>
+=======
+              <button className="al-page-btn" disabled={page === 1} onClick={() => setPage(page - 1)}>← Prev</button>
+              <span className="al-page-info">Halaman {meta.current_page} dari {meta.last_page}</span>
+              <button className="al-page-btn" disabled={page === meta.last_page} onClick={() => setPage(page + 1)}>Next →</button>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
             </div>
           )}
         </div>

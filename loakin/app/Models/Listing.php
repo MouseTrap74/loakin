@@ -58,12 +58,15 @@ class Listing extends Model
         return $this->hasOne(ListingPhoto::class)->orderBy('order');
     }
 
+<<<<<<< HEAD
     // User yang memfavoritkan listing ini
     public function favoritedBy()
     {
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
     // Helper: apakah listing ini aktif?
     public function isActive()
     {

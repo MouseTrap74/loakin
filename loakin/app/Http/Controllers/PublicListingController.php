@@ -14,6 +14,7 @@ class PublicListingController extends Controller
         $query = Listing::with(['user:id,name,photo', 'category:id,name,icon', 'primaryPhoto'])
             ->where('status', 'active');
 
+<<<<<<< HEAD
         // Sembunyikan listing dari pengguna yang diblokir dan yang memblokir jika user sedang login
         if ($userId = \Illuminate\Support\Facades\Auth::guard('sanctum')->id()) {
             $blockedByMe = \App\Models\BlockedUser::where('user_id', $userId)->pluck('blocked_id')->toArray();
@@ -26,6 +27,8 @@ class PublicListingController extends Controller
             }
         }
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         // Filter kategori
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
@@ -44,6 +47,7 @@ class PublicListingController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
+<<<<<<< HEAD
         // Pencarian judul (guest) atau judul + deskripsi (member: search_in=all)
         if ($request->filled('search')) {
             $keyword = '%' . trim($request->search) . '%';
@@ -55,6 +59,11 @@ class PublicListingController extends Controller
             } else {
                 $query->where('title', 'like', $keyword);
             }
+=======
+        // Pencarian judul
+        if ($request->search) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         }
 
         // Filter radius geolokasi — hanya aktif kalau lat, lng, dan radius semua terisi
@@ -70,6 +79,7 @@ class PublicListingController extends Controller
                   );
         }
 
+<<<<<<< HEAD
         // Pengurutan hasil
         switch ($request->sort_by) {
             case 'price_asc':
@@ -91,6 +101,13 @@ class PublicListingController extends Controller
                 // Default: featured dulu baru terbaru
                 $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
                 break;
+=======
+        // Urutan: sort_by=recent → hanya created_at; default → featured dulu baru terbaru
+        if ($request->sort_by === 'recent') {
+            $query->orderBy('created_at', 'desc');
+        } else {
+            $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         }
 
         return response()->json($query->paginate(12));
@@ -103,6 +120,7 @@ class PublicListingController extends Controller
             ->where('status', 'active')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
+<<<<<<< HEAD
             ->select(['id', 'title', 'price', 'latitude', 'longitude', 'condition', 'is_featured', 'category_id', 'user_id']);
 
         // Sembunyikan listing dari pengguna yang diblokir dan yang memblokir jika user sedang login
@@ -116,6 +134,9 @@ class PublicListingController extends Controller
                 $query->whereNotIn('user_id', $allBlockedIds);
             }
         }
+=======
+            ->select(['id', 'title', 'price', 'latitude', 'longitude', 'condition', 'is_featured', 'category_id']);
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
         // Filter radius kalau koordinat dan radius tersedia
         if ($request->filled('lat') && $request->filled('lng') && $request->filled('radius')) {
@@ -136,12 +157,16 @@ class PublicListingController extends Controller
     public function show($id)
     {
         $listing = Listing::with([
+<<<<<<< HEAD
             'user' => function ($query) {
                 $query->select('id', 'name', 'photo', 'created_at')
                       ->withCount(['listings as active_listings_count' => function ($q) {
                           $q->where('status', 'active');
                       }]);
             },
+=======
+            'user:id,name,photo,created_at',
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
             'category:id,name,icon',
             'photos'
         ])->where('status', 'active')->findOrFail($id);

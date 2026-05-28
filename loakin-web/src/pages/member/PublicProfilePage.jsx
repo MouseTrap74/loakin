@@ -10,11 +10,15 @@ export default function PublicProfilePage() {
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
+<<<<<<< HEAD
   const [listings, setListings] = useState([]);
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchInput, setSearchInput] = useState('');
 
+<<<<<<< HEAD
   // Report User state
   const [showReportUserForm, setShowReportUserForm] = useState(false);
   const [reportUserReason, setReportUserReason] = useState('');
@@ -45,6 +49,22 @@ export default function PublicProfilePage() {
       setLoading(false);
     };
     fetchData();
+=======
+  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get(`/users/${id}/public`);
+        setProfile(res.data);
+      } catch (err) {
+        setError('Pengguna tidak ditemukan');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   }, [id]);
 
   const handleLogout = async () => {
@@ -58,6 +78,7 @@ export default function PublicProfilePage() {
     if (searchInput.trim()) navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
   };
 
+<<<<<<< HEAD
   const handleReportUser = async () => {
     if (!reportUserReason.trim()) return alert('Alasan laporan wajib diisi');
     setReportingUser(true);
@@ -95,6 +116,8 @@ export default function PublicProfilePage() {
 
   const getPhotoUrl = (path) => `http://127.0.0.1:8000/storage/${path}`;
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
   if (loading) return <div style={styles.center}>Memuat...</div>;
   if (error)   return <div style={styles.center}>{error}</div>;
 
@@ -136,9 +159,12 @@ export default function PublicProfilePage() {
         .pp-btn-sell { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
         .pp-btn-sell:hover { background: #2aadb8; }
 
+<<<<<<< HEAD
         /* Listing card hover */
         .pp-listing-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
 
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         /* Footer */
         .pp-footer { text-align: center; color: #b0bec5; font-size: 0.77rem; padding: 1.2rem 0; border-top: 1px solid #e8edf0; background: #fff; margin-top: auto; }
       `}</style>
@@ -192,6 +218,15 @@ export default function PublicProfilePage() {
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                   </svg>
                 </button>
+<<<<<<< HEAD
+=======
+                <button className="pp-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                </button>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                 <Link to="/listings/create" className="pp-btn-sell">+ Jual</Link>
                 <Link to="/my-listings" className="pp-user-chip" style={{ textDecoration: 'none' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
@@ -224,6 +259,7 @@ export default function PublicProfilePage() {
 
         {/* Konten */}
         <div style={styles.container}>
+<<<<<<< HEAD
           {/* Profile Header */}
           <div style={styles.profileHeader}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
@@ -351,6 +387,22 @@ export default function PublicProfilePage() {
               ))}
             </div>
           )}
+=======
+          <div style={styles.profileHeader}>
+            {profile.photo
+              ? <img src={`http://127.0.0.1:8000/storage/${profile.photo}`} alt="foto" style={styles.avatar} />
+              : <div style={styles.avatarPlaceholder}>{profile.name?.[0]}</div>
+            }
+            <div>
+              <h2 style={styles.name}>{profile.name}</h2>
+              {profile.city && <p style={styles.city}>📍 {profile.city}</p>}
+              {profile.bio && <p style={styles.bio}>{profile.bio}</p>}
+              <p style={styles.joined}>
+                Bergabung sejak {new Date(profile.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long' })}
+              </p>
+            </div>
+          </div>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
         </div>
 
         <footer className="pp-footer">
@@ -362,6 +414,7 @@ export default function PublicProfilePage() {
 }
 
 const styles = {
+<<<<<<< HEAD
   container:         { maxWidth: 1100, margin: '2rem auto', width: '100%', padding: '0 1rem' },
   profileHeader:     { backgroundColor: '#fff', borderRadius: 12, padding: '24px 28px', display: 'flex', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', marginBottom: 24 },
   avatar:            { width: 72, height: 72, borderRadius: 12, objectFit: 'cover', flexShrink: 0 },
@@ -383,4 +436,15 @@ const styles = {
   listingCategory:   { background: '#e8f8f5', color: '#2BB5A0', fontSize: 11, fontWeight: 700, padding: '2px 6px', borderRadius: 4 },
   listingCondition:  { background: '#f0f2f5', color: '#555', fontSize: 11, fontWeight: 700, padding: '2px 6px', borderRadius: 4 },
   center:            { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontFamily: 'Nunito, sans-serif' },
+=======
+  container:       { maxWidth: 800, margin: '2rem auto', width: '100%', padding: '0 1rem' },
+  profileHeader:   { backgroundColor: '#fff', borderRadius: 12, padding: '2rem', display: 'flex', gap: '2rem', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', marginBottom: '1.5rem' },
+  avatar:          { width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 },
+  avatarPlaceholder:{ width: 100, height: 100, borderRadius: '50%', backgroundColor: '#3BBFC9', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold', flexShrink: 0 },
+  name:            { fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.25rem', fontFamily: 'Nunito, sans-serif' },
+  city:            { color: '#888', fontSize: '0.9rem', marginBottom: '0.25rem' },
+  bio:             { color: '#555', fontSize: '0.9rem', marginBottom: '0.5rem' },
+  joined:          { color: '#aaa', fontSize: '0.85rem' },
+  center:          { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontFamily: 'Nunito, sans-serif' },
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 };

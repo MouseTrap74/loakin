@@ -352,6 +352,15 @@ export default function EditProfilePage() {
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                   </svg>
                 </button>
+<<<<<<< HEAD
+=======
+                <button className="pp-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                </button>
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
                 <Link to="/listings/create" className="pp-btn-sell">+ Jual</Link>
                 <Link to="/my-listings" className="pp-user-chip" style={{ textDecoration: 'none' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
@@ -388,6 +397,7 @@ export default function EditProfilePage() {
           {/* Sidebar nav */}
           <nav className="pp-side-nav">
             <a href="#" className="active">Profil</a>
+<<<<<<< HEAD
             <Link to="/my-reviews" style={{ display: 'block', padding: '0.6rem 1.4rem', fontSize: '0.86rem', fontWeight: 600, color: '#6b7a8d', textDecoration: 'none', borderLeft: '3px solid transparent', transition: 'color 0.15s, border-color 0.15s, background 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.color = '#3BBFC9'; e.currentTarget.style.background = '#f0fbfc'; e.currentTarget.style.borderLeftColor = '#3BBFC9'; }}
               onMouseLeave={e => { e.currentTarget.style.color = '#6b7a8d'; e.currentTarget.style.background = ''; e.currentTarget.style.borderLeftColor = 'transparent'; }}
@@ -396,6 +406,8 @@ export default function EditProfilePage() {
               onMouseEnter={e => { e.currentTarget.style.color = '#3BBFC9'; e.currentTarget.style.background = '#f0fbfc'; e.currentTarget.style.borderLeftColor = '#3BBFC9'; }}
               onMouseLeave={e => { e.currentTarget.style.color = '#6b7a8d'; e.currentTarget.style.background = ''; e.currentTarget.style.borderLeftColor = 'transparent'; }}
             >🚫 Pengguna Diblokir</Link>
+=======
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
           </nav>
 
           {/* Main card */}

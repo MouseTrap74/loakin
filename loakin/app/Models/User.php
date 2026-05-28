@@ -13,6 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
+<<<<<<< HEAD
         'name',
         'email',
         'phone',
@@ -29,10 +30,18 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+=======
+        'name', 'email', 'phone', 'bio', 'photo',
+        'role', 'status', 'password', 'birth_date', 'gender',
+    ];
+
+    protected $hidden = ['password', 'remember_token'];
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 
     protected $casts = [
         'email_verified_at'    => 'datetime',
         'password'             => 'hashed',
+<<<<<<< HEAD
     ];
 
     // Relasi ke user_locations
@@ -105,4 +114,25 @@ class User extends Authenticatable
     {
         return $this->hasMany(BlockedUser::class, 'user_id');
     }
+=======
+        'preferred_categories' => 'array', // needed by ListingObserver
+    ];
+
+    // ── Existing ────────────────────────────────────────────────
+    public function locations()     { return $this->hasMany(UserLocation::class); }
+    public function addresses()     { return $this->hasMany(UserAddress::class); }
+    public function bannedKeywords(){ return $this->hasMany(BannedKeyword::class, 'created_by'); }
+    public function listings()      { return $this->hasMany(Listing::class); }
+    public function activeListings(){ return $this->hasMany(Listing::class)->where('status', 'active'); }
+
+    // ── Chat ────────────────────────────────────────────────────
+    public function pushSubscriptions()
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────
+    public function isAdmin()     { return $this->role === 'admin'; }
+    public function isSuspended() { return $this->status === 'suspended'; }
+>>>>>>> 0619bd2 (created chat and notification features for loakin)
 }
