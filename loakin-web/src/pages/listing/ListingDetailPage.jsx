@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
+import { trackListingView } from '../../services/searchHistory';
 import logoText from '../../assets/LoakinLogoText.png';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -23,6 +24,8 @@ export default function ListingDetailPage() {
   const [loading, setLoading]         = useState(true);
   const [activePhoto, setActivePhoto] = useState(0);
   const [searchInput, setSearchInput] = useState('');
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favLoading, setFavLoading] = useState(false);
 
   useEffect(() => { fetchListing(); }, [id]);
 
@@ -30,6 +33,10 @@ export default function ListingDetailPage() {
     try {
       const res = await api.get(`/listings/${id}`);
       setListing(res.data);
+      // Track kategori listing yang dilihat untuk rekomendasi personalisasi
+      if (res.data?.category_id) {
+        trackListingView(res.data.category_id, res.data.id);
+      }
     } catch (err) {
       navigate('/');
     } finally {
@@ -46,6 +53,37 @@ export default function ListingDetailPage() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim()) navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
+  };
+
+  useEffect(() => {
+    if (isLoggedIn() && listing) {
+      checkFavorite();
+    }
+  }, [listing]);
+
+  const checkFavorite = async () => {
+    try {
+      const res = await api.get(`/favorites/${id}/check`);
+      setIsFavorite(res.data.is_favorited);
+    } catch (_) {}
+  };
+
+  const toggleFavorite = async () => {
+    if (!isLoggedIn()) { navigate('/login'); return; }
+    setFavLoading(true);
+    try {
+      if (isFavorite) {
+        await api.delete(`/favorites/${id}`);
+        setIsFavorite(false);
+      } else {
+        await api.post(`/favorites/${id}`);
+        setIsFavorite(true);
+      }
+    } catch (_) {
+      alert('Gagal mengubah favorit.');
+    } finally {
+      setFavLoading(false);
+    }
   };
 
   const formatPrice = (price) =>
@@ -159,12 +197,6 @@ export default function ListingDetailPage() {
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                   </svg>
                 </button>
-                <button className="ld-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                  </svg>
-                </button>
                 <Link to="/listings/create" className="ld-btn-sell">+ Jual</Link>
                 <Link to="/my-listings" className="ld-user-chip" style={{ textDecoration: 'none' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
@@ -172,6 +204,12 @@ export default function ListingDetailPage() {
                     <rect x="9" y="3" width="6" height="4" rx="1"/>
                   </svg>
                   <span className="ld-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
+                </Link>
+                <Link to="/favorites" className="ld-user-chip" style={{ textDecoration: 'none' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                  <span className="ld-username" style={{ fontSize: '0.84rem' }}>Favorit</span>
                 </Link>
                 <Link to="/profile" className="ld-user-chip">
                   <div className="ld-avatar-sm">
@@ -317,22 +355,43 @@ export default function ListingDetailPage() {
               ) : isOwner ? (
                 <>
                   <Link to={'/listings/' + listing.id + '/edit'} style={s.btnPesan}>✏️ Edit Listing</Link>
-                  <Link to="/my-listings" style={s.btnKeranjang}>📋 Kelola Listing</Link>
+                  <Link to="/my-listings" style={{ background: '#fff', color: '#3BBFC9', border: '1.5px solid #3BBFC9', padding: '10px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' }}>📋 Kelola Listing</Link>
                 </>
               ) : isLoggedIn() ? (
                 <>
                   <a href={waUrl} target="_blank" rel="noreferrer" style={s.btnPesan}>Pesan</a>
-                  <button style={s.btnKeranjang} onClick={() => alert('Fitur keranjang akan segera hadir!')}>
-                    Masuk ke Keranjang
-                  </button>
                   <a href={waUrl} target="_blank" rel="noreferrer" style={s.btnChat}>Chat Penjual</a>
                 </>
               ) : (
                 <>
                   <Link to="/login" style={s.btnPesan}>Masuk untuk Pesan</Link>
-                  <Link to="/login" style={s.btnKeranjang}>Masuk ke Keranjang</Link>
                   <Link to="/login" style={s.btnChat}>Chat Penjual</Link>
                 </>
+              )}
+
+              {!isOwner && (
+                <button
+                  onClick={toggleFavorite}
+                  disabled={favLoading}
+                  style={{
+                    background: isFavorite ? '#fff0f0' : '#f5f7fa',
+                    border: `1.5px solid ${isFavorite ? '#e74c3c' : '#e2e8f0'}`,
+                    color: isFavorite ? '#e74c3c' : '#8a9ab0',
+                    padding: '10px',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    fontFamily: "'Nunito', sans-serif",
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.4rem',
+                    width: '100%',
+                  }}
+                >
+                  {isFavorite ? '❤️ Tersimpan' : '🤍 Simpan ke Favorit'}
+                </button>
               )}
 
               <div style={s.panelMeta}>
@@ -406,6 +465,7 @@ export default function ListingDetailPage() {
   );
 }
 
+
 const s = {
   container:       { maxWidth: 1200, margin: '0 auto', padding: '20px 16px' },
   center:          { textAlign: 'center', padding: 80, fontSize: 16, color: '#aaa', fontFamily: 'Nunito, sans-serif' },
@@ -448,7 +508,6 @@ const s = {
   panelLabel:      { fontSize: 13, color: '#8a9ab0', fontWeight: 600 },
   panelPrice:      { fontSize: 16, fontWeight: 800, color: '#333' },
   btnPesan:        { background: '#3BBFC9', color: '#fff', border: 'none', padding: '11px', borderRadius: 8, fontWeight: 800, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' },
-  btnKeranjang:    { background: '#fff', color: '#3BBFC9', border: '1.5px solid #3BBFC9', padding: '10px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' },
   btnChat:         { background: '#f0f2f5', color: '#555', border: 'none', padding: '10px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' },
   panelMeta:       { display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#8a9ab0' },
   soldBanner:      { background: '#fff5f5', color: '#e53e3e', padding: 12, borderRadius: 8, textAlign: 'center', fontWeight: 700, fontSize: 14 },
