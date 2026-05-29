@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
-import logoText from '../../assets/LoakinLogoText.png';
 
 export default function PublicProfilePage() {
   const { id } = useParams();
@@ -16,6 +15,7 @@ export default function PublicProfilePage() {
 >>>>>>> 0619bd2 (created chat and notification features for loakin)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+<<<<<<< HEAD
   const [searchInput, setSearchInput] = useState('');
 
 <<<<<<< HEAD
@@ -51,6 +51,8 @@ export default function PublicProfilePage() {
     fetchData();
 =======
   const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+=======
+>>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -67,16 +69,7 @@ export default function PublicProfilePage() {
 >>>>>>> 0619bd2 (created chat and notification features for loakin)
   }, [id]);
 
-  const handleLogout = async () => {
-    try { await api.post('/logout'); } catch (_) {}
-    logout();
-    navigate('/login');
-  };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchInput.trim()) navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
-  };
 
 <<<<<<< HEAD
   const handleReportUser = async () => {
@@ -124,11 +117,11 @@ export default function PublicProfilePage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; }
         .pp-wrap { min-height: 100vh; display: flex; flex-direction: column; font-family: 'Nunito', sans-serif; background: #f0f2f5; }
 
+<<<<<<< HEAD
         /* Utility bar */
         .pp-util { background: #fff; border-bottom: 1px solid #eaeef2; display: flex; justify-content: flex-end; align-items: center; padding: 0.35rem 2.5rem; gap: 1.6rem; }
         .pp-util a { color: #8a9ab0; font-size: 0.78rem; text-decoration: none; font-weight: 600; }
@@ -165,12 +158,15 @@ export default function PublicProfilePage() {
 
 =======
 >>>>>>> 0619bd2 (created chat and notification features for loakin)
+=======
+>>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
         /* Footer */
         .pp-footer { text-align: center; color: #b0bec5; font-size: 0.77rem; padding: 1.2rem 0; border-top: 1px solid #e8edf0; background: #fff; margin-top: auto; }
       `}</style>
 
       <div className="pp-wrap">
 
+<<<<<<< HEAD
         {/* Utility bar */}
         <div className="pp-util">
           {isLoggedIn() && isAdmin() && (
@@ -257,6 +253,8 @@ export default function PublicProfilePage() {
           </div>
         </nav>
 
+=======
+>>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
         {/* Konten */}
         <div style={styles.container}>
 <<<<<<< HEAD

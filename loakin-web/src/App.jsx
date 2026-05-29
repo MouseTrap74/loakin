@@ -132,6 +132,7 @@ import ConversationPage    from './pages/member/ConversationPage';
 import NotificationsPage   from './pages/member/NotificationsPage';
 
 import ChatWidget from './components/ChatWidget';
+import Navbar from './components/Navbar';
 
 // Listing
 import ListingBrowsePage   from './pages/listing/ListingBrowsePage';
@@ -169,6 +170,7 @@ function App() {
 
     return (
         <BrowserRouter>
+            <Navbar />
             <Routes>
                 {/* Auth */}
                 <Route path="/login"            element={<LoginPage />} />

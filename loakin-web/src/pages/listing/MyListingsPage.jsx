@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
-import logoText from '../../assets/LoakinLogoText.png';
 
 export default function MyListingsPage() {
   const navigate = useNavigate();
   const { user, isLoggedIn, isAdmin, logout } = useAuth();
 
-  const [searchInput, setSearchInput]         = useState('');
+
   const [listings, setListings]               = useState([]);
   const [loading, setLoading]                 = useState(true);
   const [currentPage, setCurrentPage]         = useState(1);
@@ -27,15 +26,7 @@ export default function MyListingsPage() {
     finally { setLoading(false); }
   };
 
-  const handleLogout = async () => {
-    try { await api.post('/logout'); } catch (_) {}
-    logout(); navigate('/login');
-  };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchInput.trim()) navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
-  };
 
   const handleMarkSold = async (id) => {
     if (!confirm('Tandai listing ini sebagai terjual?')) return;
@@ -73,46 +64,15 @@ export default function MyListingsPage() {
     return map[status] ?? { label: status, cls: 'ml-badge-inactive' };
   };
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; }
 
         .ml-page { min-height: 100vh; background: #f0f2f5; font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; }
-
-        /* ── utility bar ── */
-        .ml-util { background: #fff; border-bottom: 1px solid #eaeef2; display: flex; justify-content: flex-end; align-items: center; padding: 0.35rem 2.5rem; gap: 1.6rem; }
-        .ml-util a { color: #8a9ab0; font-size: 0.78rem; text-decoration: none; font-weight: 600; }
-        .ml-util a:hover { color: #3BBFC9; }
-
-        /* ── navbar ── */
-        .ml-nav { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; padding: 0.7rem 2.5rem; gap: 1.5rem; position: sticky; top: 0; z-index: 100; }
-        .ml-nav-logo img { height: 34px; object-fit: contain; mix-blend-mode: multiply; cursor: pointer; }
-        .ml-search { flex: 1; position: relative; }
-        .ml-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.6rem; border: 1.5px solid #e2e8f0; border-radius: 50px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8fafc; transition: border-color 0.2s; }
-        .ml-search input:focus { border-color: #3BBFC9; background: #fff; }
-        .ml-search input::placeholder { color: #b0bec5; }
-        .ml-search-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #b0bec5; pointer-events: none; }
-        .ml-search-btn { position: absolute; right: 0; top: 0; bottom: 0; background: #3BBFC9; border: none; border-radius: 0 50px 50px 0; padding: 0 1.2rem; color: #fff; font-weight: 700; font-size: 0.85rem; font-family: 'Nunito', sans-serif; cursor: pointer; }
-        .ml-search-btn:hover { background: #2aadb8; }
-        .ml-nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .ml-icon-btn { background: none; border: none; cursor: pointer; color: #6b7a8d; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: background 0.15s, color 0.15s; text-decoration: none; }
-        .ml-icon-btn:hover { background: #f0f4f8; color: #3BBFC9; }
-        .ml-user-chip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 50px; transition: background 0.15s; text-decoration: none; }
-        .ml-user-chip:hover { background: #f0f4f8; }
-        .ml-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: #e8f7f8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-        .ml-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
-        .ml-username { font-size: 0.88rem; font-weight: 700; color: #333; }
-        .ml-btn-login { background: #fff; border: 1.5px solid #3BBFC9; color: #3BBFC9; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-        .ml-btn-login:hover { background: #f0fbfc; }
-        .ml-btn-register { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .ml-btn-register:hover { background: #2aadb8; }
-        .ml-btn-sell { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .ml-btn-sell:hover { background: #2aadb8; }
 
         /* ── container ── */
         .ml-container { max-width: 920px; margin: 0 auto; padding: 2rem 1.5rem; flex: 1; }
@@ -185,6 +145,7 @@ export default function MyListingsPage() {
 
       <div className="ml-page">
 
+<<<<<<< HEAD
         {/* Utility bar */}
         <div className="ml-util">
           {isLoggedIn() && isAdmin() && (
@@ -270,6 +231,8 @@ export default function MyListingsPage() {
           </div>
         </nav>
 
+=======
+>>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
         <div className="ml-container">
           {/* Header */}
           <div className="ml-header">

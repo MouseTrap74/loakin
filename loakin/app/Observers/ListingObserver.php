@@ -16,7 +16,17 @@ class ListingObserver
             return;
         }
 
-        $this->notifyNearbyUsers($listing);
+        try {
+            // Guard: skip if the users table no longer has location columns
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'latitude')) {
+                return;
+            }
+            $this->notifyNearbyUsers($listing);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('ListingObserver: failed to notify nearby users', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     private function notifyNearbyUsers(Listing $listing): void

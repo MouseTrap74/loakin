@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { trackListingView } from '../../services/searchHistory';
 import logoText from '../../assets/LoakinLogoText.png';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
@@ -12,6 +13,8 @@ import Footer from '../../components/Footer';
 =======
 import logoText from '../../assets/LoakinLogoText.png';
 import NotificationBell from '../../components/NotificationBell';
+=======
+>>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
 import { useChat } from '../../context/ChatContext';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -37,6 +40,7 @@ export default function ListingDetailPage() {
   const [listing, setListing]         = useState(null);
   const [loading, setLoading]         = useState(true);
   const [activePhoto, setActivePhoto] = useState(0);
+<<<<<<< HEAD
   const [searchInput, setSearchInput] = useState('');
 <<<<<<< HEAD
   const [isFavorite, setIsFavorite] = useState(false);
@@ -48,6 +52,9 @@ export default function ListingDetailPage() {
   const [showReportForm, setShowReportForm] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reportDesc, setReportDesc]     = useState('');
+=======
+
+>>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
 
   useEffect(() => { fetchListing(); }, [id]);
   useEffect(() => { if (listing?.id) fetchReviews(); }, [listing?.id]);
@@ -111,16 +118,7 @@ export default function ListingDetailPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try { await api.post('/logout'); } catch (_) {}
-    logout();
-    navigate('/login');
-  };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchInput.trim()) navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
-  };
 
 <<<<<<< HEAD
   useEffect(() => {
@@ -165,7 +163,7 @@ export default function ListingDetailPage() {
   const formatDate = (date) =>
     new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+
 
   if (loading) return <div style={s.center}>Memuat...</div>;
   if (!listing) return null;
@@ -200,40 +198,9 @@ export default function ListingDetailPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; }
         .ld-wrap { min-height: 100vh; display: flex; flex-direction: column; font-family: 'Nunito', sans-serif; background: #f0f2f5; }
-
-        /* Utility bar */
-        .ld-util { background: #fff; border-bottom: 1px solid #eaeef2; display: flex; justify-content: flex-end; align-items: center; padding: 0.35rem 2.5rem; gap: 1.6rem; }
-        .ld-util a { color: #8a9ab0; font-size: 0.78rem; text-decoration: none; font-weight: 600; }
-        .ld-util a:hover { color: #3BBFC9; }
-
-        /* Navbar */
-        .ld-nav { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; padding: 0.7rem 2.5rem; gap: 1.5rem; position: sticky; top: 0; z-index: 100; }
-        .ld-nav-logo img { height: 34px; object-fit: contain; mix-blend-mode: multiply; cursor: pointer; }
-        .ld-search { flex: 1; position: relative; }
-        .ld-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.6rem; border: 1.5px solid #e2e8f0; border-radius: 50px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8fafc; transition: border-color 0.2s; }
-        .ld-search input:focus { border-color: #3BBFC9; background: #fff; }
-        .ld-search input::placeholder { color: #b0bec5; }
-        .ld-search-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #b0bec5; pointer-events: none; }
-        .ld-search-btn { position: absolute; right: 0; top: 0; bottom: 0; background: #3BBFC9; border: none; border-radius: 0 50px 50px 0; padding: 0 1.2rem; color: #fff; font-weight: 700; font-size: 0.85rem; font-family: 'Nunito', sans-serif; cursor: pointer; }
-        .ld-search-btn:hover { background: #2aadb8; }
-        .ld-nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .ld-icon-btn { background: none; border: none; cursor: pointer; color: #6b7a8d; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: background 0.15s, color 0.15s; text-decoration: none; }
-        .ld-icon-btn:hover { background: #f0f4f8; color: #3BBFC9; }
-        .ld-user-chip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 50px; transition: background 0.15s; text-decoration: none; }
-        .ld-user-chip:hover { background: #f0f4f8; }
-        .ld-avatar-sm { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #e8f7f8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-        .ld-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
-        .ld-username { font-size: 0.88rem; font-weight: 700; color: #333; }
-        .ld-btn-login { background: #fff; border: 1.5px solid #3BBFC9; color: #3BBFC9; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-        .ld-btn-login:hover { background: #f0fbfc; }
-        .ld-btn-register { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .ld-btn-register:hover { background: #2aadb8; }
-        .ld-btn-sell { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .ld-btn-sell:hover { background: #2aadb8; }
 
         /* Leaflet z-index fix */
         .leaflet-pane, .leaflet-top, .leaflet-bottom { z-index: 1 !important; }
@@ -243,6 +210,7 @@ export default function ListingDetailPage() {
 
       <div className="ld-wrap">
 
+<<<<<<< HEAD
         {/* Utility bar */}
         <div className="ld-util">
           {isLoggedIn() && isAdmin() && (
@@ -336,6 +304,8 @@ export default function ListingDetailPage() {
           </div>
         </nav>
 
+=======
+>>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
         {/* Konten Utama */}
         <div style={s.container}>
 
