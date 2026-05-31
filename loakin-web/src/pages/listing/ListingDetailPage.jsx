@@ -6,6 +6,7 @@ import logoText from '../../assets/LoakinLogoText.png';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import Footer from '../../components/Footer';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -24,7 +25,52 @@ export default function ListingDetailPage() {
   const [activePhoto, setActivePhoto] = useState(0);
   const [searchInput, setSearchInput] = useState('');
 
+  const [reviews, setReviews]           = useState([]);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [showReportForm, setShowReportForm] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDesc, setReportDesc]     = useState('');
+
   useEffect(() => { fetchListing(); }, [id]);
+  useEffect(() => { if (listing) fetchReviews(); }, [listing]);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await api.get(`/users/${listing?.user_id}/reviews`);
+      setReviews(res.data.data || []);
+    } catch (_) {}
+  };
+
+  const handleSubmitReview = async () => {
+    try {
+      await api.post(`/listings/${id}/reviews`, {
+        rating: reviewRating,
+        comment: reviewComment,
+      });
+      alert('Ulasan berhasil dikirim!');
+      setReviewComment('');
+      fetchReviews();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Gagal mengirim ulasan');
+    }
+  };
+
+  const handleReportListing = async () => {
+    if (!reportReason.trim()) return alert('Alasan laporan wajib diisi');
+    try {
+      await api.post(`/listings/${id}/report`, {
+        reason: reportReason,
+        description: reportDesc,
+      });
+      alert('Laporan berhasil dikirim!');
+      setShowReportForm(false);
+      setReportReason('');
+      setReportDesc('');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Gagal mengirim laporan');
+    }
+  };
 
   const fetchListing = async () => {
     try {
@@ -244,7 +290,7 @@ export default function ListingDetailPage() {
             {/* Peta */}
             <div style={s.mapCol}>
               <div style={s.mapHeader}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2.5">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2.5">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
                 </svg>
                 <span style={s.mapHeaderText}>Lokasi Barang</span>
@@ -258,7 +304,7 @@ export default function ListingDetailPage() {
                     center={[parseFloat(listing.latitude), parseFloat(listing.longitude)]}
                     zoom={isLoggedIn() ? 15 : 12}
                     style={{
-                      height: 200,
+                      height: 360,
                       width: '100%',
                       filter: isLoggedIn() ? 'none' : 'blur(5px)',
                       pointerEvents: isLoggedIn() ? 'auto' : 'none',
@@ -378,29 +424,192 @@ export default function ListingDetailPage() {
               {/* Info Penjual */}
               <div style={s.sellerRow}>
                 <div style={s.sellerLeft}>
+                  {/* Avatar */}
                   <div style={s.sellerAvatar}>
                     {listing.user?.photo
                       ? <img src={getPhotoUrl(listing.user.photo)} alt={listing.user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
+                      : <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
                           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                           <circle cx="12" cy="7" r="4"/>
                         </svg>
                     }
                   </div>
+                  {/* Info Toko */}
                   <div>
-                    <p style={s.sellerName}>{listing.user?.name}</p>
-                    <p style={s.sellerJoined}>Bergabung {formatDate(listing.user?.created_at)}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      <p style={s.sellerName}>{listing.user?.name}</p>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#3BBFC9" stroke="none">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span style={{ fontSize: 13, color: '#333', fontWeight: 600 }}>5.0</span>
+                        <span style={{ fontSize: 12, color: '#999' }}>({reviews.length})</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2">
+                          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                        </svg>
+                        <span style={{ fontSize: 12, color: '#999' }}>{listing.user?.active_listings_count || 0} total barang</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <Link to={'/users/' + listing.user_id} style={s.btnSellerProfile}>Lihat Profil</Link>
+                <Link to={'/users/' + listing.user_id} style={s.btnFollow}>Follow</Link>
+              </div>
+              {/* Laporkan Listing */}
+              {isLoggedIn() && !isOwner && (
+                <div style={{ marginTop: 16 }}>
+                  <button
+                    onClick={() => setShowReportForm(!showReportForm)}
+                    style={{ background: 'none', border: 'none', color: '#e53e3e', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0 }}
+                  >
+                    🚩 Laporkan Listing ini
+                  </button>
+                  {showReportForm && (
+                    <div style={{ marginTop: 10, background: '#fff5f5', borderRadius: 8, padding: 14 }}>
+                      <input
+                        placeholder="Alasan laporan"
+                        value={reportReason}
+                        onChange={e => setReportReason(e.target.value)}
+                        style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #fca5a5', marginBottom: 8, boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#000000' }}
+                      />
+                      <textarea
+                        placeholder="Deskripsi (opsional)"
+                        value={reportDesc}
+                        onChange={e => setReportDesc(e.target.value)}
+                        rows={3}
+                        style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #fca5a5', marginBottom: 8, boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#000000' }}
+                      />
+                      <button
+                        onClick={handleReportListing}
+                        style={{ background: '#e53e3e', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        Kirim Laporan
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Ulasan Penjual */}
+              <div style={{ marginTop: 24 }}>
+                <h3 style={s.sectionTitle}>Ulasan Penjual</h3>
+
+                {/* Form beri ulasan */}
+                {isLoggedIn() && !isOwner && (
+                  <div style={{ background: '#f8f9fb', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+                    <p style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>Beri Ulasan</p>
+                    <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
+                      {[1,2,3,4,5].map(star => (
+                        <svg
+                          key={star}
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          onClick={() => setReviewRating(star)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                            fill={star <= reviewRating ? '#f5a623' : '#ddd'}
+                            stroke={star <= reviewRating ? '#e8971e' : '#ccc'}
+                            strokeWidth="0.5"
+                          />
+                        </svg>
+                      ))}
+                    </div>
+                    <textarea
+                      placeholder="Tulis komentar (opsional)"
+                      value={reviewComment}
+                      onChange={e => setReviewComment(e.target.value)}
+                      rows={3}
+                      style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #e2e8f0', marginBottom: 8, boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#000000' }}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                      <button
+                        onClick={handleSubmitReview}
+                        style={{ background: '#3BBFC9', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        Kirim Ulasan
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Daftar ulasan */}
+                {reviews.length === 0 ? (
+                  <p style={{ color: '#aaa', fontSize: 13 }}>Belum ada ulasan untuk penjual ini.</p>
+                ) : (
+                  reviews.map(review => (
+                    <div key={review.id} style={{ border: '1px solid #eee', borderRadius: 8, padding: 14, marginBottom: 10 }}>
+                      {/* Baris 1: Bintang + Tanggal */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                        <div style={{ display: 'flex', gap: 2 }}>
+                          {[1,2,3,4,5].map(star => (
+                            <svg key={star} width="18" height="18" viewBox="0 0 24 24">
+                              <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                fill={star <= review.rating ? '#f5a623' : '#ddd'}
+                                stroke={star <= review.rating ? '#e8971e' : '#ccc'}
+                                strokeWidth="0.5"
+                              />
+                            </svg>
+                          ))}
+                        </div>
+                        <span style={{ fontSize: 12, color: '#999', fontWeight: 600 }}>
+                          {(() => {
+                            const now = new Date();
+                            const created = new Date(review.created_at);
+                            const diffMs = now - created;
+                            const diffMin = Math.floor(diffMs / 60000);
+                            const diffHour = Math.floor(diffMs / 3600000);
+                            const diffDay = Math.floor(diffMs / 86400000);
+                            const diffMonth = Math.floor(diffDay / 30);
+                            const diffYear = Math.floor(diffDay / 365);
+                            if (diffMin < 1) return 'Baru saja';
+                            if (diffMin < 60) return `${diffMin} menit lalu`;
+                            if (diffHour < 24) return `${diffHour} jam lalu`;
+                            if (diffDay < 30) return `${diffDay} hari lalu`;
+                            if (diffMonth < 12) return `${diffMonth} bulan lalu`;
+                            return `${diffYear} tahun lalu`;
+                          })()}
+                        </span>
+                      </div>
+                      {/* Baris 2: Avatar + Nama */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#e8f7f8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                          {review.reviewer?.photo
+                            ? <img src={`http://127.0.0.1:8000/storage/${review.reviewer.photo}`} alt={review.reviewer.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                              </svg>
+                          }
+                        </div>
+                        <strong style={{ fontSize: 13, color: '#333' }}>{review.reviewer?.name}</strong>
+                      </div>
+                      {/* Baris 3: Komentar */}
+                      <p style={{ fontSize: 14, color: '#333', margin: 0, lineHeight: 1.7, textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif', fontWeight: 400 }}>{review.comment}</p>
+                      {review.reply && (
+                        <div style={{ background: '#f5f5f5', borderRadius: 6, padding: 10, marginTop: 8 }}>
+                          <strong style={{ fontSize: 12 }}>Balasan penjual:</strong>
+                          <p style={{ fontSize: 13, margin: '4px 0 0' }}>{review.reply}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
         </div>
-
-        <footer className="ld-footer">
-          © 2026, PT. Loakin Indonesia. All Rights Reserved.
-        </footer>
+        
+        <Footer />
       </div>
     </>
   );
@@ -430,9 +639,9 @@ const s = {
   // Peta
   mapCol:          { background: '#fff', borderRadius: 12, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', gap: 8 },
   mapHeader:       { display: 'flex', alignItems: 'center', gap: 6 },
-  mapHeaderText:   { fontSize: 13, fontWeight: 700, color: '#333' },
+  mapHeaderText:   { fontSize: 17, fontWeight: 800, color: '#333' },
   mapAddress:      { fontSize: 12, color: '#8a9ab0', fontWeight: 600 },
-  mapWrap:         { position: 'relative', borderRadius: 8, overflow: 'hidden', flex: 1, minHeight: 200, zIndex: 0 },
+  mapWrap:         { position: 'relative', borderRadius: 8, overflow: 'hidden', flex: 1, minHeight: 360, zIndex: 0 },
   mapOverlay:      { position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 },
   mapOverlayBox:   { background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(2px)', padding: '12px 20px', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, boxShadow: '0 2px 12px rgba(0,0,0,0.12)' },
   mapOverlayText:  { color: '#333', fontSize: 13, fontWeight: 700 },
@@ -467,10 +676,10 @@ const s = {
   detailItem:      { display: 'flex', flexDirection: 'column', gap: 2 },
   detailLabel:     { fontSize: 12, color: '#aaa', fontWeight: 600 },
   detailValue:     { fontSize: 14, color: '#333', fontWeight: 700 },
-  sellerRow:       { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8f9fb', borderRadius: 10, padding: 14, marginTop: 8 },
-  sellerLeft:      { display: 'flex', alignItems: 'center', gap: 12 },
-  sellerAvatar:    { width: 44, height: 44, borderRadius: '50%', background: '#e8f7f8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  sellerName:      { fontSize: 14, fontWeight: 800, color: '#333', margin: 0 },
+  sellerRow:       { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', borderRadius: 12, padding: '16px 20px', marginTop: 8, border: '1px solid #e8edf2' },
+  sellerLeft:      { display: 'flex', alignItems: 'center', gap: 14 },
+  sellerAvatar:    { width: 52, height: 52, borderRadius: 10, background: '#e8f7f8', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 },
+  sellerName:      { fontSize: 15, fontWeight: 800, color: '#333', margin: 0 },
   sellerJoined:    { fontSize: 12, color: '#aaa', margin: '2px 0 0' },
-  btnSellerProfile:{ background: '#fff', border: '1.5px solid #e2e8f0', color: '#555', padding: '7px 14px', borderRadius: 8, textDecoration: 'none', fontSize: 13, fontWeight: 700 },
+  btnFollow:       { background: '#fff', border: '1.5px solid #3BBFC9', color: '#3BBFC9', padding: '8px 24px', borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap' },
 };

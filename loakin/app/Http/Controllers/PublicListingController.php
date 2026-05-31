@@ -88,7 +88,12 @@ class PublicListingController extends Controller
     public function show($id)
     {
         $listing = Listing::with([
-            'user:id,name,photo,created_at',
+            'user' => function ($query) {
+                $query->select('id', 'name', 'photo', 'created_at')
+                      ->withCount(['listings as active_listings_count' => function ($q) {
+                          $q->where('status', 'active');
+                      }]);
+            },
             'category:id,name,icon',
             'photos'
         ])->where('status', 'active')->findOrFail($id);

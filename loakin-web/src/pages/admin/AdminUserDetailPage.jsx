@@ -313,13 +313,17 @@ export default function AdminUserDetailPage() {
       <div className="ad-page">
         {/* Navbar */}
         <nav className="ad-nav">
-          <div className="ad-nav-logo">
+          <Link to="/" className="ad-nav-logo" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <img src={logoText} alt="Loakin" />
-          </div>
+          </Link>
           <div className="ad-nav-right">
-            <Link to="/admin/users"           className="ad-nav-link">Pengguna</Link>
+            <Link to="/admin/dashboard"       className="ad-nav-link">Dashboard</Link>
+            <Link to="/admin/listings"        className="ad-nav-link">Listing</Link>
+            <Link to="/admin/users"           className="ad-nav-link active">Pengguna</Link>
+            <Link to="/admin/reports"         className="ad-nav-link">Laporan</Link>
             <Link to="/admin/settings"        className="ad-nav-link">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="ad-nav-link">Kata Kunci</Link>
+            <button className="ad-btn ad-btn-delete" style={{padding: '0.45rem 1.1rem'}} onClick={() => navigate('/login')}>Logout</button>
           </div>
         </nav>
 

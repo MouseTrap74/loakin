@@ -27,6 +27,13 @@ import MyListingsPage from './pages/listing/MyListingsPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminListingPage from './pages/admin/AdminListingPage';
 
+// Review & Report Pages
+import SellerReviewsPage from './pages/member/SellerReviewsPage';
+import MyBlockedUsersPage from './pages/member/MyBlockedUsersPage';
+import MySellerReviewsPage from './pages/member/MySellerReviewsPage';
+import AdminReportsPage from './pages/admin/AdminReportsPage';
+import AdminReportDetailPage from './pages/admin/AdminReportDetailPage';
+
 // Protected Route Components
 const ProtectedRoute = ({ children }) => {
   const { isLoggedIn } = useAuth();
@@ -82,6 +89,23 @@ function App() {
         } />
         <Route path="/admin/listings" element={
           <AdminRoute><AdminListingPage /></AdminRoute>
+        } />
+
+        {/* Member Routes - Review & Blokir */}
+        <Route path="/users/:id/reviews" element={<SellerReviewsPage />} />
+        <Route path="/my-reviews" element={
+          <ProtectedRoute><MySellerReviewsPage /></ProtectedRoute>
+        } />
+        <Route path="/blocked-users" element={
+          <ProtectedRoute><MyBlockedUsersPage /></ProtectedRoute>
+        } />
+
+        {/* Admin Routes - Laporan */}
+        <Route path="/admin/reports" element={
+          <AdminRoute><AdminReportsPage /></AdminRoute>
+        } />
+        <Route path="/admin/reports/:id" element={
+          <AdminRoute><AdminReportDetailPage /></AdminRoute>
         } />
 
       </Routes>

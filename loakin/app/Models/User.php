@@ -75,4 +75,28 @@ class User extends Authenticatable
     {
         return $this->status === 'suspended';
     }
+
+    // Reviews yang ditulis user ini
+    public function reviewsGiven()
+    {
+        return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    // Reviews yang diterima user ini (sebagai penjual)
+    public function reviewsReceived()
+    {
+        return $this->hasMany(Review::class, 'seller_id');
+    }
+
+    // Laporan yang dibuat user ini
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'reporter_id');
+    }
+
+    // User yang diblokir oleh user ini
+    public function blockedUsers()
+    {
+        return $this->hasMany(BlockedUser::class, 'user_id');
+    }
 }
