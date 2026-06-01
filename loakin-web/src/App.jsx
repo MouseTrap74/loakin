@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import FavoritesPage from './pages/member/FavoritesPage';
 
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
@@ -54,6 +55,7 @@ function App() {
         <Route path="/profile" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         <Route path="/profile/change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
         <Route path="/users/:id" element={<PublicProfilePage />} />
+        <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
 
         {/* Admin Routes */}
         <Route path="/admin/users" element={<AdminRoute><AdminUserListPage /></AdminRoute>} />

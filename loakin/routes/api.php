@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\AdminListingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\BannedKeywordController;
+use App\Http\Controllers\FavoriteController;
 
 // ================================================================
 // PUBLIC ROUTES (tidak perlu login)
@@ -62,6 +63,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Foto listing
     Route::post('/listings/{id}/photos', [ListingController::class, 'uploadPhotos']);
     Route::delete('/listings/{id}/photos/{photoId}', [ListingController::class, 'deletePhoto']);
+
+    // Favorit
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/favorites/{listingId}', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{listingId}', [FavoriteController::class, 'destroy']);
+    Route::get('/favorites/{listingId}/check', [FavoriteController::class, 'check']);
 });
 
 // ================================================================

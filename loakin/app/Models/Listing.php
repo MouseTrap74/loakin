@@ -58,6 +58,12 @@ class Listing extends Model
         return $this->hasOne(ListingPhoto::class)->orderBy('order');
     }
 
+    // User yang memfavoritkan listing ini
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
+    }
+
     // Helper: apakah listing ini aktif?
     public function isActive()
     {
