@@ -35,27 +35,18 @@ class FavoriteController extends Controller
         // Pastikan listing ada dan aktif
         Listing::where('status', 'active')->findOrFail($listingId);
 
-        // Cek apakah sudah difavoritkan
-        $exists = Favorite::where('user_id', auth()->id())
-            ->where('listing_id', $listingId)
-            ->exists();
-
-        if ($exists) {
-            return response()->json([
-                'message'      => 'Listing sudah ada di favorit.',
-                'is_favorited' => true,
-            ]);
-        }
-
-        Favorite::create([
+        // Atomically find or create the favorite (eliminates race condition)
+        $favorite = Favorite::firstOrCreate([
             'user_id'    => auth()->id(),
             'listing_id' => $listingId,
         ]);
 
         return response()->json([
-            'message'      => 'Listing disimpan ke favorit!',
+            'message'      => $favorite->wasRecentlyCreated
+                ? 'Listing disimpan ke favorit!'
+                : 'Listing sudah ada di favorit.',
             'is_favorited' => true,
-        ], 201);
+        ], $favorite->wasRecentlyCreated ? 201 : 200);
     }
 
     // DELETE /api/favorites/{listingId} — Hapus listing dari favorit

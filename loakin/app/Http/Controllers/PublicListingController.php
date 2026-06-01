@@ -33,8 +33,8 @@ class PublicListingController extends Controller
         }
 
         // Pencarian judul (guest) atau judul + deskripsi (member: search_in=all)
-        if ($request->search) {
-            $keyword = '%' . $request->search . '%';
+        if ($request->filled('search')) {
+            $keyword = '%' . trim($request->search) . '%';
             if ($request->search_in === 'all') {
                 $query->where(function ($q) use ($keyword) {
                     $q->where('title', 'like', $keyword)

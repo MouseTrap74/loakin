@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import api, { storageUrl } from '../../services/api';
 import logoText from '../../assets/LoakinLogoText.png';
 
 export default function FavoritesPage() {
@@ -39,7 +39,15 @@ export default function FavoritesPage() {
     setRemoving(listingId);
     try {
       await api.delete(`/favorites/${listingId}`);
-      setFavorites((prev) => prev.filter((f) => f.id !== listingId));
+      setFavorites((prev) => {
+        const newFavorites = prev.filter((f) => f.id !== listingId);
+        // If the current page is now empty and we're not on the first page,
+        // go back one page (the useEffect on currentPage will refetch).
+        if (newFavorites.length === 0 && currentPage > 1) {
+          setCurrentPage((p) => p - 1);
+        }
+        return newFavorites;
+      });
       setTotalCount((prev) => Math.max(0, prev - 1));
     } catch (err) {
       alert('Gagal menghapus dari favorit.');
@@ -63,9 +71,9 @@ export default function FavoritesPage() {
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
 
   const getPhotoUrl = (photo) =>
-    photo?.photo_path ? `http://127.0.0.1:8000/storage/${photo.photo_path}` : null;
+    photo?.photo_path ? storageUrl(photo.photo_path) : null;
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+  const photoUrl = user?.photo ? storageUrl(user.photo) : null;
 
   return (
     <>

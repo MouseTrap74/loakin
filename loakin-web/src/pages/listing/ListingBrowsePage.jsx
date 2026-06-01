@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import api, { storageUrl } from '../../services/api';
 import logoText from '../../assets/LoakinLogoText.png';
 import BrowseMapView from '../../components/BrowseMapView';
 import { trackSearch, trackCategoryClick, getTopCategories, hasHistory } from '../../services/searchHistory';
@@ -87,9 +87,10 @@ export default function ListingBrowsePage() {
     fetchNearbyListings();
   }, [userLocation, filters.radius]);
 
+  const loggedIn = isLoggedIn();
   useEffect(() => {
-  if (isLoggedIn()) fetchFavoriteIds();
-}, [isLoggedIn]);
+    if (loggedIn) fetchFavoriteIds();
+  }, [loggedIn]);
 
 const fetchFavoriteIds = async () => {
   try {
@@ -327,9 +328,9 @@ const toggleFavorite = async (e, listingId) => {
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
 
   const getPhotoUrl = (photo) =>
-    photo ? `http://127.0.0.1:8000/storage/${photo.photo_path}` : null;
+    photo ? storageUrl(photo.photo_path) : null;
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+  const photoUrl = user?.photo ? storageUrl(user.photo) : null;
 
   const categoriesToShow = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
   const quickCategories = categoriesToShow.slice(0, QUICK_CAT_LIMIT);
