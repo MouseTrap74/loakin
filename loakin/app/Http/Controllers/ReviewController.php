@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Review;
+use App\Models\Listing;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class ReviewController extends Controller
+{
+    // Beri ulasan ke penjual (via listing yang dibeli)
+    public function store(Request $request, $listingId)
+    {
+        $request->validate([
+            'rating'  => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        $listing = Listing::findOrFail($listingId);
+
+        // Tidak boleh review listing sendiri
+        if ($listing->user_id === Auth::id()) {
+            return response()->json(['message' => 'Tidak bisa mengulas listing sendiri'], 403);
+        }
+
+        $review = Review::firstOrCreate(
+            [
+                'reviewer_id' => Auth::id(),
+                'listing_id'  => $listingId,
+            ],
+            [
+                'seller_id'   => $listing->user_id,
+                'rating'      => $request->rating,
+                'comment'     => $request->comment,
+            ]
+        );
+
+        if (!$review->wasRecentlyCreated) {
+            return response()->json(['message' => 'Kamu sudah memberikan ulasan untuk listing ini'], 422);
+        }
+
+        return response()->json([
+            'message' => 'Ulasan berhasil dikirim',
+            'review'  => $review->load('reviewer'),
+        ], 201);
+    }
+
+    // Lihat semua ulasan milik seorang penjual
+    public function sellerReviews($sellerId)
+    {
+        $reviews = Review::with(['reviewer', 'listing'])
+            ->where('seller_id', $sellerId)
+            ->latest()
+            ->paginate(10);
+
+        return response()->json($reviews);
+    }
+
+    // Penjual balas ulasan
+    public function reply(Request $request, $reviewId)
+    {
+        $request->validate([
+            'reply' => 'required|string|max:1000',
+        ]);
+
+        $review = Review::findOrFail($reviewId);
+
+        // Hanya penjual yang bisa balas
+        if ($review->seller_id !== Auth::id()) {
+            return response()->json(['message' => 'Tidak diizinkan'], 403);
+        }
+
+        $updated = Review::where('id', $review->id)
+            ->whereNull('reply')
+            ->update([
+                'reply'      => $request->reply,
+                'replied_at' => now(),
+            ]);
+
+        if (!$updated) {
+            return response()->json(['message' => 'Ulasan sudah dibalas'], 422);
+        }
+
+        return response()->json([
+            'message' => 'Balasan berhasil dikirim',
+            'review'  => $review,
+        ]);
+    }
+}

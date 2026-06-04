@@ -290,11 +290,14 @@ export default function AdminBannedKeywordPage() {
       <div className="bk-page">
         {/* Navbar */}
         <nav className="bk-nav">
-          <div className="bk-nav-logo">
+          <Link to="/" className="bk-nav-logo" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <img src={logoText} alt="Loakin" />
-          </div>
+          </Link>
           <div className="bk-nav-right">
+            <Link to="/admin/dashboard"       className="bk-nav-link">Dashboard</Link>
+            <Link to="/admin/listings"        className="bk-nav-link">Listing</Link>
             <Link to="/admin/users"           className="bk-nav-link">Pengguna</Link>
+            <Link to="/admin/reports"         className="bk-nav-link">Laporan</Link>
             <Link to="/admin/settings"        className="bk-nav-link">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="bk-nav-link active">Kata Kunci</Link>
             <button className="bk-logout-btn" onClick={handleLogout}>Logout</button>

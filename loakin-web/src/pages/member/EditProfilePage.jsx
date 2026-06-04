@@ -388,6 +388,14 @@ export default function EditProfilePage() {
           {/* Sidebar nav */}
           <nav className="pp-side-nav">
             <a href="#" className="active">Profil</a>
+            <Link to="/my-reviews" style={{ display: 'block', padding: '0.6rem 1.4rem', fontSize: '0.86rem', fontWeight: 600, color: '#6b7a8d', textDecoration: 'none', borderLeft: '3px solid transparent', transition: 'color 0.15s, border-color 0.15s, background 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#3BBFC9'; e.currentTarget.style.background = '#f0fbfc'; e.currentTarget.style.borderLeftColor = '#3BBFC9'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#6b7a8d'; e.currentTarget.style.background = ''; e.currentTarget.style.borderLeftColor = 'transparent'; }}
+            >⭐ Ulasan Saya</Link>
+            <Link to="/blocked-users" style={{ display: 'block', padding: '0.6rem 1.4rem', fontSize: '0.86rem', fontWeight: 600, color: '#6b7a8d', textDecoration: 'none', borderLeft: '3px solid transparent', transition: 'color 0.15s, border-color 0.15s, background 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#3BBFC9'; e.currentTarget.style.background = '#f0fbfc'; e.currentTarget.style.borderLeftColor = '#3BBFC9'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#6b7a8d'; e.currentTarget.style.background = ''; e.currentTarget.style.borderLeftColor = 'transparent'; }}
+            >🚫 Pengguna Diblokir</Link>
           </nav>
 
           {/* Main card */}

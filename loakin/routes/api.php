@@ -12,6 +12,10 @@ use App\Http\Controllers\Admin\AdminListingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\BannedKeywordController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\BlockedUserController;
+use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\FavoriteController;
 
 // ================================================================
@@ -24,6 +28,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // Profil publik
 Route::get('/users/{id}/public', [PublicProfileController::class, 'show']);
+Route::get('/users/{id}/listings', [PublicProfileController::class, 'listings']);
 
 // Listing publik
 Route::get('/categories', [PublicListingController::class, 'categories']);
@@ -63,6 +68,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // Foto listing
     Route::post('/listings/{id}/photos', [ListingController::class, 'uploadPhotos']);
     Route::delete('/listings/{id}/photos/{photoId}', [ListingController::class, 'deletePhoto']);
+
+    // Ulasan
+    Route::post('/listings/{id}/reviews', [ReviewController::class, 'store']);
+    Route::get('/users/{id}/reviews', [ReviewController::class, 'sellerReviews']);
+    Route::post('/reviews/{id}/reply', [ReviewController::class, 'reply']);
+
+    // Laporan
+    Route::post('/listings/{id}/report', [ReportController::class, 'reportListing']);
+    Route::post('/users/{id}/report', [ReportController::class, 'reportUser']);
+
+    // Blokir
+    Route::post('/users/{id}/block', [BlockedUserController::class, 'block']);
+    Route::delete('/users/{id}/block', [BlockedUserController::class, 'unblock']);
+    Route::get('/blocked-users', [BlockedUserController::class, 'index']);
 
     // Favorit
     Route::get('/favorites', [FavoriteController::class, 'index']);
@@ -106,4 +125,10 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/banned-keywords', [BannedKeywordController::class, 'index']);
     Route::post('/banned-keywords', [BannedKeywordController::class, 'store']);
     Route::delete('/banned-keywords/{id}', [BannedKeywordController::class, 'destroy']);
+
+    // Laporan
+    Route::get('/reports', [AdminReportController::class, 'index']);
+    Route::get('/reports/{id}', [AdminReportController::class, 'show']);
+    Route::patch('/reports/{id}/resolve', [AdminReportController::class, 'resolve']);
+    Route::patch('/reports/{id}/reject', [AdminReportController::class, 'reject']);
 });

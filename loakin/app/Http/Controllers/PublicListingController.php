@@ -14,6 +14,18 @@ class PublicListingController extends Controller
         $query = Listing::with(['user:id,name,photo', 'category:id,name,icon', 'primaryPhoto'])
             ->where('status', 'active');
 
+        // Sembunyikan listing dari pengguna yang diblokir dan yang memblokir jika user sedang login
+        if ($userId = \Illuminate\Support\Facades\Auth::guard('sanctum')->id()) {
+            $blockedByMe = \App\Models\BlockedUser::where('user_id', $userId)->pluck('blocked_id')->toArray();
+            $blockingMe = \App\Models\BlockedUser::where('blocked_id', $userId)->pluck('user_id')->toArray();
+            
+            $allBlockedIds = array_unique(array_merge($blockedByMe, $blockingMe));
+            
+            if (!empty($allBlockedIds)) {
+                $query->whereNotIn('user_id', $allBlockedIds);
+            }
+        }
+
         // Filter kategori
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
@@ -91,7 +103,19 @@ class PublicListingController extends Controller
             ->where('status', 'active')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
-            ->select(['id', 'title', 'price', 'latitude', 'longitude', 'condition', 'is_featured', 'category_id']);
+            ->select(['id', 'title', 'price', 'latitude', 'longitude', 'condition', 'is_featured', 'category_id', 'user_id']);
+
+        // Sembunyikan listing dari pengguna yang diblokir dan yang memblokir jika user sedang login
+        if ($userId = \Illuminate\Support\Facades\Auth::guard('sanctum')->id()) {
+            $blockedByMe = \App\Models\BlockedUser::where('user_id', $userId)->pluck('blocked_id')->toArray();
+            $blockingMe = \App\Models\BlockedUser::where('blocked_id', $userId)->pluck('user_id')->toArray();
+            
+            $allBlockedIds = array_unique(array_merge($blockedByMe, $blockingMe));
+            
+            if (!empty($allBlockedIds)) {
+                $query->whereNotIn('user_id', $allBlockedIds);
+            }
+        }
 
         // Filter radius kalau koordinat dan radius tersedia
         if ($request->filled('lat') && $request->filled('lng') && $request->filled('radius')) {
@@ -112,7 +136,12 @@ class PublicListingController extends Controller
     public function show($id)
     {
         $listing = Listing::with([
-            'user:id,name,photo,created_at',
+            'user' => function ($query) {
+                $query->select('id', 'name', 'photo', 'created_at')
+                      ->withCount(['listings as active_listings_count' => function ($q) {
+                          $q->where('status', 'active');
+                      }]);
+            },
             'category:id,name,icon',
             'photos'
         ])->where('status', 'active')->findOrFail($id);
