@@ -71,15 +71,16 @@ class ReviewController extends Controller
             return response()->json(['message' => 'Tidak diizinkan'], 403);
         }
 
-        // Hanya bisa balas sekali
-        if ($review->reply) {
+        $updated = Review::where('id', $review->id)
+            ->whereNull('reply')
+            ->update([
+                'reply'      => $request->reply,
+                'replied_at' => now(),
+            ]);
+
+        if (!$updated) {
             return response()->json(['message' => 'Ulasan sudah dibalas'], 422);
         }
-
-        $review->update([
-            'reply'      => $request->reply,
-            'replied_at' => now(),
-        ]);
 
         return response()->json([
             'message' => 'Balasan berhasil dikirim',
