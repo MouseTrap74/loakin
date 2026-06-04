@@ -24,22 +24,21 @@ class ReviewController extends Controller
             return response()->json(['message' => 'Tidak bisa mengulas listing sendiri'], 403);
         }
 
-        // Cek apakah sudah pernah review
-        $existing = Review::where('reviewer_id', Auth::id())
-            ->where('listing_id', $listingId)
-            ->first();
+        $review = Review::firstOrCreate(
+            [
+                'reviewer_id' => Auth::id(),
+                'listing_id'  => $listingId,
+            ],
+            [
+                'seller_id'   => $listing->user_id,
+                'rating'      => $request->rating,
+                'comment'     => $request->comment,
+            ]
+        );
 
-        if ($existing) {
+        if (!$review->wasRecentlyCreated) {
             return response()->json(['message' => 'Kamu sudah memberikan ulasan untuk listing ini'], 422);
         }
-
-        $review = Review::create([
-            'reviewer_id' => Auth::id(),
-            'seller_id'   => $listing->user_id,
-            'listing_id'  => $listingId,
-            'rating'      => $request->rating,
-            'comment'     => $request->comment,
-        ]);
 
         return response()->json([
             'message' => 'Ulasan berhasil dikirim',

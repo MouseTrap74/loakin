@@ -33,7 +33,7 @@ export default function ListingDetailPage() {
   const [reportDesc, setReportDesc]     = useState('');
 
   useEffect(() => { fetchListing(); }, [id]);
-  useEffect(() => { if (listing) fetchReviews(); }, [listing]);
+  useEffect(() => { if (listing?.id) fetchReviews(); }, [listing?.id]);
 
   const fetchReviews = async () => {
     try {
@@ -112,6 +112,10 @@ export default function ListingDetailPage() {
   const waUrl = 'https://wa.me/?text=Halo, saya tertarik dengan listing ' + listing.title + ' di Loakin!';
 
   const hasPhotos = listing.photos?.length > 0;
+
+  const averageRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : '0.0';
 
   return (
     <>
@@ -447,7 +451,7 @@ export default function ListingDetailPage() {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2">
                           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                         </svg>
-                        <span style={{ fontSize: 13, color: '#333', fontWeight: 600 }}>5.0</span>
+                        <span style={{ fontSize: 13, color: '#333', fontWeight: 600 }}>{averageRating}</span>
                         <span style={{ fontSize: 12, color: '#999' }}>({reviews.length})</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

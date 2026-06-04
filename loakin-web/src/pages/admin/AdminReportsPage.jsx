@@ -339,7 +339,7 @@ export default function AdminReportsPage() {
                 <tbody>
                   {reports.map((report) => {
                     const meta = statusMeta[report.status] || { label: report.status, cls: "al-badge-inactive" };
-                    const isListing = report.reportable_type?.includes("Listing");
+                    const isListing = report.reportable_type?.endsWith("Listing");
                     return (
                       <tr key={report.id} className="al-tr">
                         <td className="al-td">{report.id}</td>

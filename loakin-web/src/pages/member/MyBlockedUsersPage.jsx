@@ -13,12 +13,15 @@ export default function MyBlockedUsersPage() {
   const [unblocking, setUnblocking] = useState(null);
   const [searchInput, setSearchInput] = useState("");
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+  const [error, setError] = useState(null);
+
+  const getStorageUrl = (path) => `${api.defaults.baseURL.replace('/api', '')}/storage/${path}`;
+  const photoUrl = user?.photo ? getStorageUrl(user.photo) : null;
 
   useEffect(() => {
     api.get("/blocked-users")
       .then(res => setBlockedUsers(res.data))
-      .catch(err => console.error(err))
+      .catch(err => setError(err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -173,6 +176,11 @@ export default function MyBlockedUsersPage() {
               <div style={{ width: 36, height: 36, border: "3px solid #e2e8f0", borderTopColor: "#3BBFC9", borderRadius: "50%", margin: "0 auto 12px" }} />
               Memuat...
             </div>
+          ) : error ? (
+            <div style={{ background: "#fff", borderRadius: 12, padding: 48, textAlign: "center", color: "#ef4444", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+              <span style={{ fontSize: 48 }}>⚠️</span>
+              <p style={{ fontSize: 15, marginTop: 12 }}>Gagal memuat daftar pengguna yang diblokir.</p>
+            </div>
           ) : blockedUsers.length === 0 ? (
             <div style={{ background: "#fff", borderRadius: 12, padding: 48, textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
               <span style={{ fontSize: 48 }}>🤝</span>
@@ -193,7 +201,7 @@ export default function MyBlockedUsersPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
                       {item.blocked?.photo
-                        ? <img src={`http://127.0.0.1:8000/storage/${item.blocked.photo}`} alt={item.blocked.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ? <img src={getStorageUrl(item.blocked.photo)} alt={item.blocked.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                           </svg>

@@ -407,9 +407,9 @@ export default function AdminUserListPage() {
           {/* Pagination */}
           {meta && (
             <div className="al-pagination">
-              <button className="al-page-btn" disabled={page === 1} onClick={() => setPage(page - 1)}>← Prev</button>
+              <button className="al-page-btn" disabled={page === 1} onClick={() => setPage(page - 1)}>Prev</button>
               <span className="al-page-info">Halaman {meta.current_page} dari {meta.last_page}</span>
-              <button className="al-page-btn" disabled={page === meta.last_page} onClick={() => setPage(page + 1)}>Next →</button>
+              <button className="al-page-btn" disabled={page === meta.last_page} onClick={() => setPage(page + 1)}>Next</button>
             </div>
           )}
         </div>

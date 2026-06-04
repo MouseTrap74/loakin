@@ -69,7 +69,7 @@ export default function AdminReportDetailPage() {
   );
 
   const meta = statusMeta[report.status] || { label: report.status, cls: "al-badge-inactive" };
-  const isListing = report.reportable_type?.includes("Listing");
+  const isListing = report.reportable_type?.endsWith("Listing");
 
   return (
     <>
@@ -463,6 +463,7 @@ export default function AdminReportDetailPage() {
                       <Link
                         to={isListing ? `/listings/${report.reportable.id}` : `/users/${report.reportable.id}`}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="ad-reportable-link"
                       >
                         {isListing ? "Lihat Listing →" : "Lihat Profil →"}

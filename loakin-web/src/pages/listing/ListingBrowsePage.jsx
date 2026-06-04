@@ -5,6 +5,7 @@ import api from '../../services/api';
 import logoText from '../../assets/LoakinLogoText.png';
 import BrowseMapView from '../../components/BrowseMapView';
 import Footer from '../../components/Footer';
+import { trackSearch, trackCategoryClick, getTopCategories, hasHistory } from '../../services/searchHistory';
 
 // ── Carousel & category assets ────────────────────────────────
 import carousel1 from '../../assets/carousel1.png';
@@ -64,11 +65,12 @@ export default function ListingBrowsePage() {
   const [specialListings, setSpecialListings] = useState([]);
   const [showCatPopup, setShowCatPopup] = useState(false);
   const carouselTimerRef = useRef(null);
+  const [recoSource, setRecoSource] = useState('featured'); // 'personalized' | 'featured'
 
   // ── Effects ──────────────────────────────────────────────
   useEffect(() => {
     fetchCategories();
-    fetchSpecialListings();
+    fetchRecommendations();
   }, []);
 
   useEffect(() => {
@@ -114,10 +116,45 @@ export default function ListingBrowsePage() {
     }
   };
 
-  const fetchSpecialListings = async () => {
+  // ── Rekomendasi Personalisasi ──────────────────────────────
+  const fetchRecommendations = async () => {
+    const topCats = getTopCategories(3);
+
+    if (topCats.length > 0) {
+      // Ada riwayat → ambil listing dari kategori favorit user
+      try {
+        const promises = topCats.map((catId) =>
+          api.get('/listings', {
+            params: { category_id: catId, sort_by: 'popular', per_page: 4 },
+          })
+        );
+        const results = await Promise.all(promises);
+        // Gabungkan, hilangkan duplikat
+        const seen = new Set();
+        const merged = [];
+        for (const res of results) {
+          for (const item of res.data.data || []) {
+            if (!seen.has(item.id)) {
+              seen.add(item.id);
+              merged.push(item);
+            }
+          }
+        }
+        if (merged.length > 0) {
+          setSpecialListings(merged.slice(0, 12));
+          setRecoSource('personalized');
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Fallback: tampilkan featured listings jika belum ada riwayat
     try {
       const res = await api.get('/listings', { params: { is_featured: 1, per_page: 8 } });
       setSpecialListings(res.data.data || []);
+      setRecoSource('featured');
     } catch (err) {
       console.error(err);
     }
@@ -462,19 +499,21 @@ export default function ListingBrowsePage() {
         /* Grid */
         .lb-grid-wrap { padding: 1rem 1.4rem 1.4rem; }
         .lb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 14px; }
-        .lb-card { background: #fff; border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.15s, box-shadow 0.15s; display: block; cursor: pointer; border: 1.5px solid #eaeef2; }
-        .lb-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #dce3ea; }
-        .lb-card-img { position: relative; height: 170px; background: #fff; }
-        .lb-card-img img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
-        .lb-no-img { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: #ddd; background: #f8f9fb; }
-        .lb-featured-badge { position: absolute; top: 8px; left: 8px; background: #f6c90e; color: #7a6000; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; }
-        .lb-card-body { padding: 14px 16px 16px; text-align: center; }
-        .lb-card-cat { font-size: 11px; color: #9aa7b8; margin: 0 0 6px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .lb-card-title { font-size: 14.5px; font-weight: 800; color: #333; margin: 0 0 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .lb-card-price { font-size: 17px; font-weight: 900; color: #3BBFC9; margin: 0 0 16px; }
-        .lb-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: none; }
-        .lb-card-cond { font-size: 11px; background: #e8f7f8; color: #3BBFC9; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
-        .lb-card-seller { font-size: 11px; color: #a0aec0; font-weight: 600; }
+        .lb-card { background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; color: inherit; box-shadow: 0 1px 4px rgba(0,0,0,0.07); transition: transform 0.15s, box-shadow 0.15s; display: block; cursor: pointer; border: 1.5px solid #f0f2f5; }
+        .lb-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); border-color: #e2e8f0; }
+        .lb-card-img { position: relative; height: 155px; background: #f5f5f5; }
+        .lb-card-img img { width: 100%; height: 100%; object-fit: cover; }
+        .lb-no-img { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: #ddd; }
+        .lb-featured-badge { position: absolute; top: 8px; left: 8px; background: #f6c90e; color: #7a6000; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+        .lb-fav-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.92); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); transition: background 0.15s, transform 0.15s; z-index: 2; padding: 0; }
+        .lb-fav-btn:hover { background: #fff; transform: scale(1.1); }
+        .lb-card-body { padding: 10px 12px 12px; }
+        .lb-card-cat { font-size: 10.5px; color: #8a9ab0; margin: 0 0 3px; }
+        .lb-card-title { font-size: 13px; font-weight: 700; color: #333; margin: 0 0 5px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .lb-card-price { font-size: 14.5px; font-weight: 900; color: #2BB5A0; margin: 0 0 7px; }
+        .lb-card-footer { display: flex; justify-content: space-between; align-items: center; }
+        .lb-card-cond { font-size: 10px; background: #e8f8f5; color: #2BB5A0; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+        .lb-card-seller { font-size: 10.5px; color: #aaa; }
         .lb-center { text-align: center; padding: 50px 20px; color: #aaa; font-size: 15px; }
         .lb-pagination { display: flex; justify-content: center; align-items: center; gap: 14px; margin-top: 16px; padding: 1rem 0; border-top: 1px solid #f0f2f5; }
         .lb-page-btn { background: #fff; border: 1.5px solid #e2e8f0; padding: 0.5rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 13px; font-family: 'Nunito', sans-serif; transition: border-color 0.15s; }
@@ -730,13 +769,20 @@ export default function ListingBrowsePage() {
           {/* ── SPESIAL UNTUKMU ── */}
           <div className="lb-special-card">
             <div className="lb-special-header">
-              <span className="lb-special-title">Spesial Untukmu</span>
-              <Link to="/listings" className="lb-special-link">Lihat Semua</Link>
+              <span className="lb-special-title">
+                {recoSource === 'personalized' ? '🎯 Rekomendasi Untukmu' : '✨ Spesial Untukmu'}
+              </span>
+              <Link to="/listings" className="lb-special-link">Lihat Semua →</Link>
             </div>
+            {recoSource === 'personalized' && (
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', fontWeight: 600, margin: '-6px 0 10px', letterSpacing: '0.01em' }}>
+                Berdasarkan riwayat pencarianmu
+              </p>
+            )}
             {specialListings.length === 0 ? (
               <div className="lb-special-empty">
                 <span>🎁</span>
-                <p>Belum ada rekomendasi untukmu saat ini.</p>
+                <p>Belum ada rekomendasi untukmu saat ini. Coba cari produk yang kamu suka!</p>
               </div>
             ) : (
               <div className="lb-special-scroll">
@@ -747,16 +793,12 @@ export default function ListingBrowsePage() {
                         ? <img src={getPhotoUrl(listing.primary_photo)} alt={listing.title} />
                         : <div className="lb-special-no-img">📷</div>
                       }
-                      {listing.is_featured && <span className="lb-special-badge">-10 %</span>}
+                      {listing.is_featured && <span className="lb-special-badge">⭐</span>}
                     </div>
                     <div className="lb-special-body">
-                      <p className="lb-special-cat">{listing.category?.icon} {listing.category?.name}</p>
-                      <h3 className="lb-special-name">{listing.title}</h3>
+                      <p className="lb-special-seller">{listing.user?.name}</p>
+                      <p className="lb-special-name">{listing.title}</p>
                       <p className="lb-special-price">{formatPrice(listing.price)}</p>
-                      <div className="lb-special-footer">
-                        <span className="lb-special-cond">{listing.condition}</span>
-                        <span className="lb-special-seller">{listing.user?.name}</span>
-                      </div>
                     </div>
                   </Link>
                 ))}

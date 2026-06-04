@@ -29,17 +29,20 @@ export default function PublicProfilePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, listingsRes] = await Promise.all([
-          api.get(`/users/${id}/public`),
-          api.get(`/users/${id}/listings`),
-        ]);
+        const profileRes = await api.get(`/users/${id}/public`);
         setProfile(profileRes.data);
-        setListings(listingsRes.data.data || []);
       } catch (err) {
         setError('Pengguna tidak ditemukan');
-      } finally {
-        setLoading(false);
       }
+      
+      try {
+        const listingsRes = await api.get(`/users/${id}/listings`);
+        setListings(listingsRes.data.data || []);
+      } catch (err) {
+        setListings([]);
+      }
+      
+      setLoading(false);
     };
     fetchData();
   }, [id]);

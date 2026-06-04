@@ -16,6 +16,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BlockedUserController;
 use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\FavoriteController;
 
 // ================================================================
 // PUBLIC ROUTES (tidak perlu login)
@@ -81,6 +82,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users/{id}/block', [BlockedUserController::class, 'block']);
     Route::delete('/users/{id}/block', [BlockedUserController::class, 'unblock']);
     Route::get('/blocked-users', [BlockedUserController::class, 'index']);
+
+    // Favorit
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/favorites/{listingId}', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{listingId}', [FavoriteController::class, 'destroy']);
+    Route::get('/favorites/{listingId}/check', [FavoriteController::class, 'check']);
 });
 
 // ================================================================

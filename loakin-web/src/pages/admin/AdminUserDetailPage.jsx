@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
 import logoText from '../../assets/LoakinLogoText.png';
@@ -7,11 +8,18 @@ import logoText from '../../assets/LoakinLogoText.png';
 export default function AdminUserDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  const handleLogout = async () => {
+    try { await api.post('/logout'); } catch (_) {}
+    logout();
+    navigate('/login');
+  };
 
   const fetchUser = async () => {
     try {
@@ -323,7 +331,7 @@ export default function AdminUserDetailPage() {
             <Link to="/admin/reports"         className="ad-nav-link">Laporan</Link>
             <Link to="/admin/settings"        className="ad-nav-link">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="ad-nav-link">Kata Kunci</Link>
-            <button className="ad-btn ad-btn-delete" style={{padding: '0.45rem 1.1rem'}} onClick={() => navigate('/login')}>Logout</button>
+            <button className="ad-btn ad-btn-delete" style={{padding: '0.45rem 1.1rem'}} onClick={handleLogout}>Logout</button>
           </div>
         </nav>
 
