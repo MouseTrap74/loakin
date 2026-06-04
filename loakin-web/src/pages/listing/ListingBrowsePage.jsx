@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import api, { storageUrl } from '../../services/api';
 import logoText from '../../assets/LoakinLogoText.png';
 import BrowseMapView from '../../components/BrowseMapView';
 import Footer from '../../components/Footer';
@@ -42,6 +42,7 @@ export default function ListingBrowsePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [searchInput, setSearchInput] = useState('');
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
 
   // ── State baru untuk geolokasi & peta ────────────────────
   const [viewMode, setViewMode] = useState('grid');
@@ -58,6 +59,8 @@ export default function ListingBrowsePage() {
     min_price: '',
     max_price: '',
     radius: '',
+    sort_by: '',
+    search_in: '',
   });
 
   // ── State UI ──────────────────────────────────────────────
@@ -84,6 +87,40 @@ export default function ListingBrowsePage() {
   useEffect(() => {
     fetchNearbyListings();
   }, [userLocation, filters.radius]);
+
+  const loggedIn = isLoggedIn();
+  useEffect(() => {
+    if (loggedIn) fetchFavoriteIds();
+  }, [loggedIn]);
+
+const fetchFavoriteIds = async () => {
+  try {
+    let allIds = [];
+    let page = 1;
+    let lastPage = 1;
+    do {
+      const res = await api.get(`/favorites?page=${page}`);
+      allIds = allIds.concat(res.data.data.map((listing) => listing.id));
+      lastPage = res.data.last_page;
+      page++;
+    } while (page <= lastPage);
+    setFavoriteIds(new Set(allIds));
+  } catch (_) {}
+};
+
+const toggleFavorite = async (e, listingId) => {
+  e.preventDefault(); // cegah link card ikut terklik
+  if (!isLoggedIn()) { navigate('/login'); return; }
+  try {
+    if (favoriteIds.has(listingId)) {
+      await api.delete(`/favorites/${listingId}`);
+      setFavoriteIds((prev) => { const s = new Set(prev); s.delete(listingId); return s; });
+    } else {
+      await api.post(`/favorites/${listingId}`);
+      setFavoriteIds((prev) => new Set(prev).add(listingId));
+    }
+  } catch (_) {}
+};
 
   // Auto-play carousel
   useEffect(() => {
@@ -244,6 +281,7 @@ export default function ListingBrowsePage() {
   // ── Handler filter ────────────────────────────────────────
   const handleSearch = (e) => {
     e.preventDefault();
+    trackSearch(searchInput);
     setFilters((prev) => ({ ...prev, search: searchInput }));
     setCurrentPage(1);
   };
@@ -255,7 +293,7 @@ export default function ListingBrowsePage() {
 
   const handleReset = () => {
     setSearchInput('');
-    setFilters({ search: '', category_id: '', condition: '', min_price: '', max_price: '', radius: '' });
+    setFilters({ search: '', category_id: '', condition: '', min_price: '', max_price: '', radius: '', sort_by: '', search_in: '' });
     setUserLocation(null);
     setNearbyListings([]);
     setCurrentPage(1);
@@ -270,6 +308,7 @@ export default function ListingBrowsePage() {
   };
 
   const handleSelectCategory = (id) => {
+    if (id) trackCategoryClick(id);
     handleFilterChange('category_id', id);
     setShowCatPopup(false);
   };
@@ -290,9 +329,9 @@ export default function ListingBrowsePage() {
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
 
   const getPhotoUrl = (photo) =>
-    photo ? `http://127.0.0.1:8000/storage/${photo.photo_path}` : null;
+    photo ? storageUrl(photo.photo_path) : null;
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+  const photoUrl = user?.photo ? storageUrl(user.photo) : null;
 
   const categoriesToShow = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
   const quickCategories = categoriesToShow.slice(0, QUICK_CAT_LIMIT);
@@ -573,16 +612,6 @@ export default function ListingBrowsePage() {
                     <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                   </svg>
                 </button>
-                <button
-                  className="lb-icon-btn"
-                  aria-label="Keranjang"
-                  onClick={() => alert('Fitur keranjang segera hadir!')}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                  </svg>
-                </button>
                 <Link to="/listings/create" className="lb-btn-sell">+ Jual</Link>
                 <Link to="/my-listings" className="lb-user-chip" style={{ textDecoration: 'none' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
@@ -590,6 +619,12 @@ export default function ListingBrowsePage() {
                     <rect x="9" y="3" width="6" height="4" rx="1" />
                   </svg>
                   <span className="lb-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
+                </Link>
+                <Link to="/favorites" className="lb-user-chip" style={{ textDecoration: 'none' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                  <span className="lb-username" style={{ fontSize: '0.84rem' }}>Favorit</span>
                 </Link>
                 <Link to="/profile" className="lb-user-chip">
                   <div className="lb-avatar-sm">
@@ -689,7 +724,11 @@ export default function ListingBrowsePage() {
                   <button
                     key={catValue}
                     className={`lb-cat-chip${isActive ? ' active' : ''}`}
-                    onClick={() => handleFilterChange('category_id', isActive ? '' : catValue)}
+                    onClick={() => {
+                      const newVal = isActive ? '' : catValue;
+                      if (newVal) trackCategoryClick(newVal);
+                      handleFilterChange('category_id', newVal);
+                    }}
                     type="button"
                   >
                     {cat.icon} {cat.name}
@@ -766,7 +805,7 @@ export default function ListingBrowsePage() {
             </div>
           )}
 
-          {/* ── SPESIAL UNTUKMU ── */}
+          {/* ── REKOMENDASI UNTUKMU ── */}
           <div className="lb-special-card">
             <div className="lb-special-header">
               <span className="lb-special-title">
@@ -824,6 +863,19 @@ export default function ListingBrowsePage() {
                 <option value="bekas">🔄 Bekas</option>
               </select>
 
+              <select
+                className="lb-filter-select"
+                value={filters.sort_by}
+                onChange={(e) => handleFilterChange('sort_by', e.target.value)}
+              >
+                <option value="">Urutan Default</option>
+                <option value="recent">Terbaru</option>
+                <option value="oldest">Terlama</option>
+                <option value="price_asc">Harga Terendah</option>
+                <option value="price_desc">Harga Tertinggi</option>
+                <option value="popular">Terpopuler</option>
+              </select>
+
               <input
                 className="lb-filter-input"
                 placeholder="Harga min"
@@ -864,6 +916,18 @@ export default function ListingBrowsePage() {
               )}
 
               <button className="lb-filter-reset" onClick={handleReset} type="button">↺ Reset</button>
+
+              {isLoggedIn() && (
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.82rem', fontWeight: 700, color: '#555', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <input
+                    type="checkbox"
+                    checked={filters.search_in === 'all'}
+                    onChange={(e) => handleFilterChange('search_in', e.target.checked ? 'all' : '')}
+                    style={{ accentColor: '#3BBFC9' }}
+                  />
+                  Cari di deskripsi
+                </label>
+              )}
 
               <div className="lb-filter-right">
                 <div className="lb-view-toggle">
@@ -922,6 +986,15 @@ export default function ListingBrowsePage() {
                           }
                           {listing.is_featured && (
                             <span className="lb-featured-badge">⭐ Unggulan</span>
+                          )}
+                          {isLoggedIn() && (
+                            <button
+                              className="lb-fav-btn"
+                              onClick={(e) => toggleFavorite(e, listing.id)}
+                              type="button"
+                            >
+                              {favoriteIds.has(listing.id) ? '❤️' : '🤍'}
+                            </button>
                           )}
                         </div>
                         <div className="lb-card-body">

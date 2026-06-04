@@ -58,6 +58,12 @@ class User extends Authenticatable
         return $this->hasMany(Listing::class);
     }
 
+    // Listing yang difavoritkan oleh user ini
+    public function favorites()
+    {
+        return $this->belongsToMany(Listing::class, 'favorites')->withTimestamps();
+    }
+
     // Listing yang masih aktif milik user ini
     public function activeListings()
     {

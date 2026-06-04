@@ -44,9 +44,17 @@ class PublicListingController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
-        // Pencarian judul
-        if ($request->search) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+        // Pencarian judul (guest) atau judul + deskripsi (member: search_in=all)
+        if ($request->filled('search')) {
+            $keyword = '%' . trim($request->search) . '%';
+            if ($request->search_in === 'all') {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('title', 'like', $keyword)
+                      ->orWhere('description', 'like', $keyword);
+                });
+            } else {
+                $query->where('title', 'like', $keyword);
+            }
         }
 
         // Filter radius geolokasi — hanya aktif kalau lat, lng, dan radius semua terisi
@@ -62,11 +70,27 @@ class PublicListingController extends Controller
                   );
         }
 
-        // Urutan: sort_by=recent → hanya created_at; default → featured dulu baru terbaru
-        if ($request->sort_by === 'recent') {
-            $query->orderBy('created_at', 'desc');
-        } else {
-            $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
+        // Pengurutan hasil
+        switch ($request->sort_by) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'recent':
+                $query->orderBy('created_at', 'desc');
+                break;
+            default:
+                // Default: featured dulu baru terbaru
+                $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
+                break;
         }
 
         return response()->json($query->paginate(12));
