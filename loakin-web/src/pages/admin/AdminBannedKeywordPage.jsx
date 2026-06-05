@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -70,7 +70,7 @@ export default function AdminBannedKeywordPage() {
           font-family: 'Nunito', sans-serif;
         }
 
-        /* ── navbar ── */
+        /* â”€â”€ navbar â”€â”€ */
         .bk-nav {
           background: #fff;
           box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -118,7 +118,7 @@ export default function AdminBannedKeywordPage() {
         }
         .bk-logout-btn:hover { background: #2aadb8; transform: translateY(-1px); }
 
-        /* ── container ── */
+        /* â”€â”€ container â”€â”€ */
         .bk-container {
           max-width: 720px;
           margin: 2rem auto;
@@ -135,7 +135,7 @@ export default function AdminBannedKeywordPage() {
           letter-spacing: -0.3px;
         }
 
-        /* ── card ── */
+        /* â”€â”€ card â”€â”€ */
         .bk-card {
           background: #fff;
           border-radius: 16px;
@@ -151,7 +151,7 @@ export default function AdminBannedKeywordPage() {
           margin-bottom: 1rem;
         }
 
-        /* ── add form ── */
+        /* â”€â”€ add form â”€â”€ */
         .bk-add-row {
           display: flex;
           gap: 0.75rem;
@@ -218,7 +218,7 @@ export default function AdminBannedKeywordPage() {
           margin-top: 0.85rem;
         }
 
-        /* ── keyword list ── */
+        /* â”€â”€ keyword list â”€â”€ */
         .bk-count {
           font-size: 0.82rem;
           color: #a0aab4;
@@ -275,7 +275,7 @@ export default function AdminBannedKeywordPage() {
         }
         .bk-delete-btn:hover { background: #fecaca; transform: translateY(-1px); }
 
-        /* ── footer ── */
+        /* â”€â”€ footer â”€â”€ */
         .bk-footer {
           text-align: center;
           color: #b0bec5;
@@ -290,22 +290,11 @@ export default function AdminBannedKeywordPage() {
       <div className="bk-page">
         {/* Navbar */}
         <nav className="bk-nav">
-<<<<<<< HEAD
-          <Link to="/" className="bk-nav-logo" style={{ display: 'inline-flex', textDecoration: 'none' }}>
-            <img src={logoText} alt="Loakin" />
-          </Link>
-          <div className="bk-nav-right">
-            <Link to="/admin/dashboard"       className="bk-nav-link">Dashboard</Link>
-            <Link to="/admin/listings"        className="bk-nav-link">Listing</Link>
-            <Link to="/admin/users"           className="bk-nav-link">Pengguna</Link>
-            <Link to="/admin/reports"         className="bk-nav-link">Laporan</Link>
-=======
           <div className="bk-nav-logo">
             <img src={logoText} alt="Loakin" />
           </div>
           <div className="bk-nav-right">
             <Link to="/admin/users"           className="bk-nav-link">Pengguna</Link>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
             <Link to="/admin/settings"        className="bk-nav-link">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="bk-nav-link active">Kata Kunci</Link>
             <button className="bk-logout-btn" onClick={handleLogout}>Logout</button>
@@ -329,8 +318,8 @@ export default function AdminBannedKeywordPage() {
               />
               <button className="bk-add-btn" type="submit">+ Tambah</button>
             </form>
-            {success && <div className="bk-success"><span>✓</span><span>{success}</span></div>}
-            {error   && <div className="bk-error"><span>✕</span><span>{error}</span></div>}
+            {success && <div className="bk-success"><span>âœ“</span><span>{success}</span></div>}
+            {error   && <div className="bk-error"><span>âœ•</span><span>{error}</span></div>}
           </div>
 
           {/* Keyword list */}
@@ -350,7 +339,7 @@ export default function AdminBannedKeywordPage() {
                     <div>
                       <span className="bk-keyword">{kw.keyword}</span>
                       <span className="bk-meta">
-                        ditambahkan oleh {kw.creator?.name || 'Admin'} · {new Date(kw.created_at).toLocaleDateString('id-ID')}
+                        ditambahkan oleh {kw.creator?.name || 'Admin'} Â· {new Date(kw.created_at).toLocaleDateString('id-ID')}
                       </span>
                     </div>
                     <button onClick={() => handleDelete(kw.id)} className="bk-delete-btn">Hapus</button>
@@ -362,7 +351,7 @@ export default function AdminBannedKeywordPage() {
         </div>
 
         <footer className="bk-footer">
-          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+          Â© 2026, PT. Loakin Indonesia. All Rights Reserved.
         </footer>
       </div>
     </>

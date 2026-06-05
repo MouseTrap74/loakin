@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -74,29 +74,29 @@ export default function MyListingsPage() {
 
         .ml-page { min-height: 100vh; background: #f0f2f5; font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; }
 
-        /* ── container ── */
+        /* â”€â”€ container â”€â”€ */
         .ml-container { max-width: 920px; margin: 0 auto; padding: 2rem 1.5rem; flex: 1; }
 
-        /* ── header ── */
+        /* â”€â”€ header â”€â”€ */
         .ml-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .ml-title { font-size: 1.55rem; font-weight: 900; color: #1a1a2e; letter-spacing: -0.4px; }
         .ml-subtitle { color: #a0aab4; font-size: 0.88rem; margin-top: 4px; font-weight: 600; }
         .ml-btn-create { background: #3BBFC9; color: #fff; padding: 0.62rem 1.3rem; border-radius: 10px; text-decoration: none; font-weight: 800; font-size: 0.9rem; box-shadow: 0 3px 10px rgba(59,191,201,0.28); transition: background 0.15s, transform 0.15s; white-space: nowrap; }
         .ml-btn-create:hover { background: #2aadb8; transform: translateY(-1px); }
 
-        /* ── loading / center ── */
+        /* â”€â”€ loading / center â”€â”€ */
         .ml-center { text-align: center; padding: 4rem; color: #a0aab4; font-size: 0.95rem; font-weight: 700; }
 
-        /* ── empty state ── */
+        /* â”€â”€ empty state â”€â”€ */
         .ml-empty { text-align: center; padding: 4rem 2rem; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
         .ml-empty-icon  { font-size: 3.2rem; }
         .ml-empty-title { font-size: 1.2rem; font-weight: 900; color: #1a1a2e; }
         .ml-empty-text  { color: #a0aab4; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
 
-        /* ── listing list ── */
+        /* â”€â”€ listing list â”€â”€ */
         .ml-list { display: flex; flex-direction: column; gap: 0.9rem; }
 
-        /* ── card ── */
+        /* â”€â”€ card â”€â”€ */
         .ml-card { background: #fff; border-radius: 14px; padding: 1.1rem 1.3rem; display: flex; gap: 1.1rem; align-items: center; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid #f0f2f5; transition: box-shadow 0.15s, border-color 0.15s; }
         .ml-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.08); border-color: #e2e8f0; }
 
@@ -133,7 +133,7 @@ export default function MyListingsPage() {
         .ml-btn-sold   { background: #e8f8f5; color: #2a9d6e; }
         .ml-btn-delete { background: #fff5f5; color: #e53e3e; }
 
-        /* ── pagination ── */
+        /* â”€â”€ pagination â”€â”€ */
         .ml-pagination { display: flex; justify-content: center; align-items: center; gap: 0.75rem; margin-top: 1.75rem; }
         .ml-page-btn { padding: 0.5rem 1.1rem; border: 1.5px solid #dce3ea; border-radius: 9px; background: #fff; color: #555; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
         .ml-page-btn:hover:not(:disabled) { border-color: #3BBFC9; color: #3BBFC9; }
@@ -145,94 +145,7 @@ export default function MyListingsPage() {
 
       <div className="ml-page">
 
-<<<<<<< HEAD
-        {/* Utility bar */}
-        <div className="ml-util">
-          {isLoggedIn() && isAdmin() && (
-            <Link to="/admin/dashboard" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>
-              Admin Dashboard
-            </Link>
-          )}
-          <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>
-            Notifikasi
-          </a>
-          <a href="#">Pusat Bantuan</a>
-          <a href="#">FAQ</a>
-          {isLoggedIn() && (
-            <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>
-              Keluar
-            </a>
-          )}
-        </div>
 
-        {/* Navbar */}
-        <nav className="ml-nav">
-          <div className="ml-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="ml-search" onSubmit={handleSearch}>
-            <span className="ml-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Temukan Handphone, Mouse, dan lainnya ..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button type="submit" className="ml-search-btn">Cari</button>
-          </form>
-          <div className="ml-nav-actions">
-            {isLoggedIn() ? (
-              <>
-                <button className="ml-icon-btn" aria-label="Notifikasi">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
-                </button>
-<<<<<<< HEAD
-=======
-                <button className="ml-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                  </svg>
-                </button>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-                <Link to="/listings/create" className="ml-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="ml-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="1"/>
-                  </svg>
-                  <span className="ml-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-                <Link to="/profile" className="ml-user-chip">
-                  <div className="ml-avatar-sm">
-                    {photoUrl
-                      ? <img src={photoUrl} alt="avatar" />
-                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                          <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    }
-                  </div>
-                  <span className="ml-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="ml-btn-login">Masuk</Link>
-                <Link to="/register" className="ml-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
-
-=======
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
         <div className="ml-container">
           {/* Header */}
           <div className="ml-header">
@@ -248,7 +161,7 @@ export default function MyListingsPage() {
             <div className="ml-center">Memuat listing...</div>
           ) : listings.length === 0 ? (
             <div className="ml-empty">
-              <div className="ml-empty-icon">📦</div>
+              <div className="ml-empty-icon">ðŸ“¦</div>
               <h3 className="ml-empty-title">Belum ada listing</h3>
               <p className="ml-empty-text">Mulai jual barang pertamamu sekarang!</p>
               <Link to="/listings/create" className="ml-btn-create">+ Buat Listing Pertama</Link>
@@ -264,7 +177,7 @@ export default function MyListingsPage() {
                       <div className="ml-photo-wrap">
                         {getPhotoUrl(listing.primary_photo)
                           ? <img src={getPhotoUrl(listing.primary_photo)} alt={listing.title} className="ml-photo" />
-                          : <div className="ml-no-photo">📷</div>
+                          : <div className="ml-no-photo">ðŸ“·</div>
                         }
                       </div>
 
@@ -276,7 +189,7 @@ export default function MyListingsPage() {
                             <span className="ml-category">{listing.category?.icon} {listing.category?.name}</span>
                           </div>
                           {listing.is_featured && (
-                            <span className="ml-badge-featured">⭐ Unggulan</span>
+                            <span className="ml-badge-featured">â­ Unggulan</span>
                           )}
                         </div>
                         <Link to={`/listings/${listing.id}`} className="ml-card-title">
@@ -284,16 +197,16 @@ export default function MyListingsPage() {
                         </Link>
                         <p className="ml-price">{formatPrice(listing.price)}</p>
                         <div className="ml-meta">
-                          <span>📦 Stok: {listing.stock}</span>
-                          <span>👁 {listing.views_count} dilihat</span>
-                          <span>🔄 {listing.condition}</span>
+                          <span>ðŸ“¦ Stok: {listing.stock}</span>
+                          <span>ðŸ‘ {listing.views_count} dilihat</span>
+                          <span>ðŸ”„ {listing.condition}</span>
                         </div>
                       </div>
 
                       {/* Actions */}
                       <div className="ml-actions">
                         <Link to={`/listings/${listing.id}/edit`} className="ml-btn ml-btn-edit">
-                          ✏️ Edit
+                          âœï¸ Edit
                         </Link>
                         {listing.status === 'active' && (
                           <button
@@ -301,7 +214,7 @@ export default function MyListingsPage() {
                             className="ml-btn ml-btn-sold"
                             disabled={actionLoading === listing.id + '-sold'}
                           >
-                            {actionLoading === listing.id + '-sold' ? '...' : '✅ Terjual'}
+                            {actionLoading === listing.id + '-sold' ? '...' : 'âœ… Terjual'}
                           </button>
                         )}
                         <button
@@ -309,7 +222,7 @@ export default function MyListingsPage() {
                           className="ml-btn ml-btn-delete"
                           disabled={actionLoading === listing.id + '-delete'}
                         >
-                          {actionLoading === listing.id + '-delete' ? '...' : '🗑 Hapus'}
+                          {actionLoading === listing.id + '-delete' ? '...' : 'ðŸ—‘ Hapus'}
                         </button>
                       </div>
                     </div>
@@ -321,11 +234,11 @@ export default function MyListingsPage() {
               {lastPage > 1 && (
                 <div className="ml-pagination">
                   <button className="ml-page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>
-                    ← Sebelumnya
+                    â† Sebelumnya
                   </button>
                   <span className="ml-page-info">Halaman {currentPage} dari {lastPage}</span>
                   <button className="ml-page-btn" disabled={currentPage === lastPage} onClick={() => setCurrentPage(p => p + 1)}>
-                    Selanjutnya →
+                    Selanjutnya â†’
                   </button>
                 </div>
               )}
@@ -334,7 +247,7 @@ export default function MyListingsPage() {
         </div>
 
         <footer className="ml-footer">
-          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+          Â© 2026, PT. Loakin Indonesia. All Rights Reserved.
         </footer>
       </div>
     </>

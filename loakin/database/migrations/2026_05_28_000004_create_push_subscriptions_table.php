@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             // Web Push fields
-            $table->text('endpoint')->unique();
+            $table->string('endpoint', 2048)->unique();
             $table->string('p256dh', 512)->default('');
             $table->string('auth_token', 255)->default('');
             // 'web' now; Flutter will register 'android'/'ios' later

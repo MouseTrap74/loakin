@@ -8,15 +8,10 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
-<<<<<<< HEAD
-        "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.10.1"
-=======
         "laravel/reverb": "^1.10",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "minishlink/web-push": "^10.1"
->>>>>>> 0619bd2 (created chat and notification features for loakin)
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

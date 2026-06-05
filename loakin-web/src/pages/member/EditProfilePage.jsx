@@ -20,7 +20,7 @@ export default function EditProfilePage() {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState({});
 
-  // ── address state ──
+  // â”€â”€ address state â”€â”€
   const [addresses, setAddresses]       = useState([]);
   const [addrTab, setAddrTab]           = useState(0);
   const [showAddrForm, setShowAddrForm] = useState(false);
@@ -29,7 +29,7 @@ export default function EditProfilePage() {
   const [addrLoading, setAddrLoading]   = useState(false);
   const [addrError, setAddrError]       = useState('');
 
-  // ── load user data ──
+  // â”€â”€ load user data â”€â”€
   useEffect(() => {
     if (user) {
       setForm({
@@ -176,7 +176,7 @@ export default function EditProfilePage() {
 
         .pp-wrap { min-height: 100vh; display: flex; flex-direction: column; font-family: 'Nunito', sans-serif; background: #f0f2f5; }
 
-        /* ── body layout ── */
+        /* â”€â”€ body layout â”€â”€ */
         .pp-body { flex: 1; display: flex; gap: 1.25rem; padding: 2rem 2.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
 
         .pp-side-nav { width: 170px; flex-shrink: 0; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); padding: 1.2rem 0; }
@@ -271,111 +271,13 @@ export default function EditProfilePage() {
 
       <div className="pp-wrap">
 
-<<<<<<< HEAD
-        {/* Utility bar */}
-        <div className="pp-util">
-          {isLoggedIn() && isAdmin() && (
-            <Link to="/admin/dashboard" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>
-              Admin Dashboard
-            </Link>
-          )}
-          <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>
-            Notifikasi
-          </a>
-          <a href="#">Pusat Bantuan</a>
-          <a href="#">FAQ</a>
-          {isLoggedIn() && (
-            <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>
-              Keluar
-            </a>
-          )}
-        </div>
-
-        {/* Navbar */}
-        <nav className="pp-nav">
-          <div className="pp-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="pp-search" onSubmit={handleSearch}>
-            <span className="pp-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Temukan Handphone, Mouse, dan lainnya ..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button type="submit" className="pp-search-btn">Cari</button>
-          </form>
-          <div className="pp-nav-actions">
-            {isLoggedIn() ? (
-              <>
-                <button className="pp-icon-btn" aria-label="Notifikasi">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
-                </button>
-<<<<<<< HEAD
-=======
-                <button className="pp-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                  </svg>
-                </button>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-                <Link to="/listings/create" className="pp-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="pp-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="1"/>
-                  </svg>
-                  <span className="pp-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-                <Link to="/profile" className="pp-user-chip">
-                  <div className="pp-avatar-sm">
-                    {navPhotoUrl
-                      ? <img src={navPhotoUrl} alt="avatar" />
-                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                          <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    }
-                  </div>
-                  <span className="pp-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="pp-btn-login">Masuk</Link>
-                <Link to="/register" className="pp-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
-
-=======
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
         {/* Body */}
+
         <div className="pp-body">
 
           {/* Sidebar nav */}
           <nav className="pp-side-nav">
             <a href="#" className="active">Profil</a>
-<<<<<<< HEAD
-            <Link to="/my-reviews" style={{ display: 'block', padding: '0.6rem 1.4rem', fontSize: '0.86rem', fontWeight: 600, color: '#6b7a8d', textDecoration: 'none', borderLeft: '3px solid transparent', transition: 'color 0.15s, border-color 0.15s, background 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#3BBFC9'; e.currentTarget.style.background = '#f0fbfc'; e.currentTarget.style.borderLeftColor = '#3BBFC9'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#6b7a8d'; e.currentTarget.style.background = ''; e.currentTarget.style.borderLeftColor = 'transparent'; }}
-            >⭐ Ulasan Saya</Link>
-            <Link to="/blocked-users" style={{ display: 'block', padding: '0.6rem 1.4rem', fontSize: '0.86rem', fontWeight: 600, color: '#6b7a8d', textDecoration: 'none', borderLeft: '3px solid transparent', transition: 'color 0.15s, border-color 0.15s, background 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#3BBFC9'; e.currentTarget.style.background = '#f0fbfc'; e.currentTarget.style.borderLeftColor = '#3BBFC9'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#6b7a8d'; e.currentTarget.style.background = ''; e.currentTarget.style.borderLeftColor = 'transparent'; }}
-            >🚫 Pengguna Diblokir</Link>
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
           </nav>
 
           {/* Main card */}
@@ -410,7 +312,7 @@ export default function EditProfilePage() {
 
               {photo && (
                 <button className="pp-save-photo-btn" onClick={handleSavePhoto} disabled={loading}>
-                  {loading ? 'Menyimpan...' : '💾 Simpan Foto'}
+                  {loading ? 'Menyimpan...' : 'ðŸ’¾ Simpan Foto'}
                 </button>
               )}
 
@@ -436,7 +338,7 @@ export default function EditProfilePage() {
               <button className="pp-logout-btn" onClick={handleLogout}>Log Out</button>
 
               {error   && <p className="pp-error">{error}</p>}
-              {success && <p className="pp-success">✓ {success}</p>}
+              {success && <p className="pp-success">âœ“ {success}</p>}
             </div>
 
             {/* Info column */}
@@ -448,7 +350,7 @@ export default function EditProfilePage() {
                 <span className="pp-field-label">Nama</span>
                 {editing.name
                   ? <input className="pp-field-input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoFocus />
-                  : <span className="pp-field-value">{form.name || '—'}</span>
+                  : <span className="pp-field-value">{form.name || 'â€”'}</span>
                 }
                 {editing.name
                   ? <button className="pp-save-btn" onClick={() => handleSaveField('name')} disabled={loading}>Simpan</button>
@@ -469,7 +371,7 @@ export default function EditProfilePage() {
                   : <span className="pp-field-value">
                       {form.birth_date
                         ? new Date(form.birth_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-                        : '—'}
+                        : 'â€”'}
                     </span>
                 }
                 {editing.birth_date
@@ -486,7 +388,7 @@ export default function EditProfilePage() {
                       <option value="Laki-Laki">Laki-Laki</option>
                       <option value="Perempuan">Perempuan</option>
                     </select>
-                  : <span className="pp-field-value">{form.gender || '—'}</span>
+                  : <span className="pp-field-value">{form.gender || 'â€”'}</span>
                 }
                 {editing.gender
                   ? <button className="pp-save-btn" onClick={() => handleSaveField('gender')} disabled={loading}>Simpan</button>
@@ -498,7 +400,7 @@ export default function EditProfilePage() {
 
               <div className="pp-field-row">
                 <span className="pp-field-label">Email</span>
-                <span className="pp-field-value">{form.email || '—'}</span>
+                <span className="pp-field-value">{form.email || 'â€”'}</span>
                 <button className="pp-ubah-btn" disabled title="Fitur segera hadir">Ubah</button>
               </div>
 
@@ -506,7 +408,7 @@ export default function EditProfilePage() {
                 <span className="pp-field-label">Nomor Handphone</span>
                 {editing.phone
                   ? <input className="pp-field-input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} autoFocus />
-                  : <span className="pp-field-value">{form.phone || '—'}</span>
+                  : <span className="pp-field-value">{form.phone || 'â€”'}</span>
                 }
                 {editing.phone
                   ? <button className="pp-save-btn" onClick={() => handleSaveField('phone')} disabled={loading}>Simpan</button>
@@ -540,7 +442,7 @@ export default function EditProfilePage() {
               {addresses.length > 0 ? (
                 <div className="pp-addr-card">
                   {addresses[addrTab]?.is_primary && (
-                    <div className="pp-addr-primary">★ Alamat Utama</div>
+                    <div className="pp-addr-primary">â˜… Alamat Utama</div>
                   )}
                   <div className="pp-addr-type">{addresses[addrTab]?.label}</div>
                   <div className="pp-addr-name">{addresses[addrTab]?.recipient_name}</div>
@@ -566,7 +468,7 @@ export default function EditProfilePage() {
         </div>
 
         <footer className="pp-footer">
-          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+          Â© 2026, PT. Loakin Indonesia. All Rights Reserved.
         </footer>
       </div>
 

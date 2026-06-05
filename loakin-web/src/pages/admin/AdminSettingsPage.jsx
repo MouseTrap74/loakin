@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -89,7 +89,7 @@ export default function AdminSettingsPage() {
           font-family: 'Nunito', sans-serif;
         }
 
-        /* ── navbar ── */
+        /* â”€â”€ navbar â”€â”€ */
         .as-nav {
           background: #fff;
           box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -137,7 +137,7 @@ export default function AdminSettingsPage() {
         }
         .as-logout-btn:hover { background: #2aadb8; transform: translateY(-1px); }
 
-        /* ── container ── */
+        /* â”€â”€ container â”€â”€ */
         .as-container {
           max-width: 720px;
           margin: 2rem auto;
@@ -154,7 +154,7 @@ export default function AdminSettingsPage() {
           letter-spacing: -0.3px;
         }
 
-        /* ── tabs ── */
+        /* â”€â”€ tabs â”€â”€ */
         .as-tabs {
           display: flex;
           gap: 0.5rem;
@@ -182,7 +182,7 @@ export default function AdminSettingsPage() {
           box-shadow: 0 3px 10px rgba(59,191,201,0.25);
         }
 
-        /* ── card ── */
+        /* â”€â”€ card â”€â”€ */
         .as-card {
           background: #fff;
           border-radius: 16px;
@@ -198,7 +198,7 @@ export default function AdminSettingsPage() {
           padding: 1.5rem 0;
         }
 
-        /* ── fields ── */
+        /* â”€â”€ fields â”€â”€ */
         .as-field-group { margin-bottom: 1.2rem; }
         .as-label {
           display: block;
@@ -253,7 +253,7 @@ export default function AdminSettingsPage() {
           margin-bottom: 1rem;
         }
 
-        /* ── save button ── */
+        /* â”€â”€ save button â”€â”€ */
         .as-btn {
           padding: 0.72rem 2rem;
           background: #3BBFC9;
@@ -270,7 +270,7 @@ export default function AdminSettingsPage() {
         .as-btn:hover:not(:disabled) { background: #2aadb8; transform: translateY(-1px); }
         .as-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        /* ── footer ── */
+        /* â”€â”€ footer â”€â”€ */
         .as-footer {
           text-align: center;
           color: #b0bec5;
@@ -285,22 +285,11 @@ export default function AdminSettingsPage() {
       <div className="as-page">
         {/* Navbar */}
         <nav className="as-nav">
-<<<<<<< HEAD
-          <Link to="/" className="as-nav-logo" style={{ display: 'inline-flex', textDecoration: 'none' }}>
-            <img src={logoText} alt="Loakin" />
-          </Link>
-          <div className="as-nav-right">
-            <Link to="/admin/dashboard"       className="as-nav-link">Dashboard</Link>
-            <Link to="/admin/listings"        className="as-nav-link">Listing</Link>
-            <Link to="/admin/users"           className="as-nav-link">Pengguna</Link>
-            <Link to="/admin/reports"         className="as-nav-link">Laporan</Link>
-=======
           <div className="as-nav-logo">
             <img src={logoText} alt="Loakin" />
           </div>
           <div className="as-nav-right">
             <Link to="/admin/users"           className="as-nav-link">Pengguna</Link>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
             <Link to="/admin/settings"        className="as-nav-link active">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="as-nav-link">Kata Kunci</Link>
             <button className="as-logout-btn" onClick={handleLogout}>Logout</button>
@@ -342,8 +331,8 @@ export default function AdminSettingsPage() {
                   </div>
                 ))}
 
-                {success && <div className="as-success"><span>✓</span><span>{success}</span></div>}
-                {error   && <div className="as-error"><span>✕</span><span>{error}</span></div>}
+                {success && <div className="as-success"><span>âœ“</span><span>{success}</span></div>}
+                {error   && <div className="as-error"><span>âœ•</span><span>{error}</span></div>}
 
                 <button className="as-btn" type="submit" disabled={loading}>
                   {loading ? 'Menyimpan...' : 'Simpan Pengaturan'}
@@ -354,7 +343,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <footer className="as-footer">
-          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+          Â© 2026, PT. Loakin Indonesia. All Rights Reserved.
         </footer>
       </div>
     </>

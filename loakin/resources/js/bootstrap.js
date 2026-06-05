@@ -2,8 +2,6 @@ import axios from 'axios';
 window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-<<<<<<< HEAD
-=======
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
@@ -12,4 +10,3 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
  */
 
 import './echo';
->>>>>>> 0619bd2 (created chat and notification features for loakin)

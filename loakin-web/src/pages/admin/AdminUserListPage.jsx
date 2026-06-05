@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -50,7 +50,7 @@ export default function AdminUserListPage() {
           font-family: 'Nunito', sans-serif;
         }
 
-        /* ── navbar ── */
+        /* â”€â”€ navbar â”€â”€ */
         .al-nav {
           background: #fff;
           box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -98,7 +98,7 @@ export default function AdminUserListPage() {
         }
         .al-logout-btn:hover { background: #2aadb8; transform: translateY(-1px); }
 
-        /* ── container ── */
+        /* â”€â”€ container â”€â”€ */
         .al-container {
           max-width: 1100px;
           margin: 2rem auto;
@@ -115,7 +115,7 @@ export default function AdminUserListPage() {
           letter-spacing: -0.3px;
         }
 
-        /* ── filter row ── */
+        /* â”€â”€ filter row â”€â”€ */
         .al-filter-row {
           display: flex;
           gap: 0.9rem;
@@ -181,7 +181,7 @@ export default function AdminUserListPage() {
         }
         .al-select:focus { border-color: #3BBFC9; }
 
-        /* ── table ── */
+        /* â”€â”€ table â”€â”€ */
         .al-table-wrap {
           background: #fff;
           border-radius: 16px;
@@ -272,7 +272,7 @@ export default function AdminUserListPage() {
           font-weight: 700;
         }
 
-        /* ── pagination ── */
+        /* â”€â”€ pagination â”€â”€ */
         .al-pagination {
           display: flex;
           justify-content: center;
@@ -300,7 +300,7 @@ export default function AdminUserListPage() {
           font-weight: 700;
         }
 
-        /* ── footer ── */
+        /* â”€â”€ footer â”€â”€ */
         .al-footer {
           text-align: center;
           color: #b0bec5;
@@ -315,22 +315,11 @@ export default function AdminUserListPage() {
       <div className="al-page">
         {/* Navbar */}
         <nav className="al-nav">
-<<<<<<< HEAD
-          <Link to="/" className="al-nav-logo" style={{ display: 'inline-flex', textDecoration: 'none' }}>
-            <img src={logoText} alt="Loakin" />
-          </Link>
-          <div className="al-nav-right">
-            <Link to="/admin/dashboard"       className="al-nav-link">Dashboard</Link>
-            <Link to="/admin/listings"        className="al-nav-link">Listing</Link>
-            <Link to="/admin/users"           className="al-nav-link active">Pengguna</Link>
-            <Link to="/admin/reports"         className="al-nav-link">Laporan</Link>
-=======
           <div className="al-nav-logo">
             <img src={logoText} alt="Loakin" />
           </div>
           <div className="al-nav-right">
             <Link to="/admin/users"           className="al-nav-link active">Pengguna</Link>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
             <Link to="/admin/settings"        className="al-nav-link">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="al-nav-link">Kata Kunci</Link>
             <button className="al-logout-btn" onClick={handleLogout}>Logout</button>
@@ -415,21 +404,15 @@ export default function AdminUserListPage() {
           {/* Pagination */}
           {meta && (
             <div className="al-pagination">
-<<<<<<< HEAD
-              <button className="al-page-btn" disabled={page === 1} onClick={() => setPage(page - 1)}>Prev</button>
+              <button className="al-page-btn" disabled={page === 1} onClick={() => setPage(page - 1)}>â† Prev</button>
               <span className="al-page-info">Halaman {meta.current_page} dari {meta.last_page}</span>
-              <button className="al-page-btn" disabled={page === meta.last_page} onClick={() => setPage(page + 1)}>Next</button>
-=======
-              <button className="al-page-btn" disabled={page === 1} onClick={() => setPage(page - 1)}>← Prev</button>
-              <span className="al-page-info">Halaman {meta.current_page} dari {meta.last_page}</span>
-              <button className="al-page-btn" disabled={page === meta.last_page} onClick={() => setPage(page + 1)}>Next →</button>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
+              <button className="al-page-btn" disabled={page === meta.last_page} onClick={() => setPage(page + 1)}>Next â†’</button>
             </div>
           )}
         </div>
 
         <footer className="al-footer">
-          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+          Â© 2026, PT. Loakin Indonesia. All Rights Reserved.
         </footer>
       </div>
     </>

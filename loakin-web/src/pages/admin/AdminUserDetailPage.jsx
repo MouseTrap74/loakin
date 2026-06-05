@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
 import { useAuth } from '../../context/AuthContext';
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
 import api from '../../services/api';
 
 import logoText from '../../assets/LoakinLogoText.png';
@@ -11,25 +8,19 @@ import logoText from '../../assets/LoakinLogoText.png';
 export default function AdminUserDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-<<<<<<< HEAD
   const { logout } = useAuth();
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-<<<<<<< HEAD
   const handleLogout = async () => {
     try { await api.post('/logout'); } catch (_) {}
     logout();
     navigate('/login');
   };
 
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
   const fetchUser = async () => {
     try {
       const res = await api.get(`/admin/users/${id}`);
@@ -330,7 +321,6 @@ export default function AdminUserDetailPage() {
       <div className="ad-page">
         {/* Navbar */}
         <nav className="ad-nav">
-<<<<<<< HEAD
           <Link to="/" className="ad-nav-logo" style={{ display: 'inline-flex', textDecoration: 'none' }}>
             <img src={logoText} alt="Loakin" />
           </Link>
@@ -341,16 +331,7 @@ export default function AdminUserDetailPage() {
             <Link to="/admin/reports"         className="ad-nav-link">Laporan</Link>
             <Link to="/admin/settings"        className="ad-nav-link">Pengaturan</Link>
             <Link to="/admin/banned-keywords" className="ad-nav-link">Kata Kunci</Link>
-            <button className="ad-btn ad-btn-delete" style={{padding: '0.45rem 1.1rem'}} onClick={handleLogout}>Logout</button>
-=======
-          <div className="ad-nav-logo">
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <div className="ad-nav-right">
-            <Link to="/admin/users"           className="ad-nav-link">Pengguna</Link>
-            <Link to="/admin/settings"        className="ad-nav-link">Pengaturan</Link>
-            <Link to="/admin/banned-keywords" className="ad-nav-link">Kata Kunci</Link>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
+            <button className="ad-logout-btn" onClick={handleLogout}>Logout</button>
           </div>
         </nav>
 

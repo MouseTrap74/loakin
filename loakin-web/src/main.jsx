@@ -1,19 +1,4 @@
-<<<<<<< HEAD
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { AuthProvider } from './context/AuthContext'
-import './index.css'
-import App from './App.jsx'
-
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </StrictMode>,
-)
-=======
-import React from 'react';
+﻿import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
@@ -32,4 +17,3 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </AuthProvider>
     </React.StrictMode>
 );
->>>>>>> 0619bd2 (created chat and notification features for loakin)

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -113,7 +113,7 @@ export default function CreateListingPage() {
           flex-direction: column;
         }
 
-        /* ── container ── */
+        /* â”€â”€ container â”€â”€ */
         .cl-container {
           max-width: 780px;
           margin: 0 auto;
@@ -144,10 +144,10 @@ export default function CreateListingPage() {
           margin-bottom: 1.2rem;
         }
 
-        /* ── form ── */
+        /* â”€â”€ form â”€â”€ */
         .cl-form { display: flex; flex-direction: column; gap: 1.25rem; }
 
-        /* ── card ── */
+        /* â”€â”€ card â”€â”€ */
         .cl-card {
           background: #fff;
           border-radius: 16px;
@@ -165,7 +165,7 @@ export default function CreateListingPage() {
         }
         .cl-photo-count { font-size: 0.82rem; color: #a0aab4; font-weight: 700; }
 
-        /* ── fields ── */
+        /* â”€â”€ fields â”€â”€ */
         .cl-field { margin-bottom: 1rem; }
         .cl-field:last-child { margin-bottom: 0; }
         .cl-label {
@@ -223,7 +223,7 @@ export default function CreateListingPage() {
           margin-top: 6px;
         }
 
-        /* ── photo section ── */
+        /* â”€â”€ photo section â”€â”€ */
         .cl-photo-section-label {
           font-size: 0.8rem;
           font-weight: 700;
@@ -294,7 +294,7 @@ export default function CreateListingPage() {
         .cl-upload-text { font-weight: 700; color: #555; font-size: 0.9rem; margin-bottom: 4px; }
         .cl-upload-hint { color: #b0bec5; font-size: 0.77rem; font-weight: 600; }
 
-        /* ── submit row ── */
+        /* â”€â”€ submit row â”€â”€ */
         .cl-submit-row {
           display: flex;
           gap: 0.75rem;
@@ -332,62 +332,6 @@ export default function CreateListingPage() {
       `}</style>
 
       <div className="cl-page">
-<<<<<<< HEAD
-        {/* Utility bar */}
-        <div className="cl-util">
-          {isLoggedIn() && isAdmin() && <Link to="/admin/users" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>Admin Dashboard</Link>}
-          <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>Notifikasi</a>
-          <a href="#">Pusat Bantuan</a>
-          <a href="#">FAQ</a>
-          {isLoggedIn() && <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>Keluar</a>}
-        </div>
-
-        {/* Navbar */}
-        <nav className="cl-nav">
-          <div className="cl-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="cl-search" onSubmit={handleSearch}>
-            <span className="cl-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            </span>
-            <input type="text" placeholder="Temukan barang di sekitarmu..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
-            <button type="submit" className="cl-search-btn">Cari</button>
-          </form>
-          <div className="cl-nav-actions">
-            {isLoggedIn() ? (
-              <>
-                <button className="cl-icon-btn" aria-label="Notifikasi">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </button>
-<<<<<<< HEAD
-=======
-                <button className="cl-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                </button>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-                <Link to="/listings/create" className="cl-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="cl-user-chip">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-                  <span className="cl-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-                <Link to="/profile" className="cl-user-chip">
-                  <div className="cl-avatar-sm">
-                    {photoUrl ? <img src={photoUrl} alt="avatar" /> : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
-                  </div>
-                  <span className="cl-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="cl-btn-login">Masuk</Link>
-                <Link to="/register" className="cl-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
-=======
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
 
         <div className="cl-container">
           <div className="cl-header">
@@ -397,7 +341,7 @@ export default function CreateListingPage() {
 
           {error && (
             <div className="cl-error-box">
-              <span>✕</span><span>{error}</span>
+              <span>âœ•</span><span>{error}</span>
             </div>
           )}
 
@@ -442,8 +386,8 @@ export default function CreateListingPage() {
                   <label className="cl-label">Kondisi *</label>
                   <div className="cl-select-wrap">
                     <select name="condition" value={form.condition} onChange={handleChange} className="cl-select" required>
-                      <option value="baru">✨ Baru</option>
-                      <option value="bekas">🔄 Bekas</option>
+                      <option value="baru">âœ¨ Baru</option>
+                      <option value="bekas">ðŸ”„ Bekas</option>
                     </select>
                   </div>
                 </div>
@@ -461,7 +405,7 @@ export default function CreateListingPage() {
                 <label className="cl-label">Tentukan Lokasi di Peta</label>
                 <MapPicker latitude={form.latitude} longitude={form.longitude} onLocationSelect={handleLocationSelect} />
                 {form.latitude !== null && form.longitude !== null && (
-                  <p className="cl-coord-info">✅ Koordinat: {form.latitude.toFixed(6)}, {form.longitude.toFixed(6)}</p>
+                  <p className="cl-coord-info">âœ… Koordinat: {form.latitude.toFixed(6)}, {form.longitude.toFixed(6)}</p>
                 )}
               </div>
             </div>
@@ -479,7 +423,7 @@ export default function CreateListingPage() {
                     <div key={index} className="cl-preview-item">
                       <img src={src} alt={`Preview ${index + 1}`} className="cl-preview-img" />
                       {index === 0 && <span className="cl-main-label">Utama</span>}
-                      <button type="button" onClick={() => removePhoto(index)} className="cl-remove-btn">✕</button>
+                      <button type="button" onClick={() => removePhoto(index)} className="cl-remove-btn">âœ•</button>
                     </div>
                   ))}
                 </div>
@@ -488,9 +432,9 @@ export default function CreateListingPage() {
               {form.photos.length < maxPhotos && (
                 <label className="cl-upload-area">
                   <input type="file" accept="image/*" multiple onChange={handlePhotos} style={{ display: 'none' }} />
-                  <div className="cl-upload-icon">📷</div>
+                  <div className="cl-upload-icon">ðŸ“·</div>
                   <p className="cl-upload-text">Klik untuk upload foto</p>
-                  <p className="cl-upload-hint">Maks {maxPhotos} foto · Format JPG, PNG · Maks 2MB per foto</p>
+                  <p className="cl-upload-hint">Maks {maxPhotos} foto Â· Format JPG, PNG Â· Maks 2MB per foto</p>
                 </label>
               )}
             </div>
@@ -499,7 +443,7 @@ export default function CreateListingPage() {
             <div className="cl-submit-row">
               <Link to="/my-listings" className="cl-btn-cancel">Batal</Link>
               <button type="submit" className="cl-btn-submit" disabled={loading}>
-                {loading ? 'Menyimpan...' : '🚀 Terbitkan Listing'}
+                {loading ? 'Menyimpan...' : 'ðŸš€ Terbitkan Listing'}
               </button>
             </div>
 

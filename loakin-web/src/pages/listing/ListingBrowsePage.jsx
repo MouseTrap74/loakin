@@ -1,23 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-<<<<<<< HEAD
-import api, { storageUrl } from '../../services/api';
-import logoText from '../../assets/LoakinLogoText.png';
-import BrowseMapView from '../../components/BrowseMapView';
-import Footer from '../../components/Footer';
-import { trackSearch, trackCategoryClick, getTopCategories, hasHistory } from '../../services/searchHistory';
-=======
 import api from '../../services/api';
 import BrowseMapView from '../../components/BrowseMapView';
-<<<<<<< HEAD
-import NotificationBell from '../../components/NotificationBell';
-import { useChat } from '../../context/ChatContext';
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-=======
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
 
-// ── Carousel & category assets ────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬ Carousel & category assets Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 import carousel1 from '../../assets/carousel1.png';
 import carousel2 from '../../assets/carousel2.png';
 import carousel3 from '../../assets/carousel3.png';
@@ -26,16 +13,16 @@ import kategoriBanner from '../../assets/kategori.png';
 const CAROUSEL_SLIDES = [carousel1, carousel2, carousel3];
 
 const DEFAULT_CATEGORIES = [
-  { name: 'Elektronik', slug: 'elektronik', icon: '📱' },
-  { name: 'Pakaian', slug: 'pakaian', icon: '👕' },
-  { name: 'Rumah Tangga', slug: 'rumah-tangga', icon: '🏠' },
-  { name: 'Kendaraan', slug: 'kendaraan', icon: '🚗' },
-  { name: 'Olahraga', slug: 'olahraga', icon: '⚽' },
-  { name: 'Buku & Alat Tulis', slug: 'buku', icon: '📚' },
-  { name: 'Makanan & Minuman', slug: 'makanan', icon: '🍱' },
-  { name: 'Mainan & Hobi', slug: 'mainan-hobi', icon: '🎮' },
-  { name: 'Kesehatan', slug: 'kesehatan', icon: '💊' },
-  { name: 'Lainnya', slug: 'lainnya', icon: '📦' },
+  { name: 'Elektronik', slug: 'elektronik', icon: 'Ã°Å¸â€œÂ±' },
+  { name: 'Pakaian', slug: 'pakaian', icon: 'Ã°Å¸â€˜â€¢' },
+  { name: 'Rumah Tangga', slug: 'rumah-tangga', icon: 'Ã°Å¸ÂÂ ' },
+  { name: 'Kendaraan', slug: 'kendaraan', icon: 'Ã°Å¸Å¡â€”' },
+  { name: 'Olahraga', slug: 'olahraga', icon: 'Ã¢Å¡Â½' },
+  { name: 'Buku & Alat Tulis', slug: 'buku', icon: 'Ã°Å¸â€œÅ¡' },
+  { name: 'Makanan & Minuman', slug: 'makanan', icon: 'Ã°Å¸ÂÂ±' },
+  { name: 'Mainan & Hobi', slug: 'mainan-hobi', icon: 'Ã°Å¸Å½Â®' },
+  { name: 'Kesehatan', slug: 'kesehatan', icon: 'Ã°Å¸â€™Å ' },
+  { name: 'Lainnya', slug: 'lainnya', icon: 'Ã°Å¸â€œÂ¦' },
 ];
 
 // How many category chips to show inline before the popup trigger
@@ -43,32 +30,16 @@ const QUICK_CAT_LIMIT = 6;
 
 export default function ListingBrowsePage() {
   const { user, isLoggedIn, isAdmin, logout } = useAuth();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  const { openWidget } = useChat();
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-=======
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
   const navigate = useNavigate();
 
-  // ── State yang sudah ada ──────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ State yang sudah ada Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const [listings, setListings] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-<<<<<<< HEAD
-  const [searchInput, setSearchInput] = useState('');
-<<<<<<< HEAD
-  const [favoriteIds, setFavoriteIds] = useState(new Set());
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-=======
 
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
-
-  // ── State baru untuk geolokasi & peta ────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ State baru untuk geolokasi & peta Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const [viewMode, setViewMode] = useState('grid');
   const [userLocation, setUserLocation] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
@@ -83,31 +54,19 @@ export default function ListingBrowsePage() {
     min_price: '',
     max_price: '',
     radius: '',
-<<<<<<< HEAD
-    sort_by: '',
-    search_in: '',
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
   });
 
-  // ── State UI ──────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ State UI Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [specialListings, setSpecialListings] = useState([]);
   const [showCatPopup, setShowCatPopup] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
   const carouselTimerRef = useRef(null);
-<<<<<<< HEAD
-  const [recoSource, setRecoSource] = useState('featured'); // 'personalized' | 'featured'
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
 
-  // ── Effects ──────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Effects Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   useEffect(() => {
     fetchCategories();
-<<<<<<< HEAD
-    fetchRecommendations();
-=======
     fetchSpecialListings();
->>>>>>> 0619bd2 (created chat and notification features for loakin)
   }, []);
 
   useEffect(() => {
@@ -122,43 +81,6 @@ export default function ListingBrowsePage() {
     fetchNearbyListings();
   }, [userLocation, filters.radius]);
 
-<<<<<<< HEAD
-  const loggedIn = isLoggedIn();
-  useEffect(() => {
-    if (loggedIn) fetchFavoriteIds();
-  }, [loggedIn]);
-
-const fetchFavoriteIds = async () => {
-  try {
-    let allIds = [];
-    let page = 1;
-    let lastPage = 1;
-    do {
-      const res = await api.get(`/favorites?page=${page}`);
-      allIds = allIds.concat(res.data.data.map((listing) => listing.id));
-      lastPage = res.data.last_page;
-      page++;
-    } while (page <= lastPage);
-    setFavoriteIds(new Set(allIds));
-  } catch (_) {}
-};
-
-const toggleFavorite = async (e, listingId) => {
-  e.preventDefault(); // cegah link card ikut terklik
-  if (!isLoggedIn()) { navigate('/login'); return; }
-  try {
-    if (favoriteIds.has(listingId)) {
-      await api.delete(`/favorites/${listingId}`);
-      setFavoriteIds((prev) => { const s = new Set(prev); s.delete(listingId); return s; });
-    } else {
-      await api.post(`/favorites/${listingId}`);
-      setFavoriteIds((prev) => new Set(prev).add(listingId));
-    }
-  } catch (_) {}
-};
-
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
   // Auto-play carousel
   useEffect(() => {
     carouselTimerRef.current = setInterval(() => {
@@ -179,7 +101,7 @@ const toggleFavorite = async (e, listingId) => {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [showCatPopup]);
 
-  // ── Data fetching ─────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Data fetching Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const fetchCategories = async () => {
     try {
       const res = await api.get('/categories');
@@ -190,52 +112,10 @@ const toggleFavorite = async (e, listingId) => {
     }
   };
 
-<<<<<<< HEAD
-  // ── Rekomendasi Personalisasi ──────────────────────────────
-  const fetchRecommendations = async () => {
-    const topCats = getTopCategories(3);
-
-    if (topCats.length > 0) {
-      // Ada riwayat → ambil listing dari kategori favorit user
-      try {
-        const promises = topCats.map((catId) =>
-          api.get('/listings', {
-            params: { category_id: catId, sort_by: 'popular', per_page: 4 },
-          })
-        );
-        const results = await Promise.all(promises);
-        // Gabungkan, hilangkan duplikat
-        const seen = new Set();
-        const merged = [];
-        for (const res of results) {
-          for (const item of res.data.data || []) {
-            if (!seen.has(item.id)) {
-              seen.add(item.id);
-              merged.push(item);
-            }
-          }
-        }
-        if (merged.length > 0) {
-          setSpecialListings(merged.slice(0, 12));
-          setRecoSource('personalized');
-          return;
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    // Fallback: tampilkan featured listings jika belum ada riwayat
-    try {
-      const res = await api.get('/listings', { params: { is_featured: 1, per_page: 8 } });
-      setSpecialListings(res.data.data || []);
-      setRecoSource('featured');
-=======
   const fetchSpecialListings = async () => {
     try {
       const res = await api.get('/listings', { params: { is_featured: 1, per_page: 8 } });
       setSpecialListings(res.data.data || []);
->>>>>>> 0619bd2 (created chat and notification features for loakin)
     } catch (err) {
       console.error(err);
     }
@@ -300,7 +180,7 @@ const toggleFavorite = async (e, listingId) => {
     }
   };
 
-  // ── Geolokasi ─────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Geolokasi Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const getMyLocation = () => {
     if (!navigator.geolocation) {
       alert('Browser kamu tidak mendukung geolokasi.');
@@ -322,20 +202,12 @@ const toggleFavorite = async (e, listingId) => {
     );
   };
 
-  // ── Handler filter ────────────────────────────────────────
-<<<<<<< HEAD
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Handler filter Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const handleSearch = (e) => {
     e.preventDefault();
-<<<<<<< HEAD
-    trackSearch(searchInput);
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
     setFilters((prev) => ({ ...prev, search: searchInput }));
     setCurrentPage(1);
   };
-=======
-
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -343,46 +215,24 @@ const toggleFavorite = async (e, listingId) => {
   };
 
   const handleReset = () => {
-<<<<<<< HEAD
-    setSearchInput('');
-<<<<<<< HEAD
-    setFilters({ search: '', category_id: '', condition: '', min_price: '', max_price: '', radius: '', sort_by: '', search_in: '' });
-=======
-=======
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
     setFilters({ search: '', category_id: '', condition: '', min_price: '', max_price: '', radius: '' });
->>>>>>> 0619bd2 (created chat and notification features for loakin)
     setUserLocation(null);
     setNearbyListings([]);
     setCurrentPage(1);
   };
 
-<<<<<<< HEAD
   const handleLogout = async () => {
-    try {
-      await api.post('/logout');
-<<<<<<< HEAD
-    } catch (_) { }
-=======
-    } catch (_) {}
->>>>>>> 0619bd2 (created chat and notification features for loakin)
+    try { await api.post('/logout'); } catch (_) {}
     logout();
     navigate('/login');
   };
-=======
-
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
 
   const handleSelectCategory = (id) => {
-<<<<<<< HEAD
-    if (id) trackCategoryClick(id);
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
     handleFilterChange('category_id', id);
     setShowCatPopup(false);
   };
 
-  // ── Carousel helpers ──────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Carousel helpers Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const goToSlide = (idx) => {
     clearInterval(carouselTimerRef.current);
     setCarouselIndex(idx);
@@ -393,24 +243,12 @@ const toggleFavorite = async (e, listingId) => {
   const prevSlide = () => goToSlide((carouselIndex - 1 + CAROUSEL_SLIDES.length) % CAROUSEL_SLIDES.length);
   const nextSlide = () => goToSlide((carouselIndex + 1) % CAROUSEL_SLIDES.length);
 
-  // ── Helpers ───────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Helpers Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const formatPrice = (price) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
 
-  const getPhotoUrl = (photo) =>
-<<<<<<< HEAD
-    photo ? storageUrl(photo.photo_path) : null;
-
-  const photoUrl = user?.photo ? storageUrl(user.photo) : null;
-=======
-    photo ? `http://127.0.0.1:8000/storage/${photo.photo_path}` : null;
-
-<<<<<<< HEAD
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-=======
-
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
+  const getPhotoUrl = (photo) => photo ? `http://127.0.0.1:8000/storage/${photo}` : null;
+  const photoUrl = user?.photo ? getPhotoUrl(user.photo) : null;
 
   const categoriesToShow = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
   const quickCategories = categoriesToShow.slice(0, QUICK_CAT_LIMIT);
@@ -426,22 +264,12 @@ const toggleFavorite = async (e, listingId) => {
 
         .lb-wrap { min-height: 100vh; display: flex; flex-direction: column; font-family: 'Nunito', sans-serif; background: #f0f2f5; }
 
-        /* ── SECTION WRAPPER ── */
+        /* Ã¢â€â‚¬Ã¢â€â‚¬ SECTION WRAPPER Ã¢â€â‚¬Ã¢â€â‚¬ */
         .lb-section-wrap { max-width: 1200px; margin: 0 auto; padding: 0 1rem 1.5rem; width: 100%; }
 
-        /* ── CAROUSEL (card style) ── */
+        /* Ã¢â€â‚¬Ã¢â€â‚¬ CAROUSEL (card style) Ã¢â€â‚¬Ã¢â€â‚¬ */
         .lb-carousel-card {
           margin: 1.2rem 0 0;
-<<<<<<< HEAD
-          border-radius: 28px;
-          overflow: hidden;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-          position: relative;
-        }
-        .lb-carousel-track { display: flex; transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
-        .lb-carousel-slide { flex-shrink: 0; width: 100%; }
-        .lb-carousel-slide img { width: 100%; height: auto; display: block; }
-=======
           border-radius: 16px;
           overflow: hidden;
           box-shadow: 0 2px 12px rgba(0,0,0,0.1);
@@ -452,7 +280,6 @@ const toggleFavorite = async (e, listingId) => {
         .lb-carousel-track { display: flex; height: 100%; transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
         .lb-carousel-slide { flex-shrink: 0; width: 100%; height: 100%; }
         .lb-carousel-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
->>>>>>> 0619bd2 (created chat and notification features for loakin)
         .lb-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.88); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.18); transition: background 0.15s; z-index: 2; backdrop-filter: blur(4px); }
         .lb-carousel-btn:hover { background: #fff; }
         .lb-carousel-btn.prev { left: 14px; }
@@ -461,18 +288,10 @@ const toggleFavorite = async (e, listingId) => {
         .lb-carousel-dot { width: 8px; height: 8px; border-radius: 50%; border: none; cursor: pointer; background: rgba(0,0,0,0.25); transition: background 0.2s, transform 0.2s; padding: 0; }
         .lb-carousel-dot.active { background: #3BBFC9; transform: scale(1.3); }
 
-        /* ── CATEGORY CARD ── */
-<<<<<<< HEAD
-        .lb-cat-card { background: #fff; border-radius: 16px; margin: 1.5rem 0 0; border: 1.5px solid #eaeef2; padding: 1.2rem 1.5rem 1.5rem; }
-        .lb-cat-title { font-size: 1.35rem; font-weight: 900; color: #111; margin: 0 0 1rem 0; font-family: 'Nunito', sans-serif; text-align: left; }
-        .lb-cat-banner-img { width: 100%; height: auto; display: block; border-radius: 12px; margin-bottom: 1.2rem; }
-        .lb-cat-chips { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
-        .lb-cat-chips::-webkit-scrollbar { display: none; }
-=======
+        /* Ã¢â€â‚¬Ã¢â€â‚¬ CATEGORY CARD Ã¢â€â‚¬Ã¢â€â‚¬ */
         .lb-cat-card { background: #fff; border-radius: 14px; overflow: visible; margin: 1rem 0 0; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
         .lb-cat-banner-img { width: 100%; display: block; border-radius: 14px 14px 0 0; object-fit: cover; max-height: 170px; }
         .lb-cat-chips { display: flex; align-items: center; gap: 8px; padding: 0.9rem 1.2rem 1.1rem; flex-wrap: nowrap; overflow: hidden; }
->>>>>>> 0619bd2 (created chat and notification features for loakin)
 
         /* Category chip */
         .lb-cat-chip { display: inline-flex; align-items: center; gap: 5px; padding: 0.38rem 0.9rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; color: #555; background: #fff; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; white-space: nowrap; flex-shrink: 0; }
@@ -536,32 +355,7 @@ const toggleFavorite = async (e, listingId) => {
         .lb-cat-popup-clear { margin-top: 10px; width: 100%; padding: 0.52rem; border-radius: 10px; border: 1.5px solid #eaeef2; font-size: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; color: #8a9ab0; background: #f8f9fb; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
         .lb-cat-popup-clear:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
 
-        /* ── SPESIAL UNTUKMU ── */
-<<<<<<< HEAD
-        .lb-special-card { background: #51a5ba; border-radius: 12px; overflow: hidden; margin: 1.5rem 0 0; padding: 1.4rem 1.6rem 1.6rem; }
-        .lb-special-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .lb-special-title { font-size: 1.5rem; font-weight: 800; color: #fff; font-family: 'Nunito', sans-serif; }
-        .lb-special-link { font-size: 0.95rem; font-weight: 700; color: #fff; text-decoration: none; }
-        .lb-special-link:hover { text-decoration: underline; }
-        .lb-special-scroll {
-          display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none;
-        }
-        .lb-special-scroll::-webkit-scrollbar { display: none; }
-        
-        .lb-special-item { flex-shrink: 0; width: 175px; background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: transform 0.15s, box-shadow 0.15s; }
-        .lb-special-item:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-        .lb-special-img { height: 160px; background: #fff; position: relative; border-bottom: none; }
-        .lb-special-img img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
-        .lb-special-no-img { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #ddd; background: #f8f9fb; }
-        .lb-special-badge { position: absolute; top: 8px; left: 8px; background: #f34848; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 10px 2px 4px; clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 50%, 100% 100%, 0 100%); }
-        .lb-special-body { padding: 14px 14px 16px; display: flex; flex-direction: column; flex: 1; text-align: center; }
-        .lb-special-cat { font-size: 11px; color: #9aa7b8; margin: 0 0 6px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .lb-special-name { font-size: 13.5px; font-weight: 800; color: #333; margin: 0 0 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
-        .lb-special-price { font-size: 16px; font-weight: 900; color: #3BBFC9; margin: 0 0 16px; }
-        .lb-special-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .lb-special-cond { font-size: 11px; background: #e8f7f8; color: #3BBFC9; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
-        .lb-special-seller { font-size: 11px; color: #a0aec0; font-weight: 600; }
-=======
+        /* Ã¢â€â‚¬Ã¢â€â‚¬ SPESIAL UNTUKMU Ã¢â€â‚¬Ã¢â€â‚¬ */
         .lb-special-card { background: #47A8BC; border-radius: 14px; overflow: hidden; margin: 1rem 0 0; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 1.2rem 1.4rem 1.4rem; }
         .lb-special-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
         .lb-special-title { font-size: 1rem; font-weight: 900; color: #fff; }
@@ -591,12 +385,11 @@ const toggleFavorite = async (e, listingId) => {
         .lb-special-seller { font-size: 10px; color: #3BBFC9; font-weight: 700; text-transform: uppercase; margin: 0 0 2px; }
         .lb-special-name { font-size: 11.5px; font-weight: 700; color: #333; margin: 0 0 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.35; }
         .lb-special-price { font-size: 13px; font-weight: 900; color: #2BB5A0; margin: 0; }
->>>>>>> 0619bd2 (created chat and notification features for loakin)
         .lb-special-empty { display: flex; flex-direction: column; align-items: center; padding: 2rem; color: rgba(255,255,255,0.8); gap: 8px; }
         .lb-special-empty span { font-size: 32px; }
         .lb-special-empty p { font-size: 13px; font-weight: 600; }
 
-        /* ── NEARBY ── */
+        /* Ã¢â€â‚¬Ã¢â€â‚¬ NEARBY Ã¢â€â‚¬Ã¢â€â‚¬ */
         .lb-nearby-card-wrap { background: #fff; border-radius: 14px; overflow: hidden; margin: 1rem 0 0; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 1.2rem 1.4rem 1.4rem; }
         .lb-nearby-header { font-size: 14px; font-weight: 800; color: #333; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
         .lb-nearby-radius { font-size: 12px; color: #8a9ab0; font-weight: 600; }
@@ -613,18 +406,14 @@ const toggleFavorite = async (e, listingId) => {
         .lb-nearby-name { font-size: 11px; font-weight: 700; color: #333; margin: 0 0 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
         .lb-nearby-price { font-size: 12px; font-weight: 800; color: #2BB5A0; margin: 0; }
 
-        /* ── SEMUA LISTING ── */
+        /* Ã¢â€â‚¬Ã¢â€â‚¬ SEMUA LISTING Ã¢â€â‚¬Ã¢â€â‚¬ */
         .lb-listings-card { background: #fff; border-radius: 14px; overflow: hidden; margin: 1rem 0; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
         .lb-listings-header { padding: 1rem 1.4rem 0; }
         .lb-listings-title { font-size: 1rem; font-weight: 900; color: #222; }
         .lb-inline-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0.8rem 1.4rem; border-bottom: 1px solid #f0f2f5; }
         .lb-filter-select { padding: 0.42rem 0.85rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; font-family: 'Nunito', sans-serif; color: #555; background: #fff; cursor: pointer; outline: none; transition: border-color 0.2s; }
         .lb-filter-select:focus { border-color: #3BBFC9; }
-<<<<<<< HEAD
-        .lb-filter-input { padding: 0.42rem 0.85rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; font-family: 'Nunito', sans-serif; color: #555; width: 140px; outline: none; background: #fff; }
-=======
         .lb-filter-input { padding: 0.42rem 0.85rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; font-family: 'Nunito', sans-serif; color: #555; width: 115px; outline: none; background: #fff; }
->>>>>>> 0619bd2 (created chat and notification features for loakin)
         .lb-filter-reset { background: #f0f2f5; color: #555; border: 1.5px solid #e2e8f0; padding: 0.42rem 1rem; border-radius: 50px; font-weight: 700; font-size: 0.82rem; font-family: 'Nunito', sans-serif; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
         .lb-filter-reset:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
         .lb-loc-btn { display: inline-flex; align-items: center; gap: 5px; padding: 0.42rem 0.9rem; border-radius: 50px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; background: #fff; color: #555; transition: border-color 0.15s, color 0.15s; white-space: nowrap; }
@@ -646,11 +435,6 @@ const toggleFavorite = async (e, listingId) => {
         .lb-card-img img { width: 100%; height: 100%; object-fit: cover; }
         .lb-no-img { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: #ddd; }
         .lb-featured-badge { position: absolute; top: 8px; left: 8px; background: #f6c90e; color: #7a6000; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
-<<<<<<< HEAD
-        .lb-fav-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.92); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); transition: background 0.15s, transform 0.15s; z-index: 2; padding: 0; }
-        .lb-fav-btn:hover { background: #fff; transform: scale(1.1); }
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
         .lb-card-body { padding: 10px 12px 12px; }
         .lb-card-cat { font-size: 10.5px; color: #8a9ab0; margin: 0 0 3px; }
         .lb-card-title { font-size: 13px; font-weight: 700; color: #333; margin: 0 0 5px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -665,127 +449,16 @@ const toggleFavorite = async (e, listingId) => {
         .lb-page-btn:disabled { opacity: 0.45; cursor: default; }
         .lb-page-info { color: #555; font-size: 13px; font-weight: 600; }
         .lb-map-wrap { padding: 1rem 1.4rem 1.4rem; min-height: 480px; }
-<<<<<<< HEAD
-=======
 
         /* Footer */
         .lb-footer { text-align: center; color: #b0bec5; font-size: 0.77rem; padding: 1.2rem 0; border-top: 1px solid #e8edf0; background: #fff; margin-top: auto; }
->>>>>>> 0619bd2 (created chat and notification features for loakin)
       `}</style>
 
       <div className="lb-wrap">
-<<<<<<< HEAD
-        {/* ── Utility bar ── */}
-        <div className="lb-util">
-          <div className="lb-util-right">
-            {isLoggedIn() && isAdmin() && (
-              <Link to="/admin/dashboard" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>
-                Admin Dashboard
-              </Link>
-            )}
-            <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>
-              Notifikasi
-            </a>
-            <a href="#">Pusat Bantuan</a>
-            <a href="#">FAQ</a>
-            {isLoggedIn() && (
-              <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>
-                Keluar
-              </a>
-            )}
-          </div>
-        </div>
 
-        {/* ── Main navbar ── */}
-        <nav className="lb-nav">
-          <div className="lb-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="lb-search" onSubmit={handleSearch}>
-            <span className="lb-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Temukan barang di sekitarmu..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button type="submit" className="lb-search-btn">Cari</button>
-          </form>
-          <div className="lb-nav-actions">
-            {isLoggedIn() ? (
-              <>
-<<<<<<< HEAD
-                <button className="lb-icon-btn" aria-label="Notifikasi">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-=======
-                <NotificationBell />
-                <button
-                  className="lb-icon-btn"
-                  aria-label="Keranjang"
-                  onClick={() => alert('Fitur keranjang segera hadir!')}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-                  </svg>
-                </button>
-                <Link to="/listings/create" className="lb-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="lb-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-                    <rect x="9" y="3" width="6" height="4" rx="1" />
-                  </svg>
-                  <span className="lb-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-<<<<<<< HEAD
-                <Link to="/favorites" className="lb-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                  </svg>
-                  <span className="lb-username" style={{ fontSize: '0.84rem' }}>Favorit</span>
-                </Link>
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-                <Link to="/profile" className="lb-user-chip">
-                  <div className="lb-avatar-sm">
-                    {photoUrl
-                      ? <img src={photoUrl} alt="avatar" />
-                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-<<<<<<< HEAD
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
-=======
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx="12" cy="7" r="4" />
-                        </svg>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-                    }
-                  </div>
-                  <span className="lb-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="lb-btn-login">Masuk</Link>
-                <Link to="/register" className="lb-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
-=======
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
-
-        {/* ── MAIN CONTENT ── */}
+        {/* Ã¢â€â‚¬Ã¢â€â‚¬ MAIN CONTENT Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <div className="lb-section-wrap">
-          {/* ── CAROUSEL ── */}
+          {/* Ã¢â€â‚¬Ã¢â€â‚¬ CAROUSEL Ã¢â€â‚¬Ã¢â€â‚¬ */}
           <div className="lb-carousel-card">
             <div
               className="lb-carousel-track"
@@ -821,12 +494,8 @@ const toggleFavorite = async (e, listingId) => {
             </div>
           </div>
 
-          {/* ── CATEGORY CARD ── */}
+          {/* Ã¢â€â‚¬Ã¢â€â‚¬ CATEGORY CARD Ã¢â€â‚¬Ã¢â€â‚¬ */}
           <div className="lb-cat-card">
-<<<<<<< HEAD
-            <h2 className="lb-cat-title">Kategori</h2>
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
             <img src={kategoriBanner} alt="Kategori" className="lb-cat-banner-img" />
 
             <div className="lb-cat-chips">
@@ -862,15 +531,7 @@ const toggleFavorite = async (e, listingId) => {
                   <button
                     key={catValue}
                     className={`lb-cat-chip${isActive ? ' active' : ''}`}
-<<<<<<< HEAD
-                    onClick={() => {
-                      const newVal = isActive ? '' : catValue;
-                      if (newVal) trackCategoryClick(newVal);
-                      handleFilterChange('category_id', newVal);
-                    }}
-=======
                     onClick={() => handleFilterChange('category_id', isActive ? '' : catValue)}
->>>>>>> 0619bd2 (created chat and notification features for loakin)
                     type="button"
                   >
                     {cat.icon} {cat.name}
@@ -880,14 +541,14 @@ const toggleFavorite = async (e, listingId) => {
             </div>
           </div>
 
-          {/* ── CATEGORY POPUP MODAL ── */}
+          {/* Ã¢â€â‚¬Ã¢â€â‚¬ CATEGORY POPUP MODAL Ã¢â€â‚¬Ã¢â€â‚¬ */}
           {showCatPopup && (
             <div className="lb-cat-modal-overlay" onClick={() => setShowCatPopup(false)}>
               <div className="lb-cat-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="lb-cat-modal-header">
                   <p className="lb-cat-popup-title">Semua Kategori</p>
                   <button className="lb-cat-modal-close" onClick={() => setShowCatPopup(false)} type="button">
-                    ✕
+                    Ã¢Å“â€¢
                   </button>
                 </div>
 
@@ -912,20 +573,20 @@ const toggleFavorite = async (e, listingId) => {
 
                 {filters.category_id && (
                   <button className="lb-cat-popup-clear" onClick={() => handleSelectCategory('')} type="button">
-                    ✕ Hapus filter kategori
+                    Ã¢Å“â€¢ Hapus filter kategori
                   </button>
                 )}
               </div>
             </div>
           )}
 
-          {/* ── NEARBY LISTINGS ── */}
+          {/* Ã¢â€â‚¬Ã¢â€â‚¬ NEARBY LISTINGS Ã¢â€â‚¬Ã¢â€â‚¬ */}
           {nearbyListings.length > 0 && (
             <div className="lb-nearby-card-wrap">
               <p className="lb-nearby-header">
-                📍 Listing Terbaru di Sekitar Kamu
+                Ã°Å¸â€œÂ Listing Terbaru di Sekitar Kamu
                 {filters.radius && (
-                  <span className="lb-nearby-radius"> · dalam {filters.radius} km</span>
+                  <span className="lb-nearby-radius"> Ã‚Â· dalam {filters.radius} km</span>
                 )}
               </p>
               <div className="lb-nearby-scroll">
@@ -934,7 +595,7 @@ const toggleFavorite = async (e, listingId) => {
                     <div className="lb-nearby-img">
                       {getPhotoUrl(listing.primary_photo)
                         ? <img src={getPhotoUrl(listing.primary_photo)} alt={listing.title} />
-                        : <div className="lb-nearby-no-img">📷</div>
+                        : <div className="lb-nearby-no-img">Ã°Å¸â€œÂ·</div>
                       }
                     </div>
                     <div className="lb-nearby-body">
@@ -947,36 +608,16 @@ const toggleFavorite = async (e, listingId) => {
             </div>
           )}
 
-<<<<<<< HEAD
-          {/* ── REKOMENDASI UNTUKMU ── */}
+          {/* Ã¢â€â‚¬Ã¢â€â‚¬ SPESIAL UNTUKMU Ã¢â€â‚¬Ã¢â€â‚¬ */}
           <div className="lb-special-card">
             <div className="lb-special-header">
-              <span className="lb-special-title">
-                {recoSource === 'personalized' ? '🎯 Rekomendasi Untukmu' : '✨ Spesial Untukmu'}
-              </span>
-              <Link to="/listings" className="lb-special-link">Lihat Semua →</Link>
-            </div>
-            {recoSource === 'personalized' && (
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', fontWeight: 600, margin: '-6px 0 10px', letterSpacing: '0.01em' }}>
-                Berdasarkan riwayat pencarianmu
-              </p>
-            )}
-            {specialListings.length === 0 ? (
-              <div className="lb-special-empty">
-                <span>🎁</span>
-                <p>Belum ada rekomendasi untukmu saat ini. Coba cari produk yang kamu suka!</p>
-=======
-          {/* ── SPESIAL UNTUKMU ── */}
-          <div className="lb-special-card">
-            <div className="lb-special-header">
-              <span className="lb-special-title">✨ Spesial Untukmu</span>
-              <Link to="/listings" className="lb-special-link">Lihat Semua →</Link>
+              <span className="lb-special-title">Ã¢Å“Â¨ Spesial Untukmu</span>
+              <Link to="/listings" className="lb-special-link">Lihat Semua Ã¢â€ â€™</Link>
             </div>
             {specialListings.length === 0 ? (
               <div className="lb-special-empty">
-                <span>🎁</span>
+                <span>Ã°Å¸Å½Â</span>
                 <p>Belum ada rekomendasi untukmu saat ini.</p>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
               </div>
             ) : (
               <div className="lb-special-scroll">
@@ -985,9 +626,9 @@ const toggleFavorite = async (e, listingId) => {
                     <div className="lb-special-img">
                       {getPhotoUrl(listing.primary_photo)
                         ? <img src={getPhotoUrl(listing.primary_photo)} alt={listing.title} />
-                        : <div className="lb-special-no-img">📷</div>
+                        : <div className="lb-special-no-img">Ã°Å¸â€œÂ·</div>
                       }
-                      {listing.is_featured && <span className="lb-special-badge">⭐</span>}
+                      {listing.is_featured && <span className="lb-special-badge">Ã¢Â­Â</span>}
                     </div>
                     <div className="lb-special-body">
                       <p className="lb-special-seller">{listing.user?.name}</p>
@@ -1000,7 +641,7 @@ const toggleFavorite = async (e, listingId) => {
             )}
           </div>
 
-          {/* ── SEMUA LISTING ── */}
+          {/* Ã¢â€â‚¬Ã¢â€â‚¬ SEMUA LISTING Ã¢â€â‚¬Ã¢â€â‚¬ */}
           <div className="lb-listings-card" id="listings">
             <div className="lb-listings-header">
               <span className="lb-listings-title">Semua Listing</span>
@@ -1014,26 +655,10 @@ const toggleFavorite = async (e, listingId) => {
                 onChange={(e) => handleFilterChange('condition', e.target.value)}
               >
                 <option value="">Semua Kondisi</option>
-                <option value="baru">✨ Baru</option>
-                <option value="bekas">🔄 Bekas</option>
+                <option value="baru">Ã¢Å“Â¨ Baru</option>
+                <option value="bekas">Ã°Å¸â€â€ž Bekas</option>
               </select>
 
-<<<<<<< HEAD
-              <select
-                className="lb-filter-select"
-                value={filters.sort_by}
-                onChange={(e) => handleFilterChange('sort_by', e.target.value)}
-              >
-                <option value="">Urutan Default</option>
-                <option value="recent">Terbaru</option>
-                <option value="oldest">Terlama</option>
-                <option value="price_asc">Harga Terendah</option>
-                <option value="price_desc">Harga Tertinggi</option>
-                <option value="popular">Terpopuler</option>
-              </select>
-
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
               <input
                 className="lb-filter-input"
                 placeholder="Harga min"
@@ -1055,7 +680,7 @@ const toggleFavorite = async (e, listingId) => {
                 disabled={locationLoading}
                 type="button"
               >
-                📍 {locationLoading ? 'Mencari...' : userLocation ? 'Lokasi Aktif' : 'Lokasi Saya'}
+                Ã°Å¸â€œÂ {locationLoading ? 'Mencari...' : userLocation ? 'Lokasi Aktif' : 'Lokasi Saya'}
               </button>
 
               {userLocation && (
@@ -1073,23 +698,8 @@ const toggleFavorite = async (e, listingId) => {
                 </select>
               )}
 
-              <button className="lb-filter-reset" onClick={handleReset} type="button">↺ Reset</button>
+              <button className="lb-filter-reset" onClick={handleReset} type="button">Ã¢â€ Âº Reset</button>
 
-<<<<<<< HEAD
-              {isLoggedIn() && (
-                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.82rem', fontWeight: 700, color: '#555', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  <input
-                    type="checkbox"
-                    checked={filters.search_in === 'all'}
-                    onChange={(e) => handleFilterChange('search_in', e.target.checked ? 'all' : '')}
-                    style={{ accentColor: '#3BBFC9' }}
-                  />
-                  Cari di deskripsi
-                </label>
-              )}
-
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
               <div className="lb-filter-right">
                 <div className="lb-view-toggle">
                   <button
@@ -1133,7 +743,7 @@ const toggleFavorite = async (e, listingId) => {
                   <div className="lb-center">Memuat listing...</div>
                 ) : listings.length === 0 ? (
                   <div className="lb-center">
-                    <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>Ã°Å¸â€Â</div>
                     <p>Tidak ada listing ditemukan.</p>
                   </div>
                 ) : (
@@ -1143,23 +753,11 @@ const toggleFavorite = async (e, listingId) => {
                         <div className="lb-card-img">
                           {getPhotoUrl(listing.primary_photo)
                             ? <img src={getPhotoUrl(listing.primary_photo)} alt={listing.title} />
-                            : <div className="lb-no-img">📷</div>
+                            : <div className="lb-no-img">Ã°Å¸â€œÂ·</div>
                           }
                           {listing.is_featured && (
-                            <span className="lb-featured-badge">⭐ Unggulan</span>
+                            <span className="lb-featured-badge">Ã¢Â­Â Unggulan</span>
                           )}
-<<<<<<< HEAD
-                          {isLoggedIn() && (
-                            <button
-                              className="lb-fav-btn"
-                              onClick={(e) => toggleFavorite(e, listing.id)}
-                              type="button"
-                            >
-                              {favoriteIds.has(listing.id) ? '❤️' : '🤍'}
-                            </button>
-                          )}
-=======
->>>>>>> 0619bd2 (created chat and notification features for loakin)
                         </div>
                         <div className="lb-card-body">
                           <p className="lb-card-cat">{listing.category?.icon} {listing.category?.name}</p>
@@ -1183,7 +781,7 @@ const toggleFavorite = async (e, listingId) => {
                       onClick={() => setCurrentPage((p) => p - 1)}
                       type="button"
                     >
-                      ← Sebelumnya
+                      Ã¢â€ Â Sebelumnya
                     </button>
                     <span className="lb-page-info">Halaman {currentPage} dari {lastPage}</span>
                     <button
@@ -1192,7 +790,7 @@ const toggleFavorite = async (e, listingId) => {
                       onClick={() => setCurrentPage((p) => p + 1)}
                       type="button"
                     >
-                      Selanjutnya →
+                      Selanjutnya Ã¢â€ â€™
                     </button>
                   </div>
                 )}
@@ -1200,14 +798,10 @@ const toggleFavorite = async (e, listingId) => {
             )}
           </div>
         </div>{/* end lb-section-wrap */}
-<<<<<<< HEAD
-        <Footer />
-=======
 
         <footer className="lb-footer">
-          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+          Ã‚Â© 2026, PT. Loakin Indonesia. All Rights Reserved.
         </footer>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
       </div>
     </>
   );

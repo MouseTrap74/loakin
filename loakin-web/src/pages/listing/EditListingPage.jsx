@@ -155,7 +155,7 @@ export default function EditListingPage() {
 
         .el-page { min-height: 100vh; background: #f0f2f5; font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; }
 
-        /* ── container ── */
+        /* â”€â”€ container â”€â”€ */
         .el-container { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem; flex: 1; }
         .el-header { margin-bottom: 1.5rem; }
         .el-title { font-size: 1.55rem; font-weight: 900; color: #1a1a2e; letter-spacing: -0.4px; }
@@ -164,15 +164,15 @@ export default function EditListingPage() {
         /* error */
         .el-error-box { display: flex; align-items: center; gap: 8px; background: #fff5f5; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 0.7rem 1rem; color: #991b1b; font-size: 0.88rem; font-weight: 700; margin-bottom: 1.2rem; }
 
-        /* ── form ── */
+        /* â”€â”€ form â”€â”€ */
         .el-form { display: flex; flex-direction: column; gap: 1.25rem; }
 
-        /* ── card ── */
+        /* â”€â”€ card â”€â”€ */
         .el-card { background: #fff; border-radius: 16px; padding: 1.6rem 1.8rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
         .el-card-title { font-size: 1rem; font-weight: 900; color: #1a1a2e; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
         .el-photo-count { font-size: 0.82rem; color: #a0aab4; font-weight: 700; }
 
-        /* ── fields ── */
+        /* â”€â”€ fields â”€â”€ */
         .el-field { margin-bottom: 1rem; }
         .el-field:last-child { margin-bottom: 0; }
         .el-label { display: block; font-size: 0.83rem; font-weight: 800; color: #6b7a8d; margin-bottom: 0.4rem; }
@@ -187,7 +187,7 @@ export default function EditListingPage() {
         .el-row .el-field { flex: 1; margin-bottom: 0; }
         .el-coord-info { font-size: 0.78rem; color: #2a9d6e; font-weight: 700; margin-top: 6px; }
 
-        /* ── photos ── */
+        /* â”€â”€ photos â”€â”€ */
         .el-photo-section-label { font-size: 0.8rem; font-weight: 700; color: #a0aab4; margin-bottom: 0.6rem; }
         .el-preview-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
         .el-preview-item { position: relative; width: 88px; height: 88px; }
@@ -200,7 +200,7 @@ export default function EditListingPage() {
         .el-upload-text { font-weight: 700; color: #555; font-size: 0.9rem; margin-bottom: 4px; }
         .el-upload-hint { color: #b0bec5; font-size: 0.77rem; font-weight: 600; }
 
-        /* ── submit row ── */
+        /* â”€â”€ submit row â”€â”€ */
         .el-submit-row { display: flex; gap: 0.75rem; justify-content: flex-end; padding-bottom: 1rem; }
         .el-btn-cancel { padding: 0.72rem 1.5rem; border-radius: 10px; background: #fff; border: 1.5px solid #dce3ea; color: #6b7a8d; text-decoration: none; font-weight: 700; font-size: 0.95rem; font-family: 'Nunito', sans-serif; transition: border-color 0.15s, color 0.15s; }
         .el-btn-cancel:hover { border-color: #3BBFC9; color: #3BBFC9; }
@@ -213,94 +213,6 @@ export default function EditListingPage() {
 
       <div className="el-page">
 
-<<<<<<< HEAD
-        {/* Utility bar */}
-        <div className="el-util">
-          {isLoggedIn() && isAdmin() && (
-            <Link to="/admin/dashboard" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>
-              Admin Dashboard
-            </Link>
-          )}
-          <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>
-            Notifikasi
-          </a>
-          <a href="#">Pusat Bantuan</a>
-          <a href="#">FAQ</a>
-          {isLoggedIn() && (
-            <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>
-              Keluar
-            </a>
-          )}
-        </div>
-
-        {/* Navbar */}
-        <nav className="el-nav">
-          <div className="el-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="el-search" onSubmit={handleSearch}>
-            <span className="el-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Temukan Handphone, Mouse, dan lainnya ..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button type="submit" className="el-search-btn">Cari</button>
-          </form>
-          <div className="el-nav-actions">
-            {isLoggedIn() ? (
-              <>
-                <button className="el-icon-btn" aria-label="Notifikasi">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
-                </button>
-<<<<<<< HEAD
-=======
-                <button className="el-icon-btn" aria-label="Keranjang" onClick={() => alert('Fitur keranjang segera hadir!')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                  </svg>
-                </button>
->>>>>>> 0619bd2 (created chat and notification features for loakin)
-                <Link to="/listings/create" className="el-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="el-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="1"/>
-                  </svg>
-                  <span className="el-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-                <Link to="/profile" className="el-user-chip">
-                  <div className="el-avatar-sm">
-                    {photoUrl
-                      ? <img src={photoUrl} alt="avatar" />
-                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                          <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    }
-                  </div>
-                  <span className="el-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="el-btn-login">Masuk</Link>
-                <Link to="/register" className="el-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
-
-=======
->>>>>>> 1197e1f (fixed navbar for all pages, cleaned font usage through notifications and chatwidget, removed location fields from user table that was causing sql error)
         <div className="el-container">
           <div className="el-header">
             <h1 className="el-title">Edit Listing</h1>
@@ -308,7 +220,7 @@ export default function EditListingPage() {
           </div>
 
           {error && (
-            <div className="el-error-box"><span>✕</span><span>{error}</span></div>
+            <div className="el-error-box"><span>âœ•</span><span>{error}</span></div>
           )}
 
           <form onSubmit={handleSubmit} className="el-form">
@@ -352,8 +264,8 @@ export default function EditListingPage() {
                   <label className="el-label">Kondisi *</label>
                   <div className="el-select-wrap">
                     <select name="condition" value={form.condition} onChange={handleChange} className="el-select" required>
-                      <option value="baru">✨ Baru</option>
-                      <option value="bekas">🔄 Bekas</option>
+                      <option value="baru">âœ¨ Baru</option>
+                      <option value="bekas">ðŸ”„ Bekas</option>
                     </select>
                   </div>
                 </div>
@@ -371,7 +283,7 @@ export default function EditListingPage() {
                 <label className="el-label">Tentukan Lokasi di Peta</label>
                 <MapPicker latitude={form.latitude} longitude={form.longitude} onLocationSelect={handleLocationSelect} />
                 {form.latitude !== null && form.longitude !== null && (
-                  <p className="el-coord-info">✅ Koordinat: {form.latitude.toFixed(6)}, {form.longitude.toFixed(6)}</p>
+                  <p className="el-coord-info">âœ… Koordinat: {form.latitude.toFixed(6)}, {form.longitude.toFixed(6)}</p>
                 )}
               </div>
             </div>
@@ -391,7 +303,7 @@ export default function EditListingPage() {
                       <div key={photo.id} className="el-preview-item">
                         <img src={getPhotoUrl(photo.photo_path)} alt={`Foto ${index + 1}`} className="el-preview-img" />
                         {index === 0 && <span className="el-main-label">Utama</span>}
-                        <button type="button" onClick={() => deleteExistingPhoto(photo.id)} className="el-remove-btn">✕</button>
+                        <button type="button" onClick={() => deleteExistingPhoto(photo.id)} className="el-remove-btn">âœ•</button>
                       </div>
                     ))}
                   </div>
@@ -405,7 +317,7 @@ export default function EditListingPage() {
                     {newPreviews.map((src, index) => (
                       <div key={index} className="el-preview-item">
                         <img src={src} alt={`Baru ${index + 1}`} className="el-preview-img" />
-                        <button type="button" onClick={() => removeNewPhoto(index)} className="el-remove-btn">✕</button>
+                        <button type="button" onClick={() => removeNewPhoto(index)} className="el-remove-btn">âœ•</button>
                       </div>
                     ))}
                   </div>
@@ -415,9 +327,9 @@ export default function EditListingPage() {
               {totalPhotos < maxPhotos && (
                 <label className="el-upload-area">
                   <input type="file" accept="image/*" multiple onChange={handleNewPhotos} style={{ display: 'none' }} />
-                  <div className="el-upload-icon">📷</div>
+                  <div className="el-upload-icon">ðŸ“·</div>
                   <p className="el-upload-text">Klik untuk tambah foto</p>
-                  <p className="el-upload-hint">Sisa {maxPhotos - totalPhotos} foto · Maks 2MB per foto</p>
+                  <p className="el-upload-hint">Sisa {maxPhotos - totalPhotos} foto Â· Maks 2MB per foto</p>
                 </label>
               )}
             </div>
@@ -426,7 +338,7 @@ export default function EditListingPage() {
             <div className="el-submit-row">
               <Link to={`/listings/${id}`} className="el-btn-cancel">Batal</Link>
               <button type="submit" className="el-btn-submit" disabled={loading}>
-                {loading ? 'Menyimpan...' : '💾 Simpan Perubahan'}
+                {loading ? 'Menyimpan...' : 'ðŸ’¾ Simpan Perubahan'}
               </button>
             </div>
 
@@ -434,7 +346,7 @@ export default function EditListingPage() {
         </div>
 
         <footer className="el-footer">
-          © 2026, PT. Loakin Indonesia. All Rights Reserved.
+          Â© 2026, PT. Loakin Indonesia. All Rights Reserved.
         </footer>
       </div>
     </>
