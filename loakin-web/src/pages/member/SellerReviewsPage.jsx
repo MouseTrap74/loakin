@@ -131,7 +131,7 @@ export default function SellerReviewsPage() {
               Admin Dashboard
             </Link>
           )}
-          <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate("/login"); } : undefined}>Notifikasi</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>Notifikasi</a>
           <a href="#">Pusat Bantuan</a>
           <a href="#">FAQ</a>
           {isLoggedIn() && (

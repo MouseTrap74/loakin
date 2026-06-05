@@ -170,7 +170,7 @@ export default function FavoritesPage() {
                 Admin Dashboard
               </Link>
             )}
-            <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>
               Notifikasi
             </a>
             <a href="#">Pusat Bantuan</a>

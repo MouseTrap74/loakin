@@ -377,7 +377,7 @@ export default function CreateListingPage() {
         {/* Utility bar */}
         <div className="cl-util">
           {isLoggedIn() && isAdmin() && <Link to="/admin/users" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>Admin Dashboard</Link>}
-          <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>Notifikasi</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>Notifikasi</a>
           <a href="#">Pusat Bantuan</a>
           <a href="#">FAQ</a>
           {isLoggedIn() && <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>Keluar</a>}
