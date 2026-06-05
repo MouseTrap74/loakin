@@ -11,6 +11,7 @@ export const ChatProvider = ({ children }) => {
     // Widget state
     const [widgetOpen, setWidgetOpen]           = useState(false);
     const [activeConversationId, setActiveConvId] = useState(null);
+    const [pendingListingReference, setPendingListingReference] = useState(false);
 
     // Data
     const [conversations, setConversations]     = useState([]);
@@ -46,16 +47,23 @@ export const ChatProvider = ({ children }) => {
 
     const openChatFromListing = useCallback((conversationId) => {
         setActiveConvId(conversationId);
+        setPendingListingReference(true);
         setWidgetOpen(true);
+    }, []);
+
+    const clearPendingListingReference = useCallback(() => {
+        setPendingListingReference(false);
     }, []);
 
     const closeChat = useCallback(() => {
         setActiveConvId(null);
+        setPendingListingReference(false);
     }, []);
 
     const closeWidget = useCallback(() => {
         setWidgetOpen(false);
         setActiveConvId(null);
+        setPendingListingReference(false);
     }, []);
 
     // ── Real-time: listen on user channel for new messages ─────
@@ -120,6 +128,7 @@ export const ChatProvider = ({ children }) => {
             // State
             widgetOpen,
             activeConversationId,
+            pendingListingReference,
             conversations,
             unreadChatCount,
             loadingConvs,
@@ -127,6 +136,7 @@ export const ChatProvider = ({ children }) => {
             toggleWidget,
             openChat,
             openChatFromListing,
+            clearPendingListingReference,
             closeChat,
             closeWidget,
             fetchConversations,
