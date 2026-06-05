@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useChat } from '../../context/ChatContext';
 import api, { storageUrl } from '../../services/api';
 import logoText from '../../assets/LoakinLogoText.png';
 import BrowseMapView from '../../components/BrowseMapView';
 import Footer from '../../components/Footer';
+import NotificationBell from '../../components/NotificationBell';
 import { trackSearch, trackCategoryClick, getTopCategories, hasHistory } from '../../services/searchHistory';
 
 // ── Carousel & category assets ────────────────────────────────
@@ -33,6 +35,7 @@ const QUICK_CAT_LIMIT = 6;
 
 export default function ListingBrowsePage() {
   const { user, isLoggedIn, isAdmin, logout } = useAuth();
+  const { toggleWidget, unreadChatCount } = useChat();
   const navigate = useNavigate();
 
   // ── State yang sudah ada ──────────────────────────────────
@@ -571,7 +574,7 @@ const toggleFavorite = async (e, listingId) => {
                 Admin Dashboard
               </Link>
             )}
-            <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>
               Notifikasi
             </a>
             <a href="#">Pusat Bantuan</a>
@@ -606,7 +609,20 @@ const toggleFavorite = async (e, listingId) => {
           <div className="lb-nav-actions">
             {isLoggedIn() ? (
               <>
-                <button className="lb-icon-btn" aria-label="Notifikasi">
+                <button className="lb-icon-btn" aria-label="Chat" onClick={toggleWidget} style={{ position: 'relative' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  {unreadChatCount > 0 && (
+                    <span style={{
+                      position: 'absolute', top: 4, right: 4,
+                      width: 10, height: 10, borderRadius: '50%',
+                      background: '#e53e3e', border: '2px solid #fff',
+                    }}/>
+                  )}
+                </button>
+                <NotificationBell />
+                <button className="lb-icon-btn" aria-label="Notifikasi" style={{ display: 'none' }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                     <path d="M13.73 21a2 2 0 0 1-3.46 0" />

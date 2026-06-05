@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useChat } from '../../context/ChatContext';
 import api from '../../services/api';
 import { trackListingView } from '../../services/searchHistory';
 import logoText from '../../assets/LoakinLogoText.png';
+import NotificationBell from '../../components/NotificationBell';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -19,7 +21,9 @@ L.Icon.Default.mergeOptions({
 export default function ListingDetailPage() {
   const { id } = useParams();
   const { user, isLoggedIn, isAdmin, logout } = useAuth();
+  const { toggleWidget, openChatFromListing, unreadChatCount } = useChat();
   const navigate = useNavigate();
+  const [chatLoading, setChatLoading] = useState(false);
 
   const [listing, setListing]         = useState(null);
   const [loading, setLoading]         = useState(true);
@@ -208,7 +212,7 @@ export default function ListingDetailPage() {
               Admin Dashboard
             </Link>
           )}
-          <a href="#" onClick={!isLoggedIn() ? (e) => { e.preventDefault(); navigate('/login'); } : undefined}>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>
             Notifikasi
           </a>
           <a href="#">Pusat Bantuan</a>
@@ -242,7 +246,20 @@ export default function ListingDetailPage() {
           <div className="ld-nav-actions">
             {isLoggedIn() ? (
               <>
-                <button className="ld-icon-btn" aria-label="Notifikasi">
+                <button className="ld-icon-btn" aria-label="Chat" onClick={toggleWidget} style={{ position: 'relative' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  {unreadChatCount > 0 && (
+                    <span style={{
+                      position: 'absolute', top: 4, right: 4,
+                      width: 10, height: 10, borderRadius: '50%',
+                      background: '#e53e3e', border: '2px solid #fff',
+                    }}/>
+                  )}
+                </button>
+                <NotificationBell />
+                <button className="ld-icon-btn" aria-label="Notifikasi" style={{ display: 'none' }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                   </svg>
@@ -404,18 +421,45 @@ export default function ListingDetailPage() {
                 <div style={s.soldBanner}>Listing ini sudah terjual</div>
               ) : isOwner ? (
                 <>
-                  <Link to={'/listings/' + listing.id + '/edit'} style={s.btnPesan}>✏️ Edit Listing</Link>
-                  <Link to="/my-listings" style={{ background: '#fff', color: '#3BBFC9', border: '1.5px solid #3BBFC9', padding: '10px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' }}>📋 Kelola Listing</Link>
+                  <Link to={'/listings/' + listing.id + '/edit'} style={s.btnPesan}>Edit Listing</Link>
+                  <Link to="/my-listings" style={{ background: '#fff', color: '#3BBFC9', border: '1.5px solid #3BBFC9', padding: '10px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none', fontFamily: 'Nunito, sans-serif', display: 'block' }}>Kelola Listing</Link>
                 </>
               ) : isLoggedIn() ? (
                 <>
-                  <a href={waUrl} target="_blank" rel="noreferrer" style={s.btnPesan}>Pesan</a>
-                  <a href={waUrl} target="_blank" rel="noreferrer" style={s.btnChat}>Chat Penjual</a>
+                  <button
+                    onClick={async () => {
+                      if (chatLoading) return;
+                      setChatLoading(true);
+                      try {
+                        const res = await api.post('/conversations', { listing_id: listing.id, recipient_id: listing.user_id });
+                        const convId = res.data.data?.id ?? res.data.id;
+                        if (convId) {
+                          openChatFromListing(convId);
+                        } else {
+                          console.error('[Chat] No conversation ID in response:', res.data);
+                          alert('Gagal membuka chat.');
+                        }
+                      } catch (err) {
+                        console.error('[Chat] Error creating conversation:', err.response?.data || err.message);
+                        const existingId = err.response?.data?.data?.id ?? err.response?.data?.id;
+                        if (existingId) {
+                          openChatFromListing(existingId);
+                        } else {
+                          alert('Gagal membuka chat: ' + (err.response?.data?.message || 'Coba lagi.'));
+                        }
+                      } finally {
+                        setChatLoading(false);
+                      }
+                    }}
+                    disabled={chatLoading}
+                    style={s.btnPesan}
+                  >
+                    {chatLoading ? 'Memuat...' : 'Chat Penjual'}
+                  </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" style={s.btnPesan}>Masuk untuk Pesan</Link>
-                  <Link to="/login" style={s.btnChat}>Chat Penjual</Link>
+                  <Link to="/login" style={s.btnPesan}>Masuk untuk Chat</Link>
                 </>
               )}
 
@@ -440,7 +484,7 @@ export default function ListingDetailPage() {
                     width: '100%',
                   }}
                 >
-                  {isFavorite ? '❤️ Tersimpan' : '🤍 Simpan ke Favorit'}
+                  {isFavorite ? 'Tersimpan' : 'Simpan ke Favorit'}
                 </button>
               )}
 
@@ -532,7 +576,7 @@ export default function ListingDetailPage() {
                     onClick={() => setShowReportForm(!showReportForm)}
                     style={{ background: 'none', border: 'none', color: '#e53e3e', fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0 }}
                   >
-                    🚩 Laporkan Listing ini
+                    Laporkan Listing ini
                   </button>
                   {showReportForm && (
                     <div style={{ marginTop: 10, background: '#fff5f5', borderRadius: 8, padding: 14 }}>
