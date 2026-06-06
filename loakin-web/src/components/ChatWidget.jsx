@@ -86,7 +86,7 @@ const styles = {
     },
     backBtn: {
         background: 'none', border: 'none', cursor: 'pointer',
-        color: '#3BBFC9', fontSize: '1.1rem', padding: '4px 8px',
+        color: '#fff', fontSize: '1.1rem', padding: '4px 8px',
         borderRadius: 6, transition: 'background 0.15s', fontFamily: FONT,
     },
     messagesWrap: {
@@ -167,9 +167,9 @@ export default function ChatWidget() {
     const { user, token, isLoggedIn } = useAuth();
     const {
         widgetOpen, activeConversationId, conversations,
-        unreadChatCount, loadingConvs,
+        unreadChatCount, loadingConvs, pendingListingReference,
         toggleWidget, openChat, closeChat, closeWidget,
-        fetchConversations, markConversationRead,
+        fetchConversations, markConversationRead, clearPendingListingReference,
     } = useChat();
 
     // Chat-view state
@@ -183,6 +183,7 @@ export default function ChatWidget() {
     const bottomRef   = useRef(null);
     const textareaRef = useRef(null);
     const echoRef     = useRef(null);
+    const pollRef     = useRef(null);
     const [fabHover, setFabHover] = useState(false);
 
     // ── Load conversation when activeConversationId changes ────
@@ -246,6 +247,25 @@ export default function ChatWidget() {
         };
     }, [activeConversationId, token]);
 
+    // ── Polling fallback for real-time (every 5s when conv is open) ──
+    useEffect(() => {
+        if (!activeConversationId) return;
+        pollRef.current = setInterval(async () => {
+            try {
+                const res = await api.get(`/conversations/${activeConversationId}`);
+                const freshMsgs = res.data.data.messages ?? [];
+                setMessages(prev => {
+                    if (freshMsgs.length !== prev.length) return freshMsgs;
+                    const lastFresh = freshMsgs[freshMsgs.length - 1];
+                    const lastPrev = prev[prev.length - 1];
+                    if (lastFresh?.id !== lastPrev?.id) return freshMsgs;
+                    return prev;
+                });
+            } catch {}
+        }, 5000);
+        return () => clearInterval(pollRef.current);
+    }, [activeConversationId]);
+
     // ── Re-fetch conversations when widget opens ───────────────
     useEffect(() => {
         if (widgetOpen && !activeConversationId) {
@@ -255,14 +275,16 @@ export default function ChatWidget() {
 
     // ── Send message ───────────────────────────────────────────
     const send = useCallback(async () => {
-        if (sending || !body.trim() || !activeConversationId) return;
+        if (sending || (!body.trim() && !pendingListingReference) || !activeConversationId) return;
         setSending(true);
         try {
             const form = new FormData();
-            form.append('body', body.trim());
+            if (body.trim()) form.append('body', body.trim());
+            if (pendingListingReference) form.append('include_listing', '1');
             const res = await api.post(`/conversations/${activeConversationId}/messages`, form, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
+            clearPendingListingReference();
             setMessages(prev => {
                 if (prev.some(m => m.id === res.data.data.id)) return prev;
                 return [...prev, res.data.data];
@@ -274,7 +296,7 @@ export default function ChatWidget() {
         } finally {
             setSending(false);
         }
-    }, [activeConversationId, body, sending]);
+    }, [activeConversationId, body, sending, pendingListingReference, clearPendingListingReference]);
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -459,6 +481,22 @@ export default function ChatWidget() {
                         return (
                             <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: isMine ? 'flex-end' : 'flex-start' }}>
                                 <div style={isMine ? styles.bubbleMine : styles.bubbleOther}>
+                                    {msg.listing && (
+                                        <div 
+                                            style={{ background: '#fff', borderRadius: 8, padding: 8, marginBottom: 8, border: '1px solid #e2e8f0', display: 'flex', gap: 10, alignItems: 'center', color: '#2d3748', cursor: 'pointer' }} 
+                                            onClick={() => window.open(`/listing/${msg.listing.id}`, '_blank')}
+                                        >
+                                            {msg.listing.primary_photo_url ? (
+                                                <img src={msg.listing.primary_photo_url} alt="" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
+                                            ) : (
+                                                <div style={{ width: 48, height: 48, background: '#e2e8f0', borderRadius: 6 }} />
+                                            )}
+                                            <div style={{ flex: 1, minWidth: 0, textAlign: 'left', lineHeight: 1.2 }}>
+                                                <div style={{ fontWeight: 600, fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{msg.listing.title}</div>
+                                                <div style={{ fontWeight: 800, fontSize: '0.85rem', color: '#2d3748', marginTop: 4 }}>Rp{Number(msg.listing.price).toLocaleString('id-ID')}</div>
+                                            </div>
+                                        </div>
+                                    )}
                                     {msg.photo_url && (
                                         <img
                                             src={msg.photo_url}
@@ -486,6 +524,25 @@ export default function ChatWidget() {
                 <div ref={bottomRef} />
             </div>
 
+            {/* Listing Pill */}
+            {pendingListingReference && chatListing && (
+                <div style={{ padding: '8px 12px', background: '#fff', borderTop: '1px solid #eef2f7', position: 'relative' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f7fafc', padding: 8, borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                        {chatListing.primary_photo_url ? (
+                            <img src={chatListing.primary_photo_url} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6 }} />
+                        ) : (
+                            <div style={{ width: 40, height: 40, background: '#e2e8f0', borderRadius: 6 }} />
+                        )}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 700, fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#2d3748' }}>{chatListing.title}</div>
+                        </div>
+                        <button onClick={clearPendingListingReference} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#b0bec5', padding: 4 }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Input */}
             <div style={styles.inputBar}>
                 <textarea
@@ -501,11 +558,11 @@ export default function ChatWidget() {
                 />
                 <button
                     onClick={send}
-                    disabled={sending || !body.trim()}
+                    disabled={sending || (!body.trim() && !pendingListingReference)}
                     style={{
                         ...styles.sendBtn,
-                        background: (sending || !body.trim()) ? '#b0bec5' : '#3BBFC9',
-                        cursor: (sending || !body.trim()) ? 'default' : 'pointer',
+                        background: (sending || (!body.trim() && !pendingListingReference)) ? '#b0bec5' : '#3BBFC9',
+                        cursor: (sending || (!body.trim() && !pendingListingReference)) ? 'default' : 'pointer',
                     }}
                 >
                     {sending

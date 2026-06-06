@@ -9,6 +9,7 @@ class Message extends Model
     protected $fillable = [
         'conversation_id',
         'sender_id',
+        'listing_id',
         'body',
         'photo_path',
         'is_read',
@@ -30,6 +31,11 @@ class Message extends Model
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function listing()
+    {
+        return $this->belongsTo(Listing::class);
     }
 
     public function getPhotoUrlAttribute(): ?string

@@ -80,6 +80,10 @@ class ConversationController extends Controller
             ['listing_id' => $request->listing_id, 'last_message_at' => now()]
         );
 
+        if ($request->has('listing_id')) {
+            $conversation->update(['listing_id' => $request->listing_id]);
+        }
+
         $conversation->load([
             'participantOne:id,name,photo',
             'participantTwo:id,name,photo',
@@ -102,7 +106,10 @@ class ConversationController extends Controller
             'participantOne:id,name,photo',
             'participantTwo:id,name,photo',
             'listing:id,title,status',
+            'listing.primaryPhoto',
             'messages.sender:id,name,photo',
+            'messages.listing:id,title,price,status',
+            'messages.listing.primaryPhoto',
         ])
         ->findOrFail($id);
 
@@ -114,11 +121,22 @@ class ConversationController extends Controller
             ? asset('storage/' . $conversation->participantTwo->photo)
             : null;
 
-        // Map sender photo URLs in messages
+        if ($conversation->listing) {
+            $conversation->listing->primary_photo_url = $conversation->listing->primaryPhoto
+                ? asset('storage/' . $conversation->listing->primaryPhoto->photo_path)
+                : null;
+        }
+
+        // Map sender photo URLs in messages and listing primary photo URLs
         $conversation->messages->each(function ($msg) {
             if ($msg->sender) {
                 $msg->sender->photo_url = $msg->sender->photo
                     ? asset('storage/' . $msg->sender->photo)
+                    : null;
+            }
+            if ($msg->listing) {
+                $msg->listing->primary_photo_url = $msg->listing->primaryPhoto
+                    ? asset('storage/' . $msg->listing->primaryPhoto->photo_path)
                     : null;
             }
         });

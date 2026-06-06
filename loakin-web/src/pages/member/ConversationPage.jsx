@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useChat } from '../../context/ChatContext';
 import { getEchoAsync } from '../../services/echo';
 
 // ── SVG Icon Components ─────────────────────────────────────────
@@ -71,6 +72,7 @@ const IconTag = () => (
 export default function ConversationPage() {
     const { id }          = useParams();
     const { user, token } = useAuth();
+    const { pendingListingReference, clearPendingListingReference } = useChat();
     const [conversation, setConversation] = useState(null);
     const [messages,     setMessages]     = useState([]);
     const [body,         setBody]         = useState('');
@@ -82,6 +84,7 @@ export default function ConversationPage() {
     const fileInputRef = useRef(null);
     const bottomRef    = useRef(null);
     const textareaRef  = useRef(null);
+    const pollRef      = useRef(null);
 
     // ── Load conversation ──────────────────────────────────────
     useEffect(() => {
@@ -128,6 +131,25 @@ export default function ConversationPage() {
         };
     }, [id, token]);
 
+    // ── Polling fallback for real-time (every 5s when conv is open) ──
+    useEffect(() => {
+        if (!id) return;
+        pollRef.current = setInterval(async () => {
+            try {
+                const res = await api.get(`/conversations/${id}`);
+                const freshMsgs = res.data.data.messages ?? [];
+                setMessages(prev => {
+                    if (freshMsgs.length !== prev.length) return freshMsgs;
+                    const lastFresh = freshMsgs[freshMsgs.length - 1];
+                    const lastPrev = prev[prev.length - 1];
+                    if (lastFresh?.id !== lastPrev?.id) return freshMsgs;
+                    return prev;
+                });
+            } catch {}
+        }, 5000);
+        return () => clearInterval(pollRef.current);
+    }, [id]);
+
     // ── Photo attachment helpers ───────────────────────────────
     const handlePhotoChange = (e) => {
         const file = e.target.files?.[0];
@@ -144,17 +166,19 @@ export default function ConversationPage() {
 
     // ── Send message ───────────────────────────────────────────
     const send = useCallback(async () => {
-        if (sending || (!body.trim() && !photo)) return;
+        if (sending || (!body.trim() && !photo && !pendingListingReference)) return;
         setSending(true);
         try {
             const form = new FormData();
             if (body.trim()) form.append('body',  body.trim());
             if (photo)       form.append('photo', photo);
+            if (pendingListingReference) form.append('include_listing', '1');
 
             const res = await api.post(`/conversations/${id}/messages`, form, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
+            clearPendingListingReference();
             setMessages(prev => {
                 if (prev.some(m => m.id === res.data.data.id)) return prev;
                 return [...prev, res.data.data];
@@ -167,7 +191,7 @@ export default function ConversationPage() {
         } finally {
             setSending(false);
         }
-    }, [id, body, photo, sending]);
+    }, [id, body, photo, sending, pendingListingReference, clearPendingListingReference]);
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -342,6 +366,22 @@ export default function ConversationPage() {
                                         boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                                         fontFamily: "'Nunito', sans-serif",
                                     }}>
+                                        {msg.listing && (
+                                            <div 
+                                                style={{ background: '#fff', borderRadius: 8, padding: 10, marginBottom: 8, border: '1px solid #e2e8f0', display: 'flex', gap: 12, alignItems: 'center', color: '#2d3748', cursor: 'pointer' }} 
+                                                onClick={() => window.open(`/listing/${msg.listing.id}`, '_blank')}
+                                            >
+                                                {msg.listing.primary_photo_url ? (
+                                                    <img src={msg.listing.primary_photo_url} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 6 }} />
+                                                ) : (
+                                                    <div style={{ width: 56, height: 56, background: '#e2e8f0', borderRadius: 6 }} />
+                                                )}
+                                                <div style={{ flex: 1, minWidth: 0, textAlign: 'left', lineHeight: 1.2 }}>
+                                                    <div style={{ fontWeight: 600, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{msg.listing.title}</div>
+                                                    <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#2d3748', marginTop: 4 }}>Rp{Number(msg.listing.price).toLocaleString('id-ID')}</div>
+                                                </div>
+                                            </div>
+                                        )}
                                         {msg.photo_url && (
                                             <img
                                                 src={msg.photo_url}
@@ -410,6 +450,33 @@ export default function ConversationPage() {
                             >
                                 <IconClose />
                             </button>
+                        </div>
+                    )}
+
+                    {/* Listing Pill */}
+                    {pendingListingReference && conversation?.listing && (
+                        <div style={{
+                            maxWidth: 900,
+                            margin: '0 auto',
+                            padding: '10px 24px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            borderBottom: '1px solid #f0f2f5',
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#f7fafc', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', flex: 1 }}>
+                                {conversation.listing.primary_photo_url ? (
+                                    <img src={conversation.listing.primary_photo_url} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6 }} />
+                                ) : (
+                                    <div style={{ width: 44, height: 44, background: '#e2e8f0', borderRadius: 6 }} />
+                                )}
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontWeight: 700, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#2d3748' }}>{conversation.listing.title}</div>
+                                </div>
+                                <button onClick={clearPendingListingReference} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a0aec0', padding: 4 }}>
+                                    <IconClose />
+                                </button>
+                            </div>
                         </div>
                     )}
 

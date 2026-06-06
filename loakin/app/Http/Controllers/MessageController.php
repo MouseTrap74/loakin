@@ -19,9 +19,10 @@ class MessageController extends Controller
         $request->validate([
             'body'  => 'nullable|string|max:2000',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'include_listing' => 'nullable|boolean',
         ]);
 
-        if (!$request->body && !$request->hasFile('photo')) {
+        if (!$request->body && !$request->hasFile('photo') && !$request->boolean('include_listing')) {
             return response()->json(['message' => 'Pesan tidak boleh kosong.'], 422);
         }
 
@@ -40,12 +41,19 @@ class MessageController extends Controller
         $message = Message::create([
             'conversation_id' => $conversation->id,
             'sender_id'       => $userId,
+            'listing_id'      => $request->boolean('include_listing') ? $conversation->listing_id : null,
             'body'            => $request->body,
             'photo_path'      => $photoPath,
         ]);
 
         $conversation->update(['last_message_at' => now()]);
-        $message->load('sender:id,name,photo');
+        $message->load('sender:id,name,photo', 'listing.primaryPhoto');
+
+        if ($message->listing) {
+            $message->listing->primary_photo_url = $message->listing->primaryPhoto
+                ? asset('storage/' . $message->listing->primaryPhoto->photo_path)
+                : null;
+        }
 
         // 1. Broadcast to the conversation channel (real-time chat)
         broadcast(new MessageSent($message))->toOthers();
