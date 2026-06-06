@@ -18,7 +18,7 @@ export default function EditListingPage() {
   const [fetchLoading, setFetchLoading]     = useState(true);
   const [error, setError]                   = useState('');
   const [photoWarning, setPhotoWarning]     = useState('');
-  const [maxPhotos, setMaxPhotos]           = useState(8);
+  const [maxPhotos, setMaxPhotos]           = useState(5);
   const [existingPhotos, setExistingPhotos] = useState([]);
   const [newPreviews, setNewPreviews]       = useState([]);
 
@@ -81,9 +81,9 @@ export default function EditListingPage() {
 
   const fetchMaxPhotos = async () => {
     try {
-      const res = await api.get('/admin/settings/listing');
-      setMaxPhotos(res.data.max_photos_per_listing ?? 8);
-    } catch { setMaxPhotos(8); }
+      const res = await api.get('/settings/listing-rules');
+      setMaxPhotos(res.data.max_photos_per_listing ?? 5);
+    } catch { setMaxPhotos(5); }
   };
 
   const handleChange = (e) => {
