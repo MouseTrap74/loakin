@@ -8,14 +8,13 @@ import logoText from '../../assets/LoakinLogoText.png';
 export default function AdminSettingsPage() {
   const { logout } = useAuth();
   const navigate   = useNavigate();
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState('listing');
   const [form, setForm]           = useState({});
   const [loading, setLoading]     = useState(false);
   const [success, setSuccess]     = useState('');
   const [error, setError]         = useState('');
 
   const endpoints = {
-    general:    '/admin/settings/general',
     listing:    '/admin/settings/listing',
     moderation: '/admin/settings/moderation',
   };
@@ -52,12 +51,6 @@ export default function AdminSettingsPage() {
   };
 
   const fields = {
-    general: [
-      { key: 'app_name',         label: 'Nama Aplikasi',        type: 'text'  },
-      { key: 'app_description',  label: 'Deskripsi Aplikasi',   type: 'text'  },
-      { key: 'contact_email',    label: 'Email Kontak',         type: 'email' },
-      { key: 'contact_phone',    label: 'Nomor Telepon Kontak', type: 'text'  },
-    ],
     listing: [
       { key: 'max_photos_per_listing',  label: 'Maksimum Foto per Listing',               type: 'number' },
       { key: 'max_active_listings',     label: 'Maksimum Listing Aktif per Pengguna',      type: 'number' },
@@ -70,7 +63,6 @@ export default function AdminSettingsPage() {
   };
 
   const tabs = [
-    { key: 'general',    label: 'Konfigurasi Umum' },
     { key: 'listing',    label: 'Aturan Listing'   },
     { key: 'moderation', label: 'Aturan Moderasi'  },
   ];

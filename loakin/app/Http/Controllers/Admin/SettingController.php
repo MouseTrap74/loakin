@@ -89,4 +89,13 @@ class SettingController extends Controller
 
         return response()->json(['message' => 'Aturan moderasi berhasil diperbarui']);
     }
+
+    // Endpoint publik: nilai setting listing yang perlu diketahui frontend
+    public function publicListingRules()
+    {
+        return response()->json([
+            'max_photos_per_listing' => SystemSetting::getValue('max_photos_per_listing', 5),
+            'listing_active_days'    => SystemSetting::getValue('listing_active_days', 30),
+        ]);
+    }
 }

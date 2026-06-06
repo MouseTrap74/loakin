@@ -135,7 +135,7 @@ class ListingController extends Controller
         // lebih dari suspicious_price_threshold% di bawah rata-rata kategori.
         $warning = null;
         if ($this->isSuspiciousPrice((float) $request->price, (int) $request->category_id)) {
-            $listing->update(['status' => 'pending_review']);
+            $listing->update(['status' => 'pending_review', 'is_flagged' => true]);
             $warning = 'Harga listing terdeteksi tidak wajar dibanding rata-rata kategori. Listing sedang dalam peninjauan admin.';
         }
 
@@ -186,7 +186,7 @@ class ListingController extends Controller
         $categoryToUse = $request->filled('category_id') ? (int) $request->category_id : (int) $listing->category_id;
 
         if ($listing->status === 'active' && $this->isSuspiciousPrice($priceToCheck, $categoryToUse)) {
-            $listing->update(['status' => 'pending_review']);
+            $listing->update(['status' => 'pending_review', 'is_flagged' => true]);
             $warning = 'Harga listing terdeteksi tidak wajar dibanding rata-rata kategori. Listing sedang dalam peninjauan admin.';
         }
 

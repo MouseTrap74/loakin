@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\BannedKeywordController;
 use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\PreferenceController;
 
 // Broadcasting auth — uses sanctum so Echo can authenticate private channels
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
@@ -44,6 +45,7 @@ Route::get('/listings/map-pins', [PublicListingController::class, 'mapPins']);
 Route::get('/listings/{id}',     [PublicListingController::class, 'show']);
 // Dedicated view-tracking endpoint — called once by ListingDetailPage
 Route::post('/listings/{id}/view', [PublicListingController::class, 'trackView']);
+Route::get('/settings/listing-rules', [SettingController::class, 'publicListingRules']);
 
 // ================================================================
 // MEMBER ROUTES (harus login)
@@ -91,6 +93,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/favorites/{listingId}',       [FavoriteController::class, 'store']);
     Route::delete('/favorites/{listingId}',     [FavoriteController::class, 'destroy']);
     Route::get('/favorites/{listingId}/check',  [FavoriteController::class, 'check']);
+
+    // Riwayat & Rekomendasi
+    Route::post('/history/view',    [PreferenceController::class, 'storeView']);
+    Route::post('/history/search',  [PreferenceController::class, 'storeSearch']);
+    Route::get('/recommendations',  [PreferenceController::class, 'getRecommendations']);
 
     // ── Chat / Percakapan ──────────────────────────────────────────
     Route::get('/conversations',                [ConversationController::class, 'index']);

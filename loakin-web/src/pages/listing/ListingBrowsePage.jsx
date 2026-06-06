@@ -6,7 +6,7 @@ import BrowseMapView from '../../components/BrowseMapView';
 import Footer from '../../components/Footer';
 import Navbar from '../../components/Navbar';
 import UtilityBar from '../../components/UtilityBar';
-import { trackSearch, trackCategoryClick, getTopCategories, hasHistory } from '../../services/searchHistory';
+import { trackSearch, trackCategoryClick, getTopCategories, hasHistory, syncSearchToServer } from '../../services/searchHistory';
 
 // ── Carousel & category assets ────────────────────────────────
 import carousel1 from '../../assets/carousel1.png';
@@ -74,8 +74,12 @@ export default function ListingBrowsePage() {
   // ── Effects ──────────────────────────────────────────────
   useEffect(() => {
     fetchCategories();
-    fetchRecommendations();
   }, []);
+
+  const loggedIn = isLoggedIn();
+  useEffect(() => {
+    fetchRecommendations();
+  }, [loggedIn]);
 
   useEffect(() => {
     fetchListings();
@@ -89,39 +93,38 @@ export default function ListingBrowsePage() {
     fetchNearbyListings();
   }, [userLocation, filters.radius]);
 
-  const loggedIn = isLoggedIn();
   useEffect(() => {
     if (loggedIn) fetchFavoriteIds();
   }, [loggedIn]);
 
-const fetchFavoriteIds = async () => {
-  try {
-    let allIds = [];
-    let page = 1;
-    let lastPage = 1;
-    do {
-      const res = await api.get(`/favorites?page=${page}`);
-      allIds = allIds.concat(res.data.data.map((listing) => listing.id));
-      lastPage = res.data.last_page;
-      page++;
-    } while (page <= lastPage);
-    setFavoriteIds(new Set(allIds));
-  } catch (_) {}
-};
+  const fetchFavoriteIds = async () => {
+    try {
+      let allIds = [];
+      let page = 1;
+      let lastPage = 1;
+      do {
+        const res = await api.get(`/favorites?page=${page}`);
+        allIds = allIds.concat(res.data.data.map((listing) => listing.id));
+        lastPage = res.data.last_page;
+        page++;
+      } while (page <= lastPage);
+      setFavoriteIds(new Set(allIds));
+    } catch (_) { }
+  };
 
-const toggleFavorite = async (e, listingId) => {
-  e.preventDefault(); // cegah link card ikut terklik
-  if (!isLoggedIn()) { navigate('/login'); return; }
-  try {
-    if (favoriteIds.has(listingId)) {
-      await api.delete(`/favorites/${listingId}`);
-      setFavoriteIds((prev) => { const s = new Set(prev); s.delete(listingId); return s; });
-    } else {
-      await api.post(`/favorites/${listingId}`);
-      setFavoriteIds((prev) => new Set(prev).add(listingId));
-    }
-  } catch (_) {}
-};
+  const toggleFavorite = async (e, listingId) => {
+    e.preventDefault(); // cegah link card ikut terklik
+    if (!isLoggedIn()) { navigate('/login'); return; }
+    try {
+      if (favoriteIds.has(listingId)) {
+        await api.delete(`/favorites/${listingId}`);
+        setFavoriteIds((prev) => { const s = new Set(prev); s.delete(listingId); return s; });
+      } else {
+        await api.post(`/favorites/${listingId}`);
+        setFavoriteIds((prev) => new Set(prev).add(listingId));
+      }
+    } catch (_) { }
+  };
 
   // Auto-play carousel
   useEffect(() => {
@@ -156,18 +159,32 @@ const toggleFavorite = async (e, listingId) => {
 
   // ── Rekomendasi Personalisasi ──────────────────────────────
   const fetchRecommendations = async () => {
+    // Jika user login, gunakan backend recommendations
+    if (isLoggedIn()) {
+      try {
+        const res = await api.get('/recommendations');
+        const items = res.data.data || [];
+        if (items.length > 0) {
+          setSpecialListings(items.slice(0, 5));
+          setRecoSource(res.data.source === 'personalized' ? 'personalized' : 'featured');
+          return;
+        }
+      } catch (err) {
+        console.error('Backend recommendations failed, falling back to localStorage', err);
+      }
+    }
+
+    // Fallback: localStorage-based recommendations (guest atau jika backend gagal)
     const topCats = getTopCategories(3);
 
     if (topCats.length > 0) {
-      // Ada riwayat → ambil listing dari kategori favorit user
       try {
         const promises = topCats.map((catId) =>
           api.get('/listings', {
-            params: { category_id: catId, sort_by: 'popular', per_page: 4 },
+            params: { category_id: catId, sort_by: 'popular', per_page: 3 },
           })
         );
         const results = await Promise.all(promises);
-        // Gabungkan, hilangkan duplikat
         const seen = new Set();
         const merged = [];
         for (const res of results) {
@@ -179,7 +196,7 @@ const toggleFavorite = async (e, listingId) => {
           }
         }
         if (merged.length > 0) {
-          setSpecialListings(merged.slice(0, 12));
+          setSpecialListings(merged.slice(0, 5));
           setRecoSource('personalized');
           return;
         }
@@ -188,9 +205,9 @@ const toggleFavorite = async (e, listingId) => {
       }
     }
 
-    // Fallback: tampilkan featured listings jika belum ada riwayat
+    // Final fallback: featured listings
     try {
-      const res = await api.get('/listings', { params: { is_featured: 1, per_page: 8 } });
+      const res = await api.get('/listings', { params: { is_featured: 1, per_page: 5 } });
       setSpecialListings(res.data.data || []);
       setRecoSource('featured');
     } catch (err) {
@@ -283,6 +300,7 @@ const toggleFavorite = async (e, listingId) => {
   const handleSearch = (e) => {
     e.preventDefault();
     trackSearch(searchInput);
+    syncSearchToServer(searchInput);
     setFilters((prev) => ({ ...prev, search: searchInput }));
     setCurrentPage(1);
   };
@@ -432,20 +450,20 @@ const toggleFavorite = async (e, listingId) => {
         .lb-cat-popup-clear:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
 
         /* ── SPESIAL UNTUKMU ── */
-        .lb-special-card { background: #51a5ba; border-radius: 12px; overflow: hidden; margin: 1.5rem 0 0; padding: 1.4rem 1.6rem 1.6rem; }
+        .lb-special-card { background: linear-gradient(135deg, #2BB5A0 0%, #3BBFC9 100%); border-radius: 12px; overflow: hidden; margin: 1.5rem 0 0; padding: 1.4rem 1.6rem 1.6rem; }
         .lb-special-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .lb-special-title { font-size: 1.5rem; font-weight: 800; color: #fff; font-family: 'Nunito', sans-serif; }
         .lb-special-link { font-size: 0.95rem; font-weight: 700; color: #fff; text-decoration: none; }
         .lb-special-link:hover { text-decoration: underline; }
         .lb-special-scroll {
-          display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none;
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 14px;
         }
         .lb-special-scroll::-webkit-scrollbar { display: none; }
         
-        .lb-special-item { flex-shrink: 0; width: 175px; background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: transform 0.15s, box-shadow 0.15s; }
+        .lb-special-item { width: auto; background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: transform 0.15s, box-shadow 0.15s; }
         .lb-special-item:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
         .lb-special-img { height: 160px; background: #fff; position: relative; border-bottom: none; }
-        .lb-special-img img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
+        .lb-special-img img { width: 100%; height: 100%; object-fit: cover; }
         .lb-special-no-img { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #ddd; background: #f8f9fb; }
         .lb-special-badge { position: absolute; top: 8px; left: 8px; background: #f34848; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 10px 2px 4px; clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 50%, 100% 100%, 0 100%); }
         .lb-special-body { padding: 14px 14px 16px; display: flex; flex-direction: column; flex: 1; text-align: center; }
@@ -695,13 +713,8 @@ const toggleFavorite = async (e, listingId) => {
               <span className="lb-special-title">
                 {recoSource === 'personalized' ? '🎯 Rekomendasi Untukmu' : '✨ Spesial Untukmu'}
               </span>
-              <Link to="/listings" className="lb-special-link">Lihat Semua →</Link>
+              <Link to="/" className="lb-special-link" style={{ display: 'none' }}>Lihat Semua →</Link>
             </div>
-            {recoSource === 'personalized' && (
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', fontWeight: 600, margin: '-6px 0 10px', letterSpacing: '0.01em' }}>
-                Berdasarkan riwayat pencarianmu
-              </p>
-            )}
             {specialListings.length === 0 ? (
               <div className="lb-special-empty">
                 <span>🎁</span>
@@ -800,18 +813,6 @@ const toggleFavorite = async (e, listingId) => {
               )}
 
               <button className="lb-filter-reset" onClick={handleReset} type="button">↺ Reset</button>
-
-              {isLoggedIn() && (
-                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.82rem', fontWeight: 700, color: '#555', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  <input
-                    type="checkbox"
-                    checked={filters.search_in === 'all'}
-                    onChange={(e) => handleFilterChange('search_in', e.target.checked ? 'all' : '')}
-                    style={{ accentColor: '#3BBFC9' }}
-                  />
-                  Cari di deskripsi
-                </label>
-              )}
 
               <div className="lb-filter-right">
                 <div className="lb-view-toggle">

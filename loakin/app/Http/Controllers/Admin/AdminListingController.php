@@ -64,7 +64,7 @@ class AdminListingController extends Controller
         if ($listing->trashed()) {
             $listing->restore();
         }
-        $listing->update(['status' => 'active']);
+        $listing->update(['status' => 'active', 'is_flagged' => false]);
 
         return response()->json(['message' => 'Listing disetujui dan aktif kembali.']);
     }

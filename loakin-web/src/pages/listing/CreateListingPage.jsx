@@ -17,7 +17,7 @@ export default function CreateListingPage() {
   const [error, setError]                 = useState('');
   const [photoWarning, setPhotoWarning]   = useState('');
   const [photoPreviews, setPhotoPreviews] = useState([]);
-  const [maxPhotos, setMaxPhotos]         = useState(8);
+  const [maxPhotos, setMaxPhotos]         = useState(5);
 
   const [form, setForm] = useState({
     category_id:  '',
@@ -51,9 +51,9 @@ export default function CreateListingPage() {
 
   const fetchMaxPhotos = async () => {
     try {
-      const res = await api.get('/admin/settings/listing');
-      setMaxPhotos(res.data.max_photos_per_listing ?? 8);
-    } catch { setMaxPhotos(8); }
+      const res = await api.get('/settings/listing-rules');
+      setMaxPhotos(res.data.max_photos_per_listing ?? 5);
+    } catch { setMaxPhotos(5); }
   };
 
   const handleChange = (e) => {

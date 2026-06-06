@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useChat } from '../../context/ChatContext';
 import api from '../../services/api';
-import { trackListingView } from '../../services/searchHistory';
+import { trackListingView, syncViewToServer } from '../../services/searchHistory';
 import Navbar from '../../components/Navbar';
 import UtilityBar from '../../components/UtilityBar';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
@@ -90,6 +90,7 @@ export default function ListingDetailPage() {
       // Track kategori listing yang dilihat untuk rekomendasi personalisasi
       if (res.data?.category_id) {
         trackListingView(res.data.category_id, res.data.id);
+        syncViewToServer(res.data.category_id, res.data.id);
       }
       // Increment view count exactly once per visit, guarded against
       // StrictMode double-fire and repeated re-renders.

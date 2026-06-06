@@ -22,6 +22,7 @@ class Listing extends Model
         'longitude',
         'status',
         'is_featured',
+        'is_flagged',
         'views_count',
         'expires_at',
     ];
@@ -31,6 +32,7 @@ class Listing extends Model
         'latitude'    => 'decimal:7',
         'longitude'   => 'decimal:7',
         'is_featured' => 'boolean',
+        'is_flagged'  => 'boolean',
         'views_count' => 'integer',
         'stock'       => 'integer',
         'expires_at'  => 'datetime',
