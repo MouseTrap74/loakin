@@ -97,18 +97,6 @@ export default function LoginPage() {
           50%       { transform: rotate(14deg) translateY(0px);    }
         }
 
-        .lk-logo {
-          position: relative;
-          z-index: 3;
-          margin-bottom: 1.4rem;
-          animation: lk-fadein 0.45s ease both;
-        }
-        .lk-logo img {
-          height: 40px;
-          object-fit: contain;
-          mix-blend-mode: multiply;
-        }
-
         .lk-card {
           position: relative;
           z-index: 3;
@@ -268,10 +256,6 @@ export default function LoginPage() {
         <img src={blobImg} alt="" className="lk-blob" aria-hidden="true" />
         <img src={boxImg} alt="" className="lk-box-left" aria-hidden="true" />
         <img src={boxImg} alt="" className="lk-box-right" aria-hidden="true" />
-
-        <div className="lk-logo">
-          <img src={logoText} alt="Loakin" />
-        </div>
 
         <div className="lk-card">
           <h2 className="lk-title">Masuk Loakin</h2>

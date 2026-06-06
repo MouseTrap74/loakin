@@ -100,6 +100,7 @@ export default function RegisterPage() {
           user-select: none;
           position: relative;
           z-index: 1;
+          transform: rotate(12deg);
         }
 
         /* ── floating boxes ── */
@@ -116,9 +117,9 @@ export default function RegisterPage() {
         }
         .rk-box-right {
           position: absolute;
-          right: 14%;
-          bottom: 10%;
-          width: clamp(85px, 10vw, 118px);
+          right: calc(50% - 365px);
+          top: calc(50% + 55px);
+          width: 130px;
           transform: rotate(14deg);
           z-index: 4;
           pointer-events: none;
@@ -144,6 +145,12 @@ export default function RegisterPage() {
         }
 
         /* ── logo ── */
+        .rk-logo {
+          position: relative;
+          z-index: 3;
+          margin-bottom: 1.4rem;
+          animation: rk-fadein 0.45s ease both;
+        }
         .rk-logo img {
           height: 38px;
           object-fit: contain;

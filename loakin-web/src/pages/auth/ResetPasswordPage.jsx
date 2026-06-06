@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
           height: 700px;
           top: 50%;
           left: 50%;
-          transform: translate(-50%, -52%) rotate(12deg);
+          transform: translate(-50%, -45%) rotate(45deg);
           z-index: 0;
           pointer-events: none;
           object-fit: contain;
@@ -101,19 +101,6 @@ export default function ResetPasswordPage() {
         @keyframes rp-float-r {
           0%, 100% { transform: rotate(14deg) translateY(-12px);  }
           50%       { transform: rotate(14deg) translateY(0px);    }
-        }
-
-        /* ── logo ── */
-        .rp-logo {
-          position: relative;
-          z-index: 3;
-          margin-bottom: 1.4rem;
-          animation: rp-fadein 0.45s ease both;
-        }
-        .rp-logo img {
-          height: 40px;
-          object-fit: contain;
-          mix-blend-mode: multiply;
         }
 
         /* ── card ── */
