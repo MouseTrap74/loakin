@@ -456,7 +456,7 @@ export default function ListingDetailPage() {
                     </div>
                   </div>
                 </div>
-                <Link to={'/users/' + listing.user_id} style={s.btnFollow}>Follow</Link>
+                <Link to={'/users/' + listing.user_id} style={s.btnFollow}>Lihat Profil</Link>
               </div>
               {/* Laporkan Listing */}
               {isLoggedIn() && !isOwner && (
@@ -621,7 +621,7 @@ const s = {
   breadCurrent:    { color: '#888' },
 
   // Top row
-  topRow:          { display: 'grid', gridTemplateColumns: '1fr 1fr 280px', gap: 16, marginBottom: 20 },
+  topRow:          { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) 280px', gap: 16, marginBottom: 20 },
 
   // Foto
   photoCol:        { display: 'flex', gap: 10, background: '#fff', borderRadius: 12, padding: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' },

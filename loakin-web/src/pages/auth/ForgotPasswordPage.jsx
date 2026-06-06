@@ -92,19 +92,6 @@ export default function ForgotPasswordPage() {
           50%       { transform: rotate(14deg) translateY(0px);    }
         }
 
-        /* ── logo ── */
-        .fp-logo {
-          position: relative;
-          z-index: 3;
-          margin-bottom: 1.4rem;
-          animation: fp-fadein 0.45s ease both;
-        }
-        .fp-logo img {
-          height: 40px;
-          object-fit: contain;
-          mix-blend-mode: multiply;
-        }
-
         /* ── card ── */
         .fp-card {
           position: relative;

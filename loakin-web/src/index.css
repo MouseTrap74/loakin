@@ -118,3 +118,6 @@ html, body, #root {
   margin: 0;
   padding: 0;
 }
+
+/* Leaflet z-index fix */
+.leaflet-pane, .leaflet-top, .leaflet-bottom { z-index: 1 !important; }
