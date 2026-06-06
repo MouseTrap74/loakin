@@ -57,8 +57,8 @@ export default function AdminSettingsPage() {
       { key: 'listing_active_days',     label: 'Durasi Masa Aktif Listing (hari)',          type: 'number' },
     ],
     moderation: [
-      { key: 'auto_moderate_threshold',     label: 'Threshold Laporan Auto-Moderasi',       type: 'number' },
-      { key: 'suspicious_price_threshold',  label: 'Threshold Harga Mencurigakan (%)',      type: 'number' },
+      { key: 'auto_moderate_threshold',     label: 'Batas Laporan Otomatis',       type: 'number', helper: 'Listing akan otomatis disembunyikan dari halaman publik jika jumlah laporan dari pengguna sudah mencapai batas ini.' },
+      { key: 'suspicious_price_threshold',  label: 'Threshold Harga Mencurigakan (%)',      type: 'number', helper: 'Persentase di bawah rata-rata harga kategori yang dianggap mencurigakan. Listing dengan harga di bawah batas ini akan otomatis dilaporkan dan disembunyikan.' },
     ],
   };
 
@@ -199,6 +199,14 @@ export default function AdminSettingsPage() {
           color: #6b7a8d;
           margin-bottom: 0.4rem;
         }
+        .as-helper {
+          display: block;
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: #a0aab4;
+          margin-top: 0.35rem;
+          line-height: 1.5;
+        }
         .as-input {
           width: 100%;
           padding: 0.72rem 1rem;
@@ -323,6 +331,7 @@ export default function AdminSettingsPage() {
                       value={form[field.key] || ''}
                       onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
                     />
+                    {field.helper && <span className="as-helper">{field.helper}</span>}
                   </div>
                 ))}
 

@@ -240,6 +240,8 @@ export default function AdminReportsPage() {
         
         .al-badge-type-listing { background: #ccfbf1; color: #115e59; }
         .al-badge-type-user { background: #e0e7ff; color: #3730a3; }
+        .al-badge-suspicious { background: #fef3c7; color: #92400e; font-size: 0.76rem; }
+        .al-badge-system { background: #e0e7ff; color: #3730a3; font-size: 0.76rem; }
 
         .al-btn-detail {
           background: #f0f2f5; color: #555; border: 1.5px solid #dce3ea; padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 800; font-size: 0.8rem; cursor: pointer; font-family: 'Nunito', sans-serif;
@@ -349,12 +351,22 @@ export default function AdminReportsPage() {
                           </span>
                         </td>
                         <td className="al-td">
-                          <div style={{ maxWidth: 220, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {report.reason}
+                          <div style={{ maxWidth: 220, display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                            <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {report.reason}
+                            </span>
+                            {report.reason?.includes('Harga mencurigakan') && (
+                              <span className="al-badge al-badge-suspicious" style={{ width: 'fit-content' }}>⚠️ Harga Mencurigakan</span>
+                            )}
                           </div>
                         </td>
                         <td className="al-td">
-                          <span style={{ fontWeight: 800 }}>{report.reporter?.name || "—"}</span>
+                          <span style={{ fontWeight: 800 }}>
+                            {report.reporter
+                              ? report.reporter.name
+                              : <span className="al-badge al-badge-system">🤖 Sistem</span>
+                            }
+                          </span>
                         </td>
                         <td className="al-td" style={{ color: "#8a9ab0", fontSize: "0.82rem" }}>
                           {new Date(report.created_at).toLocaleDateString("id-ID", {

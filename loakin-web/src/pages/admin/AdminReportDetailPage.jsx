@@ -70,6 +70,8 @@ export default function AdminReportDetailPage() {
 
   const meta = statusMeta[report.status] || { label: report.status, cls: "al-badge-inactive" };
   const isListing = report.reportable_type?.endsWith("Listing");
+  const isSuspiciousPrice = report.reason?.includes('Harga mencurigakan');
+  const isSystemReport = !report.reporter_id;
 
   return (
     <>
@@ -208,6 +210,26 @@ export default function AdminReportDetailPage() {
         .al-badge-inactive { background: #fee2e2; color: #991b1b; }
         .al-badge-type-listing { background: #ccfbf1; color: #115e59; }
         .al-badge-type-user { background: #e0e7ff; color: #3730a3; }
+        .al-badge-system { background: #e0e7ff; color: #3730a3; }
+
+        .ad-suspicious-banner {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.6rem;
+          background: #fffbeb;
+          border: 1.5px solid #fbbf24;
+          border-radius: 12px;
+          padding: 1rem 1.25rem;
+          margin-bottom: 1.5rem;
+          font-size: 0.88rem;
+          font-weight: 700;
+          color: #92400e;
+          line-height: 1.5;
+        }
+        .ad-suspicious-banner span.icon {
+          font-size: 1.3rem;
+          flex-shrink: 0;
+        }
 
         /* info grid */
         .ad-info-grid {
@@ -389,6 +411,14 @@ export default function AdminReportDetailPage() {
             {/* Left: Main Detail */}
             <div className="ad-col-left">
 
+              {/* Suspicious Price Banner */}
+              {isSuspiciousPrice && report.status === 'pending' && (
+                <div className="ad-suspicious-banner">
+                  <span className="icon">⚠️</span>
+                  <div>Listing ini sedang disembunyikan dari publik karena terdeteksi harga tidak wajar. Menunggu keputusan admin.</div>
+                </div>
+              )}
+
               {/* Report Info Card */}
               <div className="ad-card">
                 <div className="ad-card-header">
@@ -410,7 +440,12 @@ export default function AdminReportDetailPage() {
                   </div>
                   <div className="ad-info-item">
                     <span className="ad-info-label">Dilaporkan Oleh</span>
-                    <span className="ad-info-value">{report.reporter?.name || "—"}</span>
+                    <span className="ad-info-value">
+                      {isSystemReport
+                        ? <span className="al-badge al-badge-system" style={{ width: 'fit-content' }}>🤖 Laporan Otomatis (Sistem)</span>
+                        : (report.reporter?.name || "—")
+                      }
+                    </span>
                   </div>
                   <div className="ad-info-item">
                     <span className="ad-info-label">Tanggal Laporan</span>
@@ -493,7 +528,10 @@ export default function AdminReportDetailPage() {
                 <div className="ad-card">
                   <h3 className="ad-card-title">Ambil Tindakan</h3>
                   <p style={{ fontSize: "0.85rem", color: "#8a9ab0", margin: "0.5rem 0 1rem", fontWeight: 600 }}>
-                    Tambahkan catatan dan pilih tindakan untuk laporan ini.
+                    {isSuspiciousPrice
+                      ? 'Tentukan apakah listing ini aman atau perlu tetap disembunyikan.'
+                      : 'Tambahkan catatan dan pilih tindakan untuk laporan ini.'
+                    }
                   </p>
                   <textarea
                     placeholder="Catatan admin (opsional)"
@@ -508,14 +546,14 @@ export default function AdminReportDetailPage() {
                       disabled={submitting}
                       className="ad-btn ad-btn-resolve"
                     >
-                      {submitting ? "Memproses..." : "✅ Tandai Selesai"}
+                      {submitting ? "Memproses..." : (isSuspiciousPrice ? "✅ Setujui — Listing Aman" : "✅ Tandai Selesai")}
                     </button>
                     <button
                       onClick={() => handleAction("reject")}
                       disabled={submitting}
                       className="ad-btn ad-btn-reject"
                     >
-                      {submitting ? "Memproses..." : "❌ Tolak Laporan"}
+                      {submitting ? "Memproses..." : (isSuspiciousPrice ? "❌ Tolak — Tetap Sembunyikan" : "❌ Tolak Laporan")}
                     </button>
                   </div>
                 </div>
