@@ -146,10 +146,19 @@ class PublicListingController extends Controller
             'photos'
         ])->where('status', 'active')->findOrFail($id);
 
-        // Tambah views count
-        $listing->increment('views_count');
+        // View count is NOT incremented here.
+        // Use POST /listings/{id}/view to track views explicitly from the frontend.
 
         return response()->json($listing);
+    }
+
+    // POST /api/listings/{id}/view — Increment view counter (called once by the detail page)
+    public function trackView($id)
+    {
+        $listing = Listing::where('status', 'active')->findOrFail($id);
+        $listing->increment('views_count');
+
+        return response()->json(['message' => 'View tracked']);
     }
 
     // GET /api/categories — Daftar semua kategori

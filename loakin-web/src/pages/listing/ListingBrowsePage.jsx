@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useChat } from '../../context/ChatContext';
 import api, { storageUrl } from '../../services/api';
-import logoText from '../../assets/LoakinLogoText.png';
 import BrowseMapView from '../../components/BrowseMapView';
 import Footer from '../../components/Footer';
-import NotificationBell from '../../components/NotificationBell';
+import Navbar from '../../components/Navbar';
+import UtilityBar from '../../components/UtilityBar';
 import { trackSearch, trackCategoryClick, getTopCategories, hasHistory } from '../../services/searchHistory';
 
 // ── Carousel & category assets ────────────────────────────────
@@ -34,8 +33,7 @@ const DEFAULT_CATEGORIES = [
 const QUICK_CAT_LIMIT = 6;
 
 export default function ListingBrowsePage() {
-  const { user, isLoggedIn, isAdmin, logout } = useAuth();
-  const { toggleWidget, unreadChatCount } = useChat();
+  const { user, isLoggedIn, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   // ── State yang sudah ada ──────────────────────────────────
@@ -302,13 +300,6 @@ const toggleFavorite = async (e, listingId) => {
     setCurrentPage(1);
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/logout');
-    } catch (_) { }
-    logout();
-    navigate('/login');
-  };
 
   const handleSelectCategory = (id) => {
     if (id) trackCategoryClick(id);
@@ -334,7 +325,6 @@ const toggleFavorite = async (e, listingId) => {
   const getPhotoUrl = (photo) =>
     photo ? storageUrl(photo.photo_path) : null;
 
-  const photoUrl = user?.photo ? storageUrl(user.photo) : null;
 
   const categoriesToShow = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
   const quickCategories = categoriesToShow.slice(0, QUICK_CAT_LIMIT);
@@ -345,42 +335,10 @@ const toggleFavorite = async (e, listingId) => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; }
 
         .lb-wrap { min-height: 100vh; display: flex; flex-direction: column; font-family: 'Nunito', sans-serif; background: #f0f2f5; }
-
-        /* ── Utility bar ── */
-        .lb-util { background: #fff; border-bottom: 1px solid #eaeef2; display: flex; justify-content: flex-end; align-items: center; padding: 0.35rem 2.5rem; gap: 1.6rem; }
-        .lb-util a { color: #8a9ab0; font-size: 0.78rem; text-decoration: none; font-weight: 600; }
-        .lb-util a:hover { color: #3BBFC9; }
-        .lb-util-right { display: flex; align-items: center; gap: 1.2rem; }
-
-        /* ── Main navbar ── */
-        .lb-nav { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; padding: 0.7rem 2.5rem; gap: 1.5rem; position: sticky; top: 0; z-index: 100; }
-        .lb-nav-logo img { height: 34px; object-fit: contain; mix-blend-mode: multiply; cursor: pointer; }
-        .lb-search { flex: 1; position: relative; }
-        .lb-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.6rem; border: 1.5px solid #e2e8f0; border-radius: 50px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8fafc; transition: border-color 0.2s; }
-        .lb-search input:focus { border-color: #3BBFC9; background: #fff; }
-        .lb-search input::placeholder { color: #b0bec5; }
-        .lb-search-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #b0bec5; pointer-events: none; }
-        .lb-search-btn { position: absolute; right: 0; top: 0; bottom: 0; background: #3BBFC9; border: none; border-radius: 0 50px 50px 0; padding: 0 1.2rem; color: #fff; font-weight: 700; font-size: 0.85rem; font-family: 'Nunito', sans-serif; cursor: pointer; }
-        .lb-search-btn:hover { background: #2aadb8; }
-        .lb-nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .lb-icon-btn { background: none; border: none; cursor: pointer; color: #6b7a8d; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: background 0.15s, color 0.15s; }
-        .lb-icon-btn:hover { background: #f0f4f8; color: #3BBFC9; }
-        .lb-user-chip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 50px; transition: background 0.15s; text-decoration: none; }
-        .lb-user-chip:hover { background: #f0f4f8; }
-        .lb-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: #e8f7f8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-        .lb-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
-        .lb-username { font-size: 0.88rem; font-weight: 700; color: #333; }
-        .lb-btn-login { background: #fff; border: 1.5px solid #3BBFC9; color: #3BBFC9; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-        .lb-btn-login:hover { background: #f0fbfc; }
-        .lb-btn-register { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 2px 8px rgba(59,191,201,0.25); }
-        .lb-btn-register:hover { background: #2aadb8; }
-        .lb-btn-sell { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 2px 8px rgba(59,191,201,0.25); }
-        .lb-btn-sell:hover { background: #2aadb8; }
 
         /* ── SECTION WRAPPER ── */
         .lb-section-wrap { max-width: 1200px; margin: 0 auto; padding: 0 1rem 1.5rem; width: 100%; }
@@ -566,103 +524,13 @@ const toggleFavorite = async (e, listingId) => {
       `}</style>
 
       <div className="lb-wrap">
-        {/* ── Utility bar ── */}
-        <div className="lb-util">
-          <div className="lb-util-right">
-            {isLoggedIn() && isAdmin() && (
-              <Link to="/admin/dashboard" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>
-                Admin Dashboard
-              </Link>
-            )}
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>
-              Notifikasi
-            </a>
-            <a href="#">Pusat Bantuan</a>
-            <a href="#">FAQ</a>
-            {isLoggedIn() && (
-              <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>
-                Keluar
-              </a>
-            )}
-          </div>
-        </div>
-
-        {/* ── Main navbar ── */}
-        <nav className="lb-nav">
-          <div className="lb-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="lb-search" onSubmit={handleSearch}>
-            <span className="lb-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Temukan barang di sekitarmu..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button type="submit" className="lb-search-btn">Cari</button>
-          </form>
-          <div className="lb-nav-actions">
-            {isLoggedIn() ? (
-              <>
-                <button className="lb-icon-btn" aria-label="Chat" onClick={toggleWidget} style={{ position: 'relative' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                  {unreadChatCount > 0 && (
-                    <span style={{
-                      position: 'absolute', top: 4, right: 4,
-                      width: 10, height: 10, borderRadius: '50%',
-                      background: '#e53e3e', border: '2px solid #fff',
-                    }}/>
-                  )}
-                </button>
-                <NotificationBell />
-                <button className="lb-icon-btn" aria-label="Notifikasi" style={{ display: 'none' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                  </svg>
-                </button>
-                <Link to="/listings/create" className="lb-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="lb-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-                    <rect x="9" y="3" width="6" height="4" rx="1" />
-                  </svg>
-                  <span className="lb-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-                <Link to="/favorites" className="lb-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                  </svg>
-                  <span className="lb-username" style={{ fontSize: '0.84rem' }}>Favorit</span>
-                </Link>
-                <Link to="/profile" className="lb-user-chip">
-                  <div className="lb-avatar-sm">
-                    {photoUrl
-                      ? <img src={photoUrl} alt="avatar" />
-                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
-                    }
-                  </div>
-                  <span className="lb-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="lb-btn-login">Masuk</Link>
-                <Link to="/register" className="lb-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
+        <UtilityBar />
+        <Navbar
+          searchValue={searchInput}
+          onSearchChange={(e) => setSearchInput(e.target.value)}
+          onSearchSubmit={handleSearch}
+          searchPlaceholder="Temukan barang di sekitarmu..."
+        />
 
         {/* ── MAIN CONTENT ── */}
         <div className="lb-section-wrap">

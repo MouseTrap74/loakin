@@ -3,18 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import MapPicker from '../../components/MapPicker';
-
-import logoText from '../../assets/LoakinLogoText.png';
+import Navbar from '../../components/Navbar';
+import UtilityBar from '../../components/UtilityBar';
 
 export default function CreateListingPage() {
   const navigate = useNavigate();
-  const { user, isLoggedIn, isAdmin, logout } = useAuth();
+  const { user, isLoggedIn, isAdmin } = useAuth();
 
   const [searchInput, setSearchInput] = useState('');
 
   const [categories, setCategories]       = useState([]);
   const [loading, setLoading]             = useState(false);
   const [error, setError]                 = useState('');
+  const [photoWarning, setPhotoWarning]   = useState('');
   const [photoPreviews, setPhotoPreviews] = useState([]);
   const [maxPhotos, setMaxPhotos]         = useState(8);
 
@@ -36,12 +37,6 @@ export default function CreateListingPage() {
     fetchMaxPhotos();
   }, []);
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
-
-  const handleLogout = async () => {
-    try { await api.post('/logout'); } catch (_) {}
-    logout(); navigate('/login');
-  };
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim()) navigate(`/?search=${encodeURIComponent(searchInput.trim())}`);
@@ -68,7 +63,22 @@ export default function CreateListingPage() {
   const handlePhotos = (e) => {
     const files = Array.from(e.target.files);
     const sisa  = maxPhotos - form.photos.length;
+
+    if (files.length > sisa) {
+      // Warn the user that not all selected photos could be added
+      const skipped = files.length - sisa;
+      setPhotoWarning(
+        sisa === 0
+          ? `Batas foto (${maxPhotos}) sudah tercapai. Tidak ada foto yang ditambahkan.`
+          : `Hanya ${sisa} foto yang dapat ditambahkan (maks ${maxPhotos} foto). ${skipped} foto tidak ditambahkan.`
+      );
+    } else {
+      setPhotoWarning('');
+    }
+
     const added = files.slice(0, sisa);
+    // Reset input value so user can re-select if needed
+    e.target.value = '';
     setForm(prev => ({ ...prev, photos: [...prev.photos, ...added] }));
     setPhotoPreviews(prev => [...prev, ...added.map(f => URL.createObjectURL(f))]);
   };
@@ -85,6 +95,7 @@ export default function CreateListingPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setPhotoWarning('');
     setLoading(true);
     try {
       const formData = new FormData();
@@ -103,6 +114,10 @@ export default function CreateListingPage() {
       const res = await api.post('/listings', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      if (res.data.warning) {
+        // Listing created but flagged for suspicious price — show warning then redirect
+        alert(res.data.warning);
+      }
       navigate(`/listings/${res.data.listing.id}`);
     } catch (err) {
       setError(err.response?.data?.message ?? 'Gagal membuat listing.');
@@ -114,7 +129,6 @@ export default function CreateListingPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         .cl-page {
@@ -124,36 +138,6 @@ export default function CreateListingPage() {
           display: flex;
           flex-direction: column;
         }
-
-        /* ── utility bar ── */
-        .cl-util { background: #fff; border-bottom: 1px solid #eaeef2; display: flex; justify-content: flex-end; align-items: center; padding: 0.35rem 2.5rem; gap: 1.6rem; }
-        .cl-util a { color: #8a9ab0; font-size: 0.78rem; text-decoration: none; font-weight: 600; }
-        .cl-util a:hover { color: #3BBFC9; }
-
-        /* ── navbar ── */
-        .cl-nav { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; padding: 0.7rem 2.5rem; gap: 1.5rem; position: sticky; top: 0; z-index: 100; }
-        .cl-nav-logo img { height: 34px; object-fit: contain; mix-blend-mode: multiply; cursor: pointer; }
-        .cl-search { flex: 1; position: relative; }
-        .cl-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.6rem; border: 1.5px solid #e2e8f0; border-radius: 50px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8fafc; transition: border-color 0.2s; }
-        .cl-search input:focus { border-color: #3BBFC9; background: #fff; }
-        .cl-search input::placeholder { color: #b0bec5; }
-        .cl-search-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #b0bec5; pointer-events: none; }
-        .cl-search-btn { position: absolute; right: 0; top: 0; bottom: 0; background: #3BBFC9; border: none; border-radius: 0 50px 50px 0; padding: 0 1.2rem; color: #fff; font-weight: 700; font-size: 0.85rem; font-family: 'Nunito', sans-serif; cursor: pointer; }
-        .cl-search-btn:hover { background: #2aadb8; }
-        .cl-nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .cl-icon-btn { background: none; border: none; cursor: pointer; color: #6b7a8d; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: background 0.15s, color 0.15s; }
-        .cl-icon-btn:hover { background: #f0f4f8; color: #3BBFC9; }
-        .cl-user-chip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 50px; transition: background 0.15s; text-decoration: none; }
-        .cl-user-chip:hover { background: #f0f4f8; }
-        .cl-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: #e8f7f8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-        .cl-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
-        .cl-username { font-size: 0.88rem; font-weight: 700; color: #333; }
-        .cl-btn-sell { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .cl-btn-sell:hover { background: #2aadb8; }
-        .cl-btn-login { background: #fff; border: 1.5px solid #3BBFC9; color: #3BBFC9; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; text-decoration: none; }
-        .cl-btn-login:hover { background: #f0fbfc; }
-        .cl-btn-register { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; text-decoration: none; }
-        .cl-btn-register:hover { background: #2aadb8; }
 
         /* ── container ── */
         .cl-container {
@@ -374,53 +358,13 @@ export default function CreateListingPage() {
       `}</style>
 
       <div className="cl-page">
-        {/* Utility bar */}
-        <div className="cl-util">
-          {isLoggedIn() && isAdmin() && <Link to="/admin/users" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>Admin Dashboard</Link>}
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>Notifikasi</a>
-          <a href="#">Pusat Bantuan</a>
-          <a href="#">FAQ</a>
-          {isLoggedIn() && <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>Keluar</a>}
-        </div>
-
-        {/* Navbar */}
-        <nav className="cl-nav">
-          <div className="cl-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="cl-search" onSubmit={handleSearch}>
-            <span className="cl-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            </span>
-            <input type="text" placeholder="Temukan barang di sekitarmu..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
-            <button type="submit" className="cl-search-btn">Cari</button>
-          </form>
-          <div className="cl-nav-actions">
-            {isLoggedIn() ? (
-              <>
-                <button className="cl-icon-btn" aria-label="Notifikasi">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </button>
-                <Link to="/listings/create" className="cl-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="cl-user-chip">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-                  <span className="cl-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-                <Link to="/profile" className="cl-user-chip">
-                  <div className="cl-avatar-sm">
-                    {photoUrl ? <img src={photoUrl} alt="avatar" /> : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
-                  </div>
-                  <span className="cl-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="cl-btn-login">Masuk</Link>
-                <Link to="/register" className="cl-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
+        <UtilityBar />
+        <Navbar
+          searchValue={searchInput}
+          onSearchChange={(e) => setSearchInput(e.target.value)}
+          onSearchSubmit={handleSearch}
+          searchPlaceholder="Temukan barang di sekitarmu..."
+        />
 
         <div className="cl-container">
           <div className="cl-header">
@@ -525,6 +469,11 @@ export default function CreateListingPage() {
                   <p className="cl-upload-text">Klik untuk upload foto</p>
                   <p className="cl-upload-hint">Maks {maxPhotos} foto · Format JPG, PNG · Maks 2MB per foto</p>
                 </label>
+              )}
+              {photoWarning && (
+                <p style={{ color: '#c0392b', fontSize: '0.82rem', fontWeight: 700, marginTop: '0.5rem', background: '#fff5f5', border: '1px solid #fca5a5', borderRadius: 8, padding: '0.5rem 0.8rem' }}>
+                  ⚠️ {photoWarning}
+                </p>
               )}
             </div>
 

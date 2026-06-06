@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\Listing;
 use App\Models\User;
+use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,9 +44,26 @@ class ReportController extends Controller
             'description'     => $request->description,
         ]);
 
+        // Auto-moderasi: jika total laporan pada listing ini mencapai threshold,
+        // ubah status listing menjadi 'pending' agar admin dapat meninjau.
+        $autoModerateThreshold = SystemSetting::getValue('auto_moderate_threshold', null);
+        $autoModerated = false;
+
+        if ($autoModerateThreshold !== null && $listing->status === 'active') {
+            $reportCount = Report::where('reportable_id', $listingId)
+                ->where('reportable_type', Listing::class)
+                ->count();
+
+            if ($reportCount >= (int) $autoModerateThreshold) {
+                $listing->update(['status' => 'pending_review']);
+                $autoModerated = true;
+            }
+        }
+
         return response()->json([
-            'message' => 'Laporan berhasil dikirim',
-            'report'  => $report,
+            'message'        => 'Laporan berhasil dikirim',
+            'report'         => $report,
+            'auto_moderated' => $autoModerated,
         ], 201);
     }
 

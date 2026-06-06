@@ -42,6 +42,8 @@ Route::get('/listings',          [PublicListingController::class, 'index']);
 // PENTING: map-pins harus di atas /{id}
 Route::get('/listings/map-pins', [PublicListingController::class, 'mapPins']);
 Route::get('/listings/{id}',     [PublicListingController::class, 'show']);
+// Dedicated view-tracking endpoint — called once by ListingDetailPage
+Route::post('/listings/{id}/view', [PublicListingController::class, 'trackView']);
 
 // ================================================================
 // MEMBER ROUTES (harus login)

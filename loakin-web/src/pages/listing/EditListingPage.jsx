@@ -3,12 +3,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import MapPicker from '../../components/MapPicker';
-import logoText from '../../assets/LoakinLogoText.png';
+import Navbar from '../../components/Navbar';
+import UtilityBar from '../../components/UtilityBar';
 
 export default function EditListingPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isLoggedIn, isAdmin, logout } = useAuth();
+  const { user, isLoggedIn, isAdmin } = useAuth();
 
   const [searchInput, setSearchInput] = useState('');
 
@@ -16,6 +17,7 @@ export default function EditListingPage() {
   const [loading, setLoading]               = useState(false);
   const [fetchLoading, setFetchLoading]     = useState(true);
   const [error, setError]                   = useState('');
+  const [photoWarning, setPhotoWarning]     = useState('');
   const [maxPhotos, setMaxPhotos]           = useState(8);
   const [existingPhotos, setExistingPhotos] = useState([]);
   const [newPreviews, setNewPreviews]       = useState([]);
@@ -39,12 +41,7 @@ export default function EditListingPage() {
     fetchMaxPhotos();
   }, []);
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
 
-  const handleLogout = async () => {
-    try { await api.post('/logout'); } catch (_) {}
-    logout(); navigate('/login');
-  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -97,7 +94,21 @@ export default function EditListingPage() {
     const files    = Array.from(e.target.files);
     const totalNow = existingPhotos.length + form.newPhotos.length;
     const sisa     = maxPhotos - totalNow;
-    const added    = files.slice(0, sisa);
+
+    if (files.length > sisa) {
+      const skipped = files.length - sisa;
+      setPhotoWarning(
+        sisa === 0
+          ? `Batas foto (${maxPhotos}) sudah tercapai. Tidak ada foto yang ditambahkan.`
+          : `Hanya ${sisa} foto yang dapat ditambahkan (maks ${maxPhotos} foto). ${skipped} foto tidak ditambahkan.`
+      );
+    } else {
+      setPhotoWarning('');
+    }
+
+    const added = files.slice(0, sisa);
+    // Reset input so user can re-select if needed
+    e.target.value = '';
     setForm(prev => ({ ...prev, newPhotos: [...prev.newPhotos, ...added] }));
     setNewPreviews(prev => [...prev, ...added.map(f => URL.createObjectURL(f))]);
   };
@@ -121,6 +132,7 @@ export default function EditListingPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setPhotoWarning('');
     setLoading(true);
     try {
       await api.put(`/listings/${id}`, {
@@ -137,9 +149,12 @@ export default function EditListingPage() {
       if (form.newPhotos.length > 0) {
         const formData = new FormData();
         form.newPhotos.forEach(photo => formData.append('photos[]', photo));
-        await api.post(`/listings/${id}/photos`, formData, {
+        const uploadRes = await api.post(`/listings/${id}/photos`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        if (uploadRes.data?.warning) {
+          alert(uploadRes.data.warning);
+        }
       }
       navigate(`/listings/${id}`);
     } catch (err) {
@@ -161,41 +176,10 @@ export default function EditListingPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; }
 
         .el-page { min-height: 100vh; background: #f0f2f5; font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; }
-
-        /* ── utility bar ── */
-        .el-util { background: #fff; border-bottom: 1px solid #eaeef2; display: flex; justify-content: flex-end; align-items: center; padding: 0.35rem 2.5rem; gap: 1.6rem; }
-        .el-util a { color: #8a9ab0; font-size: 0.78rem; text-decoration: none; font-weight: 600; }
-        .el-util a:hover { color: #3BBFC9; }
-
-        /* ── navbar ── */
-        .el-nav { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; padding: 0.7rem 2.5rem; gap: 1.5rem; position: sticky; top: 0; z-index: 100; }
-        .el-nav-logo img { height: 34px; object-fit: contain; mix-blend-mode: multiply; cursor: pointer; }
-        .el-search { flex: 1; position: relative; }
-        .el-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.6rem; border: 1.5px solid #e2e8f0; border-radius: 50px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8fafc; transition: border-color 0.2s; }
-        .el-search input:focus { border-color: #3BBFC9; background: #fff; }
-        .el-search input::placeholder { color: #b0bec5; }
-        .el-search-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #b0bec5; pointer-events: none; }
-        .el-search-btn { position: absolute; right: 0; top: 0; bottom: 0; background: #3BBFC9; border: none; border-radius: 0 50px 50px 0; padding: 0 1.2rem; color: #fff; font-weight: 700; font-size: 0.85rem; font-family: 'Nunito', sans-serif; cursor: pointer; }
-        .el-search-btn:hover { background: #2aadb8; }
-        .el-nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .el-icon-btn { background: none; border: none; cursor: pointer; color: #6b7a8d; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: background 0.15s, color 0.15s; text-decoration: none; }
-        .el-icon-btn:hover { background: #f0f4f8; color: #3BBFC9; }
-        .el-user-chip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 50px; transition: background 0.15s; text-decoration: none; }
-        .el-user-chip:hover { background: #f0f4f8; }
-        .el-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: #e8f7f8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-        .el-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
-        .el-username { font-size: 0.88rem; font-weight: 700; color: #333; }
-        .el-btn-login { background: #fff; border: 1.5px solid #3BBFC9; color: #3BBFC9; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-        .el-btn-login:hover { background: #f0fbfc; }
-        .el-btn-register { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .el-btn-register:hover { background: #2aadb8; }
-        .el-btn-sell { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .el-btn-sell:hover { background: #2aadb8; }
 
         /* ── container ── */
         .el-container { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem; flex: 1; }
@@ -255,81 +239,13 @@ export default function EditListingPage() {
 
       <div className="el-page">
 
-        {/* Utility bar */}
-        <div className="el-util">
-          {isLoggedIn() && isAdmin() && (
-            <Link to="/admin/dashboard" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>
-              Admin Dashboard
-            </Link>
-          )}
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>
-            Notifikasi
-          </a>
-          <a href="#">Pusat Bantuan</a>
-          <a href="#">FAQ</a>
-          {isLoggedIn() && (
-            <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>
-              Keluar
-            </a>
-          )}
-        </div>
-
-        {/* Navbar */}
-        <nav className="el-nav">
-          <div className="el-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="el-search" onSubmit={handleSearch}>
-            <span className="el-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Temukan Handphone, Mouse, dan lainnya ..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button type="submit" className="el-search-btn">Cari</button>
-          </form>
-          <div className="el-nav-actions">
-            {isLoggedIn() ? (
-              <>
-                <button className="el-icon-btn" aria-label="Notifikasi">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
-                </button>
-                <Link to="/listings/create" className="el-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="el-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="1"/>
-                  </svg>
-                  <span className="el-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-                <Link to="/profile" className="el-user-chip">
-                  <div className="el-avatar-sm">
-                    {photoUrl
-                      ? <img src={photoUrl} alt="avatar" />
-                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                          <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    }
-                  </div>
-                  <span className="el-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="el-btn-login">Masuk</Link>
-                <Link to="/register" className="el-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
+        <UtilityBar />
+        <Navbar
+          searchValue={searchInput}
+          onSearchChange={(e) => setSearchInput(e.target.value)}
+          onSearchSubmit={handleSearch}
+          searchPlaceholder="Temukan Handphone, Mouse, dan lainnya ..."
+        />
 
         <div className="el-container">
           <div className="el-header">
@@ -449,6 +365,11 @@ export default function EditListingPage() {
                   <p className="el-upload-text">Klik untuk tambah foto</p>
                   <p className="el-upload-hint">Sisa {maxPhotos - totalPhotos} foto · Maks 2MB per foto</p>
                 </label>
+              )}
+              {photoWarning && (
+                <p style={{ color: '#c0392b', fontSize: '0.82rem', fontWeight: 700, marginTop: '0.5rem', background: '#fff5f5', border: '1px solid #fca5a5', borderRadius: 8, padding: '0.5rem 0.8rem' }}>
+                  ⚠️ {photoWarning}
+                </p>
               )}
             </div>
 

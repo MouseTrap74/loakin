@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useChat } from '../../context/ChatContext';
 import api from '../../services/api';
 import { trackListingView } from '../../services/searchHistory';
-import logoText from '../../assets/LoakinLogoText.png';
-import NotificationBell from '../../components/NotificationBell';
+import Navbar from '../../components/Navbar';
+import UtilityBar from '../../components/UtilityBar';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -20,10 +20,14 @@ L.Icon.Default.mergeOptions({
 
 export default function ListingDetailPage() {
   const { id } = useParams();
-  const { user, isLoggedIn, isAdmin, logout } = useAuth();
-  const { toggleWidget, openChatFromListing, unreadChatCount } = useChat();
+  const { user, isLoggedIn, isAdmin } = useAuth();
+  const { openChatFromListing } = useChat();
   const navigate = useNavigate();
   const [chatLoading, setChatLoading] = useState(false);
+
+  // Guard: fire the view-tracking API call exactly once per page visit,
+  // even if StrictMode mounts the component twice in development.
+  const viewTracked = useRef(false);
 
   const [listing, setListing]         = useState(null);
   const [loading, setLoading]         = useState(true);
@@ -87,6 +91,12 @@ export default function ListingDetailPage() {
       if (res.data?.category_id) {
         trackListingView(res.data.category_id, res.data.id);
       }
+      // Increment view count exactly once per visit, guarded against
+      // StrictMode double-fire and repeated re-renders.
+      if (!viewTracked.current) {
+        viewTracked.current = true;
+        api.post(`/listings/${id}/view`).catch(() => {}); // fire-and-forget
+      }
     } catch (err) {
       navigate('/');
     } finally {
@@ -94,11 +104,7 @@ export default function ListingDetailPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try { await api.post('/logout'); } catch (_) {}
-    logout();
-    navigate('/login');
-  };
+
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -145,7 +151,7 @@ export default function ListingDetailPage() {
   const formatDate = (date) =>
     new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const photoUrl = user?.photo ? `http://127.0.0.1:8000/storage/${user.photo}` : null;
+
 
   if (loading) return <div style={s.center}>Memuat...</div>;
   if (!listing) return null;
@@ -162,40 +168,9 @@ export default function ListingDetailPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; }
         .ld-wrap { min-height: 100vh; display: flex; flex-direction: column; font-family: 'Nunito', sans-serif; background: #f0f2f5; }
-
-        /* Utility bar */
-        .ld-util { background: #fff; border-bottom: 1px solid #eaeef2; display: flex; justify-content: flex-end; align-items: center; padding: 0.35rem 2.5rem; gap: 1.6rem; }
-        .ld-util a { color: #8a9ab0; font-size: 0.78rem; text-decoration: none; font-weight: 600; }
-        .ld-util a:hover { color: #3BBFC9; }
-
-        /* Navbar */
-        .ld-nav { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; padding: 0.7rem 2.5rem; gap: 1.5rem; position: sticky; top: 0; z-index: 100; }
-        .ld-nav-logo img { height: 34px; object-fit: contain; mix-blend-mode: multiply; cursor: pointer; }
-        .ld-search { flex: 1; position: relative; }
-        .ld-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.6rem; border: 1.5px solid #e2e8f0; border-radius: 50px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; color: #333; outline: none; background: #f8fafc; transition: border-color 0.2s; }
-        .ld-search input:focus { border-color: #3BBFC9; background: #fff; }
-        .ld-search input::placeholder { color: #b0bec5; }
-        .ld-search-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #b0bec5; pointer-events: none; }
-        .ld-search-btn { position: absolute; right: 0; top: 0; bottom: 0; background: #3BBFC9; border: none; border-radius: 0 50px 50px 0; padding: 0 1.2rem; color: #fff; font-weight: 700; font-size: 0.85rem; font-family: 'Nunito', sans-serif; cursor: pointer; }
-        .ld-search-btn:hover { background: #2aadb8; }
-        .ld-nav-actions { display: flex; align-items: center; gap: 1rem; }
-        .ld-icon-btn { background: none; border: none; cursor: pointer; color: #6b7a8d; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; transition: background 0.15s, color 0.15s; text-decoration: none; }
-        .ld-icon-btn:hover { background: #f0f4f8; color: #3BBFC9; }
-        .ld-user-chip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 50px; transition: background 0.15s; text-decoration: none; }
-        .ld-user-chip:hover { background: #f0f4f8; }
-        .ld-avatar-sm { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #e8f7f8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-        .ld-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
-        .ld-username { font-size: 0.88rem; font-weight: 700; color: #333; }
-        .ld-btn-login { background: #fff; border: 1.5px solid #3BBFC9; color: #3BBFC9; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-        .ld-btn-login:hover { background: #f0fbfc; }
-        .ld-btn-register { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .ld-btn-register:hover { background: #2aadb8; }
-        .ld-btn-sell { background: #3BBFC9; border: none; color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; text-decoration: none; }
-        .ld-btn-sell:hover { background: #2aadb8; }
 
         /* Leaflet z-index fix */
         .leaflet-pane, .leaflet-top, .leaflet-bottom { z-index: 1 !important; }
@@ -205,100 +180,13 @@ export default function ListingDetailPage() {
 
       <div className="ld-wrap">
 
-        {/* Utility bar */}
-        <div className="ld-util">
-          {isLoggedIn() && isAdmin() && (
-            <Link to="/admin/dashboard" style={{ color: '#3BBFC9', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>
-              Admin Dashboard
-            </Link>
-          )}
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate(isLoggedIn() ? '/notifications' : '/login'); }}>
-            Notifikasi
-          </a>
-          <a href="#">Pusat Bantuan</a>
-          <a href="#">FAQ</a>
-          {isLoggedIn() && (
-            <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: '#e53e3e' }}>
-              Keluar
-            </a>
-          )}
-        </div>
-
-        {/* Navbar */}
-        <nav className="ld-nav">
-          <div className="ld-nav-logo" onClick={() => navigate('/')}>
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <form className="ld-search" onSubmit={handleSearch}>
-            <span className="ld-search-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Temukan Handphone, Mouse, dan lainnya ..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button type="submit" className="ld-search-btn">Cari</button>
-          </form>
-          <div className="ld-nav-actions">
-            {isLoggedIn() ? (
-              <>
-                <button className="ld-icon-btn" aria-label="Chat" onClick={toggleWidget} style={{ position: 'relative' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                  {unreadChatCount > 0 && (
-                    <span style={{
-                      position: 'absolute', top: 4, right: 4,
-                      width: 10, height: 10, borderRadius: '50%',
-                      background: '#e53e3e', border: '2px solid #fff',
-                    }}/>
-                  )}
-                </button>
-                <NotificationBell />
-                <button className="ld-icon-btn" aria-label="Notifikasi" style={{ display: 'none' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
-                </button>
-                <Link to="/listings/create" className="ld-btn-sell">+ Jual</Link>
-                <Link to="/my-listings" className="ld-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="1"/>
-                  </svg>
-                  <span className="ld-username" style={{ fontSize: '0.84rem' }}>Listing Saya</span>
-                </Link>
-                <Link to="/favorites" className="ld-user-chip" style={{ textDecoration: 'none' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                  </svg>
-                  <span className="ld-username" style={{ fontSize: '0.84rem' }}>Favorit</span>
-                </Link>
-                <Link to="/profile" className="ld-user-chip">
-                  <div className="ld-avatar-sm">
-                    {photoUrl
-                      ? <img src={photoUrl} alt="avatar" />
-                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3BBFC9" strokeWidth="2">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                          <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    }
-                  </div>
-                  <span className="ld-username">{user?.name?.split(' ')[0] || 'Pengguna'}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="ld-btn-login">Masuk</Link>
-                <Link to="/register" className="ld-btn-register">Daftar</Link>
-              </>
-            )}
-          </div>
-        </nav>
+        <UtilityBar />
+        <Navbar
+          searchValue={searchInput}
+          onSearchChange={(e) => setSearchInput(e.target.value)}
+          onSearchSubmit={handleSearch}
+          searchPlaceholder="Temukan Handphone, Mouse, dan lainnya ..."
+        />
 
         {/* Konten Utama */}
         <div style={s.container}>

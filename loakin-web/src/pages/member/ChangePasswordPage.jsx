@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-
-import logoText from '../../assets/LoakinLogoText.png';
+import Navbar from '../../components/Navbar';
+import UtilityBar from '../../components/UtilityBar';
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -47,36 +47,6 @@ export default function ChangePasswordPage() {
           font-family: 'Nunito', sans-serif;
         }
 
-        /* ── navbar ── */
-        .cp-nav {
-          background: #fff;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0.75rem 2.5rem;
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-        .cp-nav-logo img {
-          height: 34px;
-          object-fit: contain;
-          mix-blend-mode: multiply;
-        }
-        .cp-back {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.35rem;
-          color: #3BBFC9;
-          text-decoration: none;
-          font-size: 0.88rem;
-          font-weight: 700;
-          padding: 0.35rem 0.7rem;
-          border-radius: 8px;
-          transition: background 0.15s;
-        }
-        .cp-back:hover { background: #e8f9fb; }
 
         /* ── container ── */
         .cp-container {
@@ -194,13 +164,8 @@ export default function ChangePasswordPage() {
       `}</style>
 
       <div className="cp-page">
-        {/* Navbar */}
-        <nav className="cp-nav">
-          <div className="cp-nav-logo">
-            <img src={logoText} alt="Loakin" />
-          </div>
-          <Link to="/profile" className="cp-back">← Kembali ke Profil</Link>
-        </nav>
+        <UtilityBar />
+        <Navbar />
 
         {/* Content */}
         <div className="cp-container">

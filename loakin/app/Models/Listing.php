@@ -23,6 +23,7 @@ class Listing extends Model
         'status',
         'is_featured',
         'views_count',
+        'expires_at',
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class Listing extends Model
         'is_featured' => 'boolean',
         'views_count' => 'integer',
         'stock'       => 'integer',
+        'expires_at'  => 'datetime',
     ];
 
     // Listing ini milik user mana (penjual)

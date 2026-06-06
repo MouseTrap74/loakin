@@ -26,6 +26,28 @@ class ListingController extends Controller
         return false;
     }
 
+    // Cek apakah harga listing mencurigakan berdasarkan threshold setting.
+    // Mengembalikan true jika harga listing lebih dari threshold% di bawah rata-rata kategori.
+    private function isSuspiciousPrice(float $price, int $categoryId): bool
+    {
+        $threshold = SystemSetting::getValue('suspicious_price_threshold', null);
+        if ($threshold === null) {
+            return false;
+        }
+
+        $avgPrice = Listing::where('category_id', $categoryId)
+            ->where('status', 'active')
+            ->avg('price');
+
+        // Jika belum ada listing di kategori ini, skip pengecekan.
+        if ($avgPrice === null || $avgPrice <= 0) {
+            return false;
+        }
+
+        $thresholdDecimal = (float) $threshold / 100;
+        return $price < $avgPrice * (1 - $thresholdDecimal);
+    }
+
     // GET /api/my-listings — Kelola listing saya
     public function myListings(Request $request)
     {
@@ -73,6 +95,11 @@ class ListingController extends Controller
             ], 422);
         }
 
+        // Hitung expires_at berdasarkan setting listing_active_days.
+        // Jika setting tidak dikonfigurasi, biarkan null (listing tidak kedaluwarsa).
+        $activeDays = SystemSetting::getValue('listing_active_days', null);
+        $expiresAt  = $activeDays ? now()->addDays((int) $activeDays) : null;
+
         // Simpan listing
         $listing = Listing::create([
             'user_id'     => auth()->id(),
@@ -86,6 +113,7 @@ class ListingController extends Controller
             'latitude'    => $request->latitude,
             'longitude'   => $request->longitude,
             'status'      => 'active',
+            'expires_at'  => $expiresAt,
         ]);
 
         // Upload foto kalau ada
@@ -103,9 +131,18 @@ class ListingController extends Controller
             }
         }
 
+        // Cek harga mencurigakan — tahan listing untuk ditinjau admin jika harga
+        // lebih dari suspicious_price_threshold% di bawah rata-rata kategori.
+        $warning = null;
+        if ($this->isSuspiciousPrice((float) $request->price, (int) $request->category_id)) {
+            $listing->update(['status' => 'pending_review']);
+            $warning = 'Harga listing terdeteksi tidak wajar dibanding rata-rata kategori. Listing sedang dalam peninjauan admin.';
+        }
+
         return response()->json([
             'message' => 'Listing berhasil dibuat!',
             'listing' => $listing->load(['category', 'photos']),
+            'warning' => $warning,
         ], 201);
     }
 
@@ -142,9 +179,21 @@ class ListingController extends Controller
             'address', 'latitude', 'longitude',
         ]));
 
+        // Cek harga mencurigakan setelah update — jika harga yang diubah mencurigakan,
+        // tahan listing untuk ditinjau admin.
+        $warning = null;
+        $priceToCheck  = $request->filled('price')    ? (float) $request->price       : (float) $listing->price;
+        $categoryToUse = $request->filled('category_id') ? (int) $request->category_id : (int) $listing->category_id;
+
+        if ($listing->status === 'active' && $this->isSuspiciousPrice($priceToCheck, $categoryToUse)) {
+            $listing->update(['status' => 'pending_review']);
+            $warning = 'Harga listing terdeteksi tidak wajar dibanding rata-rata kategori. Listing sedang dalam peninjauan admin.';
+        }
+
         return response()->json([
             'message' => 'Listing berhasil diperbarui!',
             'listing' => $listing->load(['category', 'photos']),
+            'warning' => $warning,
         ]);
     }
 
