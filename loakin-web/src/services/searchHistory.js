@@ -122,6 +122,35 @@ export function getFullHistory() {
 }
 
 /**
+ * Kirim view listing ke backend untuk personalisasi rekomendasi.
+ * Fire-and-forget, hanya jika user login.
+ */
+export function syncViewToServer(categoryId, listingId) {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  import('./api').then(({ default: api }) => {
+    api.post('/history/view', {
+      listing_id: listingId,
+      category_id: categoryId,
+    }).catch(() => {});
+  });
+}
+
+/**
+ * Kirim keyword pencarian ke backend untuk personalisasi rekomendasi.
+ * Fire-and-forget, hanya jika user login.
+ */
+export function syncSearchToServer(keyword) {
+  const token = localStorage.getItem('token');
+  if (!token || !keyword || !keyword.trim()) return;
+
+  import('./api').then(({ default: api }) => {
+    api.post('/history/search', { keyword: keyword.trim() }).catch(() => {});
+  });
+}
+
+/**
  * Hapus seluruh riwayat browsing.
  */
 export function clearHistory() {

@@ -114,6 +114,7 @@ export default function AdminListingPage() {
       active:         { label: 'Aktif',          cls: 'al-badge-active' },
       sold:           { label: 'Terjual',         cls: 'al-badge-sold' },
       inactive:       { label: 'Tidak Aktif',     cls: 'al-badge-inactive' },
+      pending_review: { label: 'Peninjauan',      cls: 'al-badge-pending_review' },
     };
     return map[status] ?? { label: status, cls: 'al-badge-inactive' };
   };
@@ -365,6 +366,20 @@ export default function AdminListingPage() {
         .al-badge-sold { background: #e0e7ff; color: #3730a3; }
         .al-badge-pending { background: #fef3c7; color: #92400e; }
         .al-badge-inactive { background: #f1f5f9; color: #475569; }
+        .al-badge-pending_review { background: #fff3cd; color: #856404; }
+        .al-flag-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+          background: #fff3cd;
+          color: #856404;
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 5px;
+          border: 1px solid #ffc107;
+          margin-left: 6px;
+        }
 
         .al-btn-feature {
           border: none;
@@ -545,15 +560,19 @@ export default function AdminListingPage() {
                               )}
                             </div>
                             <div>
-                              <Link
-                                to={`/listings/${listing.id}`}
-                                className="al-listing-title"
-                                target="_blank"
-                              >
-                                {listing.title.length > 40
-                                  ? listing.title.slice(0, 40) + '...'
-                                  : listing.title}
-                              </Link>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
+                                <Link
+                                  to={`/listings/${listing.id}`}
+                                  className="al-listing-title"
+                                  style={{ margin: 0, display: 'inline-block' }}
+                                  target="_blank"
+                                >
+                                  {listing.title.length > 40
+                                    ? listing.title.slice(0, 40) + '...'
+                                    : listing.title}
+                                </Link>
+                                {listing.is_flagged && <span className="al-flag-badge" style={{ margin: 0 }}>⚠️ Harga Mencurigakan</span>}
+                              </div>
                               <p className="al-listing-cat">
                                 {listing.category?.icon} {listing.category?.name}
                               </p>
