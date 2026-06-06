@@ -88,12 +88,12 @@ class AdminListingController extends Controller
         return response()->json(['message' => "Listing berhasil {$status}!"]);
     }
 
-    // DELETE /api/admin/listings/{id} — Hapus listing (soft delete)
+    // DELETE /api/admin/listings/{id} — Hapus listing secara permanen
     public function destroy($id)
     {
-        $listing = Listing::findOrFail($id);
-        $listing->delete();
+        $listing = Listing::withTrashed()->findOrFail($id);
+        $listing->forceDelete();
 
-        return response()->json(['message' => 'Listing berhasil dihapus.']);
+        return response()->json(['message' => 'Listing berhasil dihapus secara permanen.']);
     }
 }

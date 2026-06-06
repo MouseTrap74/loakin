@@ -30,8 +30,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin   = () => { /* TODO: window.location.href = '/auth/google'   */ };
-  const handleFacebookLogin = () => { /* TODO: window.location.href = '/auth/facebook' */ };
 
   return (
     <>
@@ -314,24 +312,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="lk-divider">atau masuk dengan</div>
-
-          <button className="lk-social" onClick={handleGoogleLogin} type="button">
-            <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
-              <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.7 13.3l7.8 6C12.3 13 17.7 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/>
-              <path fill="#FBBC05" d="M10.5 28.7A14.4 14.4 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l7.8-6z"/>
-              <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.3 0-11.6-4.2-13.5-9.9l-7.8 6C6.7 42.6 14.7 48 24 48z"/>
-            </svg>
-            Google
-          </button>
-
-          <button className="lk-social" onClick={handleFacebookLogin} type="button">
-            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="#1877F2" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.313 0 2.686.235 2.686.235v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
-            </svg>
-            Facebook
-          </button>
         </div>
 
         <footer className="lk-footer">
