@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BannedKeyword;
 use App\Models\Listing;
 use App\Models\ListingPhoto;
+use App\Models\Report;
 use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -131,12 +132,21 @@ class ListingController extends Controller
             }
         }
 
-        // Cek harga mencurigakan — tahan listing untuk ditinjau admin jika harga
-        // lebih dari suspicious_price_threshold% di bawah rata-rata kategori.
+        // Cek harga mencurigakan — sembunyikan listing dan buat laporan otomatis
+        // jika harga lebih dari suspicious_price_threshold% di bawah rata-rata kategori.
         $warning = null;
         if ($this->isSuspiciousPrice((float) $request->price, (int) $request->category_id)) {
-            $listing->update(['status' => 'pending_review', 'is_flagged' => true]);
-            $warning = 'Harga listing terdeteksi tidak wajar dibanding rata-rata kategori. Listing sedang dalam peninjauan admin.';
+            $listing->update(['status' => 'hidden', 'is_flagged' => true]);
+
+            Report::create([
+                'reporter_id'     => null,
+                'reportable_id'   => $listing->id,
+                'reportable_type' => Listing::class,
+                'reason'          => 'Harga mencurigakan — terdeteksi otomatis oleh sistem',
+                'status'          => 'pending',
+            ]);
+
+            $warning = 'Harga listing terdeteksi tidak wajar dibanding rata-rata kategori. Listing disembunyikan dan sedang menunggu peninjauan admin.';
         }
 
         return response()->json([
@@ -180,14 +190,23 @@ class ListingController extends Controller
         ]));
 
         // Cek harga mencurigakan setelah update — jika harga yang diubah mencurigakan,
-        // tahan listing untuk ditinjau admin.
+        // sembunyikan listing dan buat laporan otomatis.
         $warning = null;
         $priceToCheck  = $request->filled('price')    ? (float) $request->price       : (float) $listing->price;
         $categoryToUse = $request->filled('category_id') ? (int) $request->category_id : (int) $listing->category_id;
 
         if ($listing->status === 'active' && $this->isSuspiciousPrice($priceToCheck, $categoryToUse)) {
-            $listing->update(['status' => 'pending_review', 'is_flagged' => true]);
-            $warning = 'Harga listing terdeteksi tidak wajar dibanding rata-rata kategori. Listing sedang dalam peninjauan admin.';
+            $listing->update(['status' => 'hidden', 'is_flagged' => true]);
+
+            Report::create([
+                'reporter_id'     => null,
+                'reportable_id'   => $listing->id,
+                'reportable_type' => Listing::class,
+                'reason'          => 'Harga mencurigakan — terdeteksi otomatis oleh sistem',
+                'status'          => 'pending',
+            ]);
+
+            $warning = 'Harga listing terdeteksi tidak wajar dibanding rata-rata kategori. Listing disembunyikan dan sedang menunggu peninjauan admin.';
         }
 
         return response()->json([

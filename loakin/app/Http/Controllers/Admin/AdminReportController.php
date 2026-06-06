@@ -41,7 +41,7 @@ class AdminReportController extends Controller
         return response()->json($report);
     }
 
-    // Tandai selesai (resolved)
+    // Tandai selesai (resolved) — listing kembali aktif jika ini laporan listing
     public function resolve(Request $request, $id)
     {
         $request->validate([
@@ -57,13 +57,21 @@ class AdminReportController extends Controller
             'reviewed_at' => now(),
         ]);
 
+        // Jika laporan terkait listing, kembalikan listing ke status aktif
+        if ($report->reportable_type === \App\Models\Listing::class && $report->reportable) {
+            $report->reportable->update([
+                'status'     => 'active',
+                'is_flagged' => false,
+            ]);
+        }
+
         return response()->json([
             'message' => 'Laporan ditandai selesai',
             'report'  => $report,
         ]);
     }
 
-    // Tolak laporan
+    // Tolak laporan — listing tetap hidden
     public function reject(Request $request, $id)
     {
         $request->validate([
@@ -78,6 +86,13 @@ class AdminReportController extends Controller
             'admin_note'  => $request->admin_note,
             'reviewed_at' => now(),
         ]);
+
+        // Jika laporan terkait listing, pastikan listing tetap hidden
+        if ($report->reportable_type === \App\Models\Listing::class && $report->reportable) {
+            $report->reportable->update([
+                'status' => 'hidden',
+            ]);
+        }
 
         return response()->json([
             'message' => 'Laporan ditolak',
