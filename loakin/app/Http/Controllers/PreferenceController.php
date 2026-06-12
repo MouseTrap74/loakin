@@ -12,7 +12,7 @@ class PreferenceController extends Controller
     // Max entries per user (FIFO)
     private const MAX_HISTORY = 50;
 
-    // Simpan riwayat view listing
+    // Simpan riwayat view listing (gunakan updateOrCreate agar tidak duplikat)
     public function storeView(Request $request)
     {
         $request->validate([
@@ -20,12 +20,19 @@ class PreferenceController extends Controller
             'category_id' => 'required|integer|exists:categories,id',
         ]);
 
-        UserHistory::create([
-            'user_id'     => auth()->id(),
-            'listing_id'  => $request->listing_id,
-            'category_id' => $request->category_id,
-            'type'        => 'view',
-        ]);
+        // Jika user sudah pernah melihat listing ini, cukup update timestamp-nya.
+        // Jika belum, buat baris baru.
+        UserHistory::updateOrCreate(
+            [
+                'user_id'    => auth()->id(),
+                'listing_id' => $request->listing_id,
+                'type'       => 'view',
+            ],
+            [
+                'category_id' => $request->category_id,
+                'created_at'  => now(),
+            ]
+        );
 
         $this->trimHistory(auth()->id());
 
@@ -55,6 +62,18 @@ class PreferenceController extends Controller
     {
         $userId = auth()->id();
 
+        // Cek apakah user sudah punya riwayat aktivitas
+        $hasHistory = UserHistory::where('user_id', $userId)->exists();
+
+        // Jika user belum punya riwayat sama sekali (akun baru),
+        // kembalikan data kosong — section rekomendasi tidak akan ditampilkan.
+        if (!$hasHistory) {
+            return response()->json([
+                'source' => 'none',
+                'data'   => [],
+            ]);
+        }
+
         // Ambil top 3 kategori yang paling sering dilihat/dicari
         $topCategories = UserHistory::where('user_id', $userId)
             ->whereNotNull('category_id')
@@ -66,11 +85,19 @@ class PreferenceController extends Controller
             ->pluck('category_id')
             ->toArray();
 
+        // Ambil semua listing_id yang sudah pernah dilihat user
+        $viewedListingIds = UserHistory::where('user_id', $userId)
+            ->whereNotNull('listing_id')
+            ->pluck('listing_id')
+            ->toArray();
+
         if (!empty($topCategories)) {
             $listings = Listing::with(['user:id,name,photo', 'category:id,name,icon', 'primaryPhoto'])
                 ->where('status', 'active')
                 ->whereIn('category_id', $topCategories)
-                ->orderByDesc('views_count')
+                ->whereNotIn('id', $viewedListingIds)       // Exclude yang sudah pernah dilihat
+                ->where('user_id', '!=', $userId)            // Exclude listing milik sendiri
+                ->orderByDesc('created_at')                  // Urutkan terbaru, bukan views_count
                 ->limit(5)
                 ->get();
 
@@ -82,17 +109,29 @@ class PreferenceController extends Controller
             }
         }
 
-        // Fallback: featured listings
-        $featured = Listing::with(['user:id,name,photo', 'category:id,name,icon', 'primaryPhoto'])
-            ->where('status', 'active')
-            ->where('is_featured', true)
-            ->orderByDesc('created_at')
-            ->limit(5)
-            ->get();
+        // Fallback: jika semua listing di kategori favorit sudah dilihat,
+        // ambil listing terbaru dari kategori tersebut (termasuk yang sudah dilihat)
+        if (!empty($topCategories)) {
+            $fallbackListings = Listing::with(['user:id,name,photo', 'category:id,name,icon', 'primaryPhoto'])
+                ->where('status', 'active')
+                ->whereIn('category_id', $topCategories)
+                ->where('user_id', '!=', $userId)
+                ->orderByDesc('created_at')
+                ->limit(5)
+                ->get();
 
+            if ($fallbackListings->isNotEmpty()) {
+                return response()->json([
+                    'source' => 'personalized',
+                    'data'   => $fallbackListings,
+                ]);
+            }
+        }
+
+        // Jika tidak ada listing sama sekali di kategori favorit, kembalikan kosong
         return response()->json([
-            'source' => 'featured',
-            'data'   => $featured,
+            'source' => 'none',
+            'data'   => [],
         ]);
     }
 
