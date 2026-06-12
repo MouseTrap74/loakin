@@ -14,6 +14,7 @@ class UserHistory extends Model
         'category_id',
         'search_keyword',
         'type',
+        'created_at',
     ];
 
     protected $casts = [

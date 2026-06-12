@@ -159,29 +159,39 @@ export default function ListingBrowsePage() {
 
   // ── Rekomendasi Personalisasi ──────────────────────────────
   const fetchRecommendations = async () => {
-    // Jika user login, gunakan backend recommendations
+    // Jika user login, gunakan backend recommendations saja
     if (isLoggedIn()) {
       try {
         const res = await api.get('/recommendations');
         const items = res.data.data || [];
-        if (items.length > 0) {
-          setSpecialListings(items.slice(0, 5));
-          setRecoSource(res.data.source === 'personalized' ? 'personalized' : 'featured');
+        const source = res.data.source || 'none';
+
+        if (source === 'none' || items.length === 0) {
+          // User baru / belum punya riwayat → kosongkan, section tidak ditampilkan
+          setSpecialListings([]);
+          setRecoSource('none');
           return;
         }
+
+        setSpecialListings(items.slice(0, 5));
+        setRecoSource('personalized');
+        return;
       } catch (err) {
-        console.error('Backend recommendations failed, falling back to localStorage', err);
+        console.error('Backend recommendations failed', err);
+        setSpecialListings([]);
+        setRecoSource('none');
+        return;
       }
     }
 
-    // Fallback: localStorage-based recommendations (guest atau jika backend gagal)
+    // Guest (tidak login): gunakan localStorage-based recommendations
     const topCats = getTopCategories(3);
 
     if (topCats.length > 0) {
       try {
         const promises = topCats.map((catId) =>
           api.get('/listings', {
-            params: { category_id: catId, sort_by: 'popular', per_page: 3 },
+            params: { category_id: catId, sort_by: 'recent', per_page: 3 },
           })
         );
         const results = await Promise.all(promises);
@@ -205,14 +215,9 @@ export default function ListingBrowsePage() {
       }
     }
 
-    // Final fallback: featured listings
-    try {
-      const res = await api.get('/listings', { params: { is_featured: 1, per_page: 5 } });
-      setSpecialListings(res.data.data || []);
-      setRecoSource('featured');
-    } catch (err) {
-      console.error(err);
-    }
+    // Guest tanpa riwayat: kosongkan section
+    setSpecialListings([]);
+    setRecoSource('none');
   };
 
   const fetchListings = async () => {
@@ -707,20 +712,15 @@ export default function ListingBrowsePage() {
             </div>
           )}
 
-          {/* ── REKOMENDASI UNTUKMU ── */}
-          <div className="lb-special-card">
-            <div className="lb-special-header">
-              <span className="lb-special-title">
-                {recoSource === 'personalized' ? '🎯 Rekomendasi Untukmu' : '✨ Spesial Untukmu'}
-              </span>
-              <Link to="/" className="lb-special-link" style={{ display: 'none' }}>Lihat Semua →</Link>
-            </div>
-            {specialListings.length === 0 ? (
-              <div className="lb-special-empty">
-                <span>🎁</span>
-                <p>Belum ada rekomendasi untukmu saat ini. Coba cari produk yang kamu suka!</p>
+          {/* ── REKOMENDASI UNTUKMU (hanya tampil jika ada data) ── */}
+          {specialListings.length > 0 && (
+            <div className="lb-special-card">
+              <div className="lb-special-header">
+                <span className="lb-special-title">
+                  🎯 Rekomendasi Untukmu
+                </span>
+                <Link to="/" className="lb-special-link" style={{ display: 'none' }}>Lihat Semua →</Link>
               </div>
-            ) : (
               <div className="lb-special-scroll">
                 {specialListings.map((listing) => (
                   <Link key={listing.id} to={`/listings/${listing.id}`} className="lb-special-item">
@@ -739,8 +739,8 @@ export default function ListingBrowsePage() {
                   </Link>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* ── SEMUA LISTING ── */}
           <div className="lb-listings-card" id="listings">
